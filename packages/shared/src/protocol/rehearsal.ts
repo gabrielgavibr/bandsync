@@ -36,9 +36,19 @@ export interface CurrentSongState {
   versionId: string;
   title: string;
   artist: string | null;
+  /** Tempo of the band's version; null while the band has not set one. */
   bpm: number | null;
+  /** Tempo of the reference recording, with how much it can be trusted. */
+  originalBpm: number | null;
+  originalBpmStatus: "unknown" | "estimated" | "confirmed";
+  /**
+   * Where the metronome tempo came from when the song was selected:
+   * the band version, the reference recording (band tempo still pending), or the conductor.
+   */
+  bpmSource: "band" | "reference" | "manual" | "none";
   beatsPerBar: number;
   beatUnit: number;
+  meterConfirmed: boolean;
   key: string | null;
   /** Position inside the active repertoire, when applicable. */
   repertoireIndex: number | null;

@@ -6,7 +6,7 @@ import {
 } from "@bandsync/shared";
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Input, Select, Textarea, useToast } from "../../components/ui";
+import { Button, Input, Segmented, Select, Textarea, Toggle, useToast } from "../../components/ui";
 import { errorCode } from "../../lib/api";
 import { useSaveMaterial, useUploadFile } from "./queries";
 
@@ -28,9 +28,11 @@ export function MaterialEditor({
   const [type, setType] = useState(material?.type ?? "chords");
   const [fileId, setFileId] = useState<string | null>(material?.fileId ?? null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [status, setStatus] = useState<"ready" | "pending">(material?.status ?? "ready");
+  const [isExample, setIsExample] = useState(material?.isExample ?? false);
   const isText = (TEXT_MATERIAL_TYPES as readonly string[]).includes(type);
   const isFile = type === "pdf" || type === "sheet_music" || type === "audio";
-  const isLink = type === "video_reference";
+  const isLink = type === "video_reference" || status === "pending";
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,6 +51,8 @@ export function MaterialEditor({
             isLink || type === "video_reference" || type === "audio" ? str("externalUrl") : null,
           fileId: isFile ? fileId : null,
           key: str("key"),
+          status,
+          isExample,
         },
       });
       onDone();
@@ -59,6 +63,19 @@ export function MaterialEditor({
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+      <div>
+        <p className="mb-1.5 text-sm font-medium">{t("repertoire:materials.status")}</p>
+        <Segmented
+          ariaLabel={t("repertoire:materials.status")}
+          value={status}
+          onChange={setStatus}
+          options={[
+            { value: "ready", label: t("repertoire:materials.statusReady") },
+            { value: "pending", label: t("repertoire:materials.statusPending") },
+          ]}
+        />
+        <p className="mt-1.5 text-xs text-muted">{t("repertoire:materials.pendingHint")}</p>
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <Select
           label={t("repertoire:materials.type")}
@@ -145,6 +162,11 @@ export function MaterialEditor({
           </p>
         </div>
       ) : null}
+      <Toggle
+        label={t("repertoire:materials.isExample")}
+        checked={isExample}
+        onChange={setIsExample}
+      />
       <p className="text-xs text-muted">{t("repertoire:materials.rights")}</p>
       <div className="flex justify-end gap-2">
         <Button variant="ghost" onClick={onDone}>

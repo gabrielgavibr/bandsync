@@ -382,3 +382,53 @@ describe("live rehearsal session", () => {
     expect(list.recent).toHaveLength(2);
   });
 });
+
+describe("tempo source when the band has not set a tempo", () => {
+  it("uses the reference tempo, labels it, and switches to manual when the conductor changes it", async () => {
+    const ana = await register({ displayName: "Ana", primaryInstrument: "drums" });
+    const bandId = await createBand(ana, "Tempo Band");
+    const pending = await createSong(ana, bandId, {
+      title: "Pending tempo",
+      originalBpm: 76,
+      originalBpmStatus: "estimated",
+      version: { bpm: null, beatsPerBar: 4, beatUnit: 4, meterConfirmed: false },
+    });
+    const unknown = await createSong(ana, bandId, {
+      title: "No tempo at all",
+      version: { beatsPerBar: 4, beatUnit: 4 },
+    });
+    const banded = await createSong(ana, bandId, {
+      title: "Band tempo",
+      originalBpm: 90,
+      version: { bpm: 84, beatsPerBar: 3, beatUnit: 4 },
+    });
+    const created = await api("POST", `/api/bands/${bandId}/rehearsals`, {}, ana.cookie);
+    const sessionId = (await json(created)).session.id as string;
+    const a = await connect(ana, bandId, sessionId);
+    await a.snapshot();
+
+    a.send({ type: "set_song", songId: pending });
+    let st = await a.nextState((s) => s.currentSong?.songId === pending);
+    expect(st.metronome.bpm).toBe(76);
+    expect(st.currentSong?.bpm).toBeNull();
+    expect(st.currentSong?.bpmSource).toBe("reference");
+    expect(st.currentSong?.originalBpmStatus).toBe("estimated");
+    expect(st.currentSong?.meterConfirmed).toBe(false);
+
+    a.send({ type: "set_tempo", bpm: 74 });
+    st = await a.nextState((s) => s.metronome.bpm === 74);
+    expect(st.currentSong?.bpmSource).toBe("manual");
+
+    a.send({ type: "set_song", songId: unknown });
+    st = await a.nextState((s) => s.currentSong?.songId === unknown);
+    expect(st.currentSong?.bpmSource).toBe("none");
+    expect(st.metronome.bpm).toBe(74); // nothing invented: the current tempo is kept
+
+    a.send({ type: "set_song", songId: banded });
+    st = await a.nextState((s) => s.currentSong?.songId === banded);
+    expect(st.currentSong?.bpmSource).toBe("band");
+    expect(st.metronome.bpm).toBe(84);
+    expect(st.metronome.beatsPerBar).toBe(3);
+    a.close();
+  });
+});

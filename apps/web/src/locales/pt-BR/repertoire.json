@@ -21,7 +21,7 @@
       "title": "Título",
       "artist": "Artista",
       "album": "Álbum",
-      "duration": "Duração (segundos)",
+      "duration": "Duração",
       "originalBpm": "BPM original",
       "originalKey": "Tom original",
       "bpm": "BPM da banda",
@@ -30,11 +30,43 @@
       "beatsPerBar": "Tempos por compasso",
       "beatUnit": "Unidade de tempo",
       "notes": "Observações",
-      "referenceUrl": "Link de referência (vídeo, streaming…)"
+      "referenceUrl": "Link de referência (vídeo, streaming…)",
+      "composer": "Compositor",
+      "referenceArtist": "Artista da gravação de referência",
+      "referenceRecording": "Gravação / projeto de referência",
+      "referenceYear": "Ano",
+      "originalTimeSignature": "Compasso da gravação",
+      "originalBpmStatus": "Situação do BPM da gravação",
+      "originalKeyStatus": "Situação do tom da gravação",
+      "meterConfirmed": "A banda confirmou o compasso"
     },
     "externalSearch": "A busca de metadados externos (MusicBrainz) está prevista; nada é obtido automaticamente ainda.",
     "deleteConfirm": "Excluir “{{title}}”? Os materiais também serão removidos.",
-    "saved": "Música salva"
+    "saved": "Música salva",
+    "sheet": "Ficha da música",
+    "compare": {
+      "reference": "Gravação de referência",
+      "band": "Versão da banda"
+    },
+    "factStatus": {
+      "unknown": "Não informado",
+      "estimated": "Estimado, a confirmar",
+      "confirmed": "Confirmado"
+    },
+    "bandPending": "Não definido pela banda",
+    "meterUnconfirmed": "A confirmar",
+    "sources": "Fontes",
+    "noSources": "Nenhuma fonte registrada.",
+    "sourceField": {
+      "bpm": "BPM",
+      "key": "Tom",
+      "time_signature": "Compasso",
+      "duration": "Duração",
+      "composer": "Composição",
+      "recording": "Gravação",
+      "structure": "Estrutura",
+      "other": "Outro"
+    }
   },
   "sections": {
     "title": "Mapa de arranjo",
@@ -73,7 +105,20 @@
     "version": "v{{version}}",
     "rights": "Adicione apenas materiais que você tem direito de usar. O BandSync não busca letras ou cifras em sites de terceiros.",
     "deleteConfirm": "Excluir este material?",
-    "openFile": "Abrir arquivo"
+    "openFile": "Abrir arquivo",
+    "status": "Situação",
+    "statusReady": "Pronto",
+    "statusPending": "Pendente",
+    "isExample": "Exemplo original (não é transcrição da música)",
+    "example": "Exemplo, não é transcrição",
+    "available": "Disponíveis",
+    "pendingList": "Pendentes",
+    "noneAvailable": "Nada disponível ainda.",
+    "nonePending": "Nada pendente.",
+    "pendingTitle": "Material pendente",
+    "pendingBody": "Este material ainda não foi adicionado.",
+    "addMaterial": "Adicionar material",
+    "pendingHint": "Marque como pendente para reservar o espaço de um instrumento antes de existir a transcrição."
   },
   "repertoires": {
     "title": "Repertórios",
@@ -101,5 +146,26 @@
     "removeFromList": "Remover da lista",
     "startRehearsal": "Ensaiar esta lista",
     "deleteConfirm": "Excluir o repertório “{{name}}”? As músicas são mantidas."
+  },
+  "references": {
+    "title": "Links de referência",
+    "linksOnly": "Somente links: letras, cifras e tablaturas de terceiros não são copiadas para o BandSync.",
+    "none": "Nenhum link de referência ainda.",
+    "add": "Adicionar link",
+    "kind": "Tipo",
+    "titleField": "Título",
+    "url": "Link (https://…)",
+    "note": "Observação",
+    "kinds": {
+      "official_video": "Vídeo oficial",
+      "official_audio": "Áudio oficial",
+      "metadata": "Metadados",
+      "chords": "Cifra",
+      "tabs": "Tablatura",
+      "lyrics": "Letra",
+      "article": "Artigo",
+      "other": "Outro"
+    },
+    "deleteConfirm": "Remover este link?"
   }
 }

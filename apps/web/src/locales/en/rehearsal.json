@@ -56,7 +56,14 @@
       "not_running": "The metronome is not running.",
       "already_running": "The metronome is already running.",
       "conductor_connected": "The conductor is still connected."
-    }
+    },
+    "bpmSource": {
+      "band": "Band tempo",
+      "reference": "Estimated tempo of the reference recording; the band has not set its own",
+      "manual": "Tempo set by the conductor",
+      "none": "No tempo recorded for this song; set it manually"
+    },
+    "meterUnconfirmed": "Time signature not yet confirmed by the band"
   },
   "controls": {
     "title": "Conductor controls",
@@ -114,7 +121,8 @@
     "notes": "Personal notes",
     "transposeTo": "Show in key",
     "originalKey": "as written",
-    "sections": "Arrangement"
+    "sections": "Arrangement",
+    "pendingChip": "pending"
   },
   "audio": {
     "enable": "Enable sound",

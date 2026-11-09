@@ -14,6 +14,8 @@ const mat = (id: string, type: string, instrument: string | null): SongMaterialD
   fileId: null,
   fileUrl: null,
   key: null,
+  status: "ready",
+  isExample: false,
   version: 1,
   createdBy: "u",
   createdAt: "",
@@ -29,7 +31,33 @@ const materials = [
   mat("keys-chords", "chords", "keys"),
 ];
 
+const pending = (id: string, type: string, instrument: string | null): SongMaterialDto => ({
+  ...mat(id, type, instrument),
+  status: "pending",
+  body: null,
+});
+
 describe("resolvePreferredMaterial", () => {
+  it("shows each musician their own pending slot instead of shared notes", () => {
+    const list = [
+      pending("bass-p", "bass_tab", "bass"),
+      pending("drums-p", "drum_map", "drums"),
+      mat("notes", "notes", null),
+    ];
+    expect(resolvePreferredMaterial(list, "bass", undefined)?.id).toBe("bass-p");
+    expect(resolvePreferredMaterial(list, "drums", undefined)?.id).toBe("drums-p");
+    // An instrument without a slot gets the shared ready notes, never someone else's placeholder.
+    expect(resolvePreferredMaterial(list, "sax", undefined)?.id).toBe("notes");
+  });
+
+  it("prefers ready over pending within the same slot, and ready material of a more preferred type", () => {
+    const sameSlot = [pending("p", "bass_tab", "bass"), mat("r", "bass_tab", "bass")];
+    expect(resolvePreferredMaterial(sameSlot, "bass", undefined)?.id).toBe("r");
+    // Guitar prefers chords over tabs: a ready shared chord chart beats a pending guitar tab.
+    const guitar = [pending("gtab-p", "guitar_tab", "guitar"), mat("chords", "chords", null)];
+    expect(resolvePreferredMaterial(guitar, "guitar", undefined)?.id).toBe("chords");
+  });
+
   it("gives each instrument its own material for the same song", () => {
     expect(resolvePreferredMaterial(materials, "vocals", undefined)?.id).toBe("lyrics");
     expect(resolvePreferredMaterial(materials, "bass", undefined)?.id).toBe("btab");

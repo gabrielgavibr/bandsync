@@ -15,7 +15,9 @@
     "db:seed:local": "wrangler d1 execute bandsync --local --file=./seed/demo.sql",
     "db:reset:local": "rm -rf .wrangler/state && wrangler d1 migrations apply bandsync --local",
     "staging:credentials": "node scripts/staging-credentials.mjs",
-    "staging:deploy": "bash scripts/deploy-staging.sh"
+    "staging:deploy": "bash scripts/deploy-staging.sh",
+    "staging:update": "bash scripts/update-staging.sh",
+    "import:real-repertoire": "node scripts/import-real-repertoire.mjs"
   },
   "dependencies": {
     "@bandsync/shared": "workspace:*",

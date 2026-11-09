@@ -41,6 +41,13 @@ export interface ApiErrorBody {
 /* Common                                                              */
 /* ------------------------------------------------------------------ */
 export const idSchema = z.string().min(8).max(64);
+/** URL limited to http(s). `z.string().url()` alone also accepts schemes like javascript:. */
+export const httpUrlSchema = z
+  .string()
+  .trim()
+  .max(500)
+  .url()
+  .refine((v) => /^https?:\/\//i.test(v), { message: "only http and https links are allowed" });
 export const emailSchema = z.string().trim().toLowerCase().email().max(254);
 export const passwordSchema = z.string().min(LIMITS.passwordMin).max(LIMITS.passwordMax);
 export const displayNameSchema = z.string().trim().min(1).max(LIMITS.displayNameMax);
@@ -76,7 +83,7 @@ export const updateProfileSchema = z.object({
   displayName: displayNameSchema.optional(),
   primaryInstrument: instrumentSchema.nullable().optional(),
   secondaryInstruments: z.array(instrumentSchema).max(8).optional(),
-  avatarUrl: z.string().url().max(500).nullable().optional(),
+  avatarUrl: httpUrlSchema.nullable().optional(),
 });
 
 export const updatePreferencesSchema = z.object({
@@ -122,7 +129,7 @@ export const createBandSchema = z.object({
   genre: z.string().trim().max(80).optional(),
 });
 export const updateBandSchema = createBandSchema.partial().extend({
-  imageUrl: z.string().url().max(500).nullable().optional(),
+  imageUrl: httpUrlSchema.nullable().optional(),
 });
 
 export const memberPermissionsSchema = z.object({
@@ -203,9 +210,58 @@ export const songSectionSchema = z.object({
   notes: z.string().trim().max(500).optional().nullable(),
 });
 
+export const FACT_STATUSES = ["unknown", "estimated", "confirmed"] as const;
+export type FactStatus = (typeof FACT_STATUSES)[number];
+
+export const REFERENCE_KINDS = [
+  "official_video",
+  "official_audio",
+  "metadata",
+  "chords",
+  "tabs",
+  "lyrics",
+  "article",
+  "other",
+] as const;
+export type ReferenceKind = (typeof REFERENCE_KINDS)[number];
+
+export const MATERIAL_STATUSES = ["ready", "pending"] as const;
+export type MaterialStatus = (typeof MATERIAL_STATUSES)[number];
+
+/** Where a fact about the reference recording came from. */
+export const metadataSourceSchema = z.object({
+  field: z.enum([
+    "bpm",
+    "key",
+    "time_signature",
+    "duration",
+    "composer",
+    "recording",
+    "structure",
+    "other",
+  ]),
+  value: z.string().trim().max(120).optional().nullable(),
+  url: httpUrlSchema.optional().nullable(),
+  note: z.string().trim().max(500).optional().nullable(),
+});
+export type MetadataSource = z.infer<typeof metadataSourceSchema>;
+
 export const createSongSchema = z.object({
   title: z.string().trim().min(1).max(LIMITS.songTitleMax),
+  /** Artist of the reference recording (not necessarily the composer). */
   artist: z.string().trim().max(160).optional().nullable(),
+  composer: z.string().trim().max(200).optional().nullable(),
+  referenceRecording: z.string().trim().max(200).optional().nullable(),
+  referenceYear: z.number().int().min(1800).max(2100).optional().nullable(),
+  originalBpmStatus: z.enum(FACT_STATUSES).optional(),
+  originalKeyStatus: z.enum(FACT_STATUSES).optional(),
+  originalTimeSignature: z
+    .string()
+    .trim()
+    .regex(/^\d{1,2}\/(1|2|4|8|16)$/)
+    .optional()
+    .nullable(),
+  metadataSources: z.array(metadataSourceSchema).max(40).optional(),
   album: z.string().trim().max(160).optional().nullable(),
   externalId: z.string().trim().max(120).optional().nullable(),
   durationSeconds: z.number().int().min(0).max(36000).optional().nullable(),
@@ -222,7 +278,9 @@ export const createSongSchema = z.object({
         .refine((n) => [1, 2, 4, 8, 16].includes(n))
         .default(4),
       notes: z.string().trim().max(2000).optional().nullable(),
-      referenceUrl: z.string().url().max(500).optional().nullable(),
+      referenceUrl: httpUrlSchema.optional().nullable(),
+      /** False while the band has not confirmed the meter of its version. */
+      meterConfirmed: z.boolean().optional(),
     })
     .default({ beatsPerBar: 4, beatUnit: 4 }),
   sections: z.array(songSectionSchema).max(60).optional(),
@@ -234,11 +292,33 @@ export const createMaterialSchema = z.object({
   title: z.string().trim().min(1).max(120),
   instrument: instrumentSchema.nullable().optional(),
   body: z.string().max(LIMITS.materialBodyMax).optional().nullable(),
-  externalUrl: z.string().url().max(500).optional().nullable(),
+  externalUrl: httpUrlSchema.optional().nullable(),
   fileId: idSchema.optional().nullable(),
   key: z.string().trim().max(12).optional().nullable(),
+  /** "pending": a slot that still needs a transcription or an import; content is optional (a note). */
+  status: z.enum(MATERIAL_STATUSES).optional(),
+  /** Original demo content written for testing, never a transcription of the song. */
+  isExample: z.boolean().optional(),
 });
 export const updateMaterialSchema = createMaterialSchema.partial();
+
+export const createReferenceSchema = z.object({
+  kind: z.enum(REFERENCE_KINDS),
+  title: z.string().trim().min(1).max(160),
+  url: httpUrlSchema,
+  note: z.string().trim().max(500).optional().nullable(),
+});
+
+export interface SongReferenceDto {
+  id: string;
+  songId: string;
+  kind: string;
+  title: string;
+  url: string;
+  note: string | null;
+  position: number;
+  createdAt: string;
+}
 
 export interface SongSectionDto {
   id: string;
@@ -260,6 +340,8 @@ export interface SongMaterialDto {
   fileId: string | null;
   fileUrl: string | null;
   key: string | null;
+  status: MaterialStatus;
+  isExample: boolean;
   version: number;
   createdBy: string;
   createdAt: string;
@@ -271,11 +353,18 @@ export interface SongDto {
   bandId: string;
   title: string;
   artist: string | null;
+  composer: string | null;
   album: string | null;
+  referenceRecording: string | null;
+  referenceYear: number | null;
   externalId: string | null;
   durationSeconds: number | null;
   originalBpm: number | null;
+  originalBpmStatus: FactStatus;
   originalKey: string | null;
+  originalKeyStatus: FactStatus;
+  originalTimeSignature: string | null;
+  metadataSources: MetadataSource[];
   version: {
     id: string;
     bpm: number | null;
@@ -284,9 +373,16 @@ export interface SongDto {
     beatUnit: number;
     notes: string | null;
     referenceUrl: string | null;
+    meterConfirmed: boolean;
   };
   sections: SongSectionDto[];
-  materialSummary: { type: string; instrument: string | null; count: number }[];
+  materialSummary: {
+    type: string;
+    instrument: string | null;
+    status: MaterialStatus;
+    count: number;
+  }[];
+  references: SongReferenceDto[];
   createdAt: string;
   updatedAt: string;
 }

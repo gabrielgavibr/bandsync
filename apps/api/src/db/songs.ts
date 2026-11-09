@@ -1,4 +1,12 @@
-import type { SongDto, SongMaterialDto, SongSectionDto } from "@bandsync/shared";
+import type {
+  FactStatus,
+  MaterialStatus,
+  MetadataSource,
+  SongDto,
+  SongMaterialDto,
+  SongReferenceDto,
+  SongSectionDto,
+} from "@bandsync/shared";
 import { newId } from "../lib/ids";
 import { nowIso } from "../lib/time";
 
@@ -12,6 +20,13 @@ interface SongRow {
   duration_seconds: number | null;
   original_bpm: number | null;
   original_key: string | null;
+  composer: string | null;
+  reference_recording: string | null;
+  reference_year: number | null;
+  original_time_signature: string | null;
+  original_bpm_status: FactStatus;
+  original_key_status: FactStatus;
+  metadata_sources: string;
   created_at: string;
   updated_at: string;
   version_id: string;
@@ -21,27 +36,47 @@ interface SongRow {
   beat_unit: number;
   notes: string | null;
   reference_url: string | null;
+  meter_confirmed: number;
 }
 
 const SONG_SELECT = `SELECT s.id, s.band_id, s.title, s.artist, s.album, s.external_id, s.duration_seconds, s.original_bpm,
-  s.original_key, s.created_at, s.updated_at, v.id AS version_id, v.bpm, v.key, v.beats_per_bar, v.beat_unit, v.notes, v.reference_url
+  s.original_key, s.composer, s.reference_recording, s.reference_year, s.original_time_signature, s.original_bpm_status,
+  s.original_key_status, s.metadata_sources, s.created_at, s.updated_at, v.id AS version_id, v.bpm, v.key, v.beats_per_bar,
+  v.beat_unit, v.notes, v.reference_url, v.meter_confirmed
   FROM songs s JOIN song_versions v ON v.song_id = s.id AND v.is_current = 1`;
+
+function parseSources(text: string | null): MetadataSource[] {
+  try {
+    const v = JSON.parse(text ?? "[]");
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
 
 function toSongDto(
   r: SongRow,
   sections: SongSectionDto[],
   summary: SongDto["materialSummary"],
+  references: SongReferenceDto[] = [],
 ): SongDto {
   return {
     id: r.id,
     bandId: r.band_id,
     title: r.title,
     artist: r.artist,
+    composer: r.composer,
     album: r.album,
+    referenceRecording: r.reference_recording,
+    referenceYear: r.reference_year,
     externalId: r.external_id,
     durationSeconds: r.duration_seconds,
     originalBpm: r.original_bpm,
+    originalBpmStatus: r.original_bpm_status ?? "unknown",
     originalKey: r.original_key,
+    originalKeyStatus: r.original_key_status ?? "unknown",
+    originalTimeSignature: r.original_time_signature,
+    metadataSources: parseSources(r.metadata_sources),
     version: {
       id: r.version_id,
       bpm: r.bpm,
@@ -50,9 +85,11 @@ function toSongDto(
       beatUnit: r.beat_unit,
       notes: r.notes,
       referenceUrl: r.reference_url,
+      meterConfirmed: r.meter_confirmed !== 0,
     },
     sections,
     materialSummary: summary,
+    references,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -68,15 +105,22 @@ export async function listSongs(db: D1Database, bandId: string): Promise<SongDto
   if (results.length === 0) return [];
   const { results: summaries } = await db
     .prepare(
-      `SELECT m.song_id, m.type, m.instrument, COUNT(*) AS count FROM song_materials m
-       JOIN songs s ON s.id = m.song_id WHERE s.band_id = ? AND m.deleted_at IS NULL GROUP BY m.song_id, m.type, m.instrument`,
+      `SELECT m.song_id, m.type, m.instrument, m.status, COUNT(*) AS count FROM song_materials m
+       JOIN songs s ON s.id = m.song_id WHERE s.band_id = ? AND m.deleted_at IS NULL
+       GROUP BY m.song_id, m.type, m.instrument, m.status`,
     )
     .bind(bandId)
-    .all<{ song_id: string; type: string; instrument: string | null; count: number }>();
+    .all<{
+      song_id: string;
+      type: string;
+      instrument: string | null;
+      status: MaterialStatus;
+      count: number;
+    }>();
   const byId = new Map<string, SongDto["materialSummary"]>();
   for (const s of summaries) {
     const arr = byId.get(s.song_id) ?? [];
-    arr.push({ type: s.type, instrument: s.instrument, count: s.count });
+    arr.push({ type: s.type, instrument: s.instrument, status: s.status, count: s.count });
     byId.set(s.song_id, arr);
   }
   return results.map((r) => toSongDto(r, [], byId.get(r.id) ?? []));
@@ -92,11 +136,12 @@ export async function getSong(
     .bind(bandId, songId)
     .first<SongRow>();
   if (!row) return null;
-  const [sections, summary] = await Promise.all([
+  const [sections, summary, references] = await Promise.all([
     listSections(db, row.version_id),
     materialSummary(db, songId),
+    listReferences(db, songId),
   ]);
-  return toSongDto(row, sections, summary);
+  return toSongDto(row, sections, summary, references);
 }
 
 /** Minimal song info for the live session (loaded by the Durable Object). */
@@ -112,8 +157,11 @@ export async function getSongForSession(db: D1Database, bandId: string, songId: 
     title: row.title,
     artist: row.artist,
     bpm: row.bpm,
+    originalBpm: row.original_bpm,
+    originalBpmStatus: row.original_bpm_status ?? "unknown",
     beatsPerBar: row.beats_per_bar,
     beatUnit: row.beat_unit,
+    meterConfirmed: row.meter_confirmed !== 0,
     key: row.key,
   };
 }
@@ -131,16 +179,23 @@ async function listSections(db: D1Database, versionId: string): Promise<SongSect
 async function materialSummary(db: D1Database, songId: string) {
   const { results } = await db
     .prepare(
-      "SELECT type, instrument, COUNT(*) AS count FROM song_materials WHERE song_id = ? AND deleted_at IS NULL GROUP BY type, instrument",
+      "SELECT type, instrument, status, COUNT(*) AS count FROM song_materials WHERE song_id = ? AND deleted_at IS NULL GROUP BY type, instrument, status",
     )
     .bind(songId)
-    .all<{ type: string; instrument: string | null; count: number }>();
+    .all<{ type: string; instrument: string | null; status: MaterialStatus; count: number }>();
   return results;
 }
 
 export interface SongInput {
   title: string;
   artist?: string | null;
+  composer?: string | null;
+  referenceRecording?: string | null;
+  referenceYear?: number | null;
+  originalBpmStatus?: FactStatus;
+  originalKeyStatus?: FactStatus;
+  originalTimeSignature?: string | null;
+  metadataSources?: MetadataSource[];
   album?: string | null;
   externalId?: string | null;
   durationSeconds?: number | null;
@@ -153,6 +208,7 @@ export interface SongInput {
     beatUnit: number;
     notes?: string | null;
     referenceUrl?: string | null;
+    meterConfirmed?: boolean;
   };
   sections?: { name: string; bars: number; notes?: string | null }[];
 }
@@ -169,8 +225,10 @@ export async function createSong(
   const stmts = [
     db
       .prepare(
-        `INSERT INTO songs (id, band_id, title, artist, album, external_id, duration_seconds, original_bpm, original_key, created_by, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO songs (id, band_id, title, artist, album, external_id, duration_seconds, original_bpm, original_key,
+           composer, reference_recording, reference_year, original_time_signature, original_bpm_status, original_key_status,
+           metadata_sources, created_by, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         id,
@@ -182,14 +240,22 @@ export async function createSong(
         input.durationSeconds ?? null,
         input.originalBpm ?? null,
         input.originalKey ?? null,
+        input.composer ?? null,
+        input.referenceRecording ?? null,
+        input.referenceYear ?? null,
+        input.originalTimeSignature ?? null,
+        input.originalBpmStatus ?? (input.originalBpm ? "confirmed" : "unknown"),
+        input.originalKeyStatus ?? (input.originalKey ? "confirmed" : "unknown"),
+        JSON.stringify(input.metadataSources ?? []),
         userId,
         ts,
         ts,
       ),
     db
       .prepare(
-        `INSERT INTO song_versions (id, song_id, label, bpm, key, beats_per_bar, beat_unit, notes, reference_url, is_current, created_at, updated_at)
-         VALUES (?, ?, 'band', ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+        `INSERT INTO song_versions (id, song_id, label, bpm, key, beats_per_bar, beat_unit, notes, reference_url, meter_confirmed,
+           is_current, created_at, updated_at)
+         VALUES (?, ?, 'band', ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
       )
       .bind(
         versionId,
@@ -200,6 +266,7 @@ export async function createSong(
         input.version.beatUnit,
         input.version.notes ?? null,
         input.version.referenceUrl ?? null,
+        input.version.meterConfirmed === false ? 0 : 1,
         ts,
         ts,
       ),
@@ -240,12 +307,22 @@ export async function updateSong(
     ["durationSeconds", "duration_seconds"],
     ["originalBpm", "original_bpm"],
     ["originalKey", "original_key"],
+    ["composer", "composer"],
+    ["referenceRecording", "reference_recording"],
+    ["referenceYear", "reference_year"],
+    ["originalTimeSignature", "original_time_signature"],
+    ["originalBpmStatus", "original_bpm_status"],
+    ["originalKeyStatus", "original_key_status"],
   ];
   for (const [k, col] of fields) {
     if (patch[k] !== undefined) {
       songSets.push(`${col} = ?`);
       songVals.push(patch[k] ?? null);
     }
+  }
+  if (patch.metadataSources !== undefined) {
+    songSets.push("metadata_sources = ?");
+    songVals.push(JSON.stringify(patch.metadataSources));
   }
   songSets.push("updated_at = ?");
   songVals.push(ts, songId);
@@ -278,6 +355,10 @@ export async function updateSong(
     if (v.referenceUrl !== undefined) {
       vSets.push("reference_url = ?");
       vVals.push(v.referenceUrl);
+    }
+    if (v.meterConfirmed !== undefined) {
+      vSets.push("meter_confirmed = ?");
+      vVals.push(v.meterConfirmed ? 1 : 0);
     }
     if (vSets.length > 0) {
       vSets.push("updated_at = ?");
@@ -328,6 +409,8 @@ interface MaterialRow {
   external_url: string | null;
   file_id: string | null;
   key: string | null;
+  status: MaterialStatus;
+  is_example: number;
   version: number;
   created_by: string;
   created_at: string;
@@ -347,6 +430,8 @@ function toMaterialDto(r: MaterialRow, bandId: string): SongMaterialDto {
     fileId: r.file_id,
     fileUrl: r.file_id ? `/api/bands/${bandId}/files/${r.file_id}` : null,
     key: r.key,
+    status: r.status ?? "ready",
+    isExample: r.is_example === 1,
     version: r.version,
     createdBy: r.created_by,
     createdAt: r.created_at,
@@ -393,6 +478,8 @@ export interface MaterialInput {
   externalUrl?: string | null;
   fileId?: string | null;
   key?: string | null;
+  status?: MaterialStatus;
+  isExample?: boolean;
 }
 
 export async function createMaterial(
@@ -406,8 +493,9 @@ export async function createMaterial(
   const ts = nowIso();
   await db
     .prepare(
-      `INSERT INTO song_materials (id, song_id, version_id, type, title, instrument, body, external_url, file_id, key, version, created_by, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+      `INSERT INTO song_materials (id, song_id, version_id, type, title, instrument, body, external_url, file_id, key, status,
+         is_example, version, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
     )
     .bind(
       id,
@@ -420,6 +508,8 @@ export async function createMaterial(
       input.externalUrl ?? null,
       input.fileId ?? null,
       input.key ?? null,
+      input.status ?? "ready",
+      input.isExample ? 1 : 0,
       userId,
       ts,
       ts,
@@ -443,12 +533,17 @@ export async function updateMaterial(
     ["externalUrl", "external_url"],
     ["fileId", "file_id"],
     ["key", "key"],
+    ["status", "status"],
   ];
   for (const [k, col] of map) {
     if (patch[k] !== undefined) {
       sets.push(`${col} = ?`);
       vals.push(patch[k] ?? null);
     }
+  }
+  if (patch.isExample !== undefined) {
+    sets.push("is_example = ?");
+    vals.push(patch.isExample ? 1 : 0);
   }
   if (sets.length === 0) return true;
   sets.push("version = version + 1", "updated_at = ?");
@@ -464,6 +559,97 @@ export async function deleteMaterial(db: D1Database, materialId: string): Promis
   const res = await db
     .prepare("UPDATE song_materials SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL")
     .bind(nowIso(), materialId)
+    .run();
+  return (res.meta.changes ?? 0) > 0;
+}
+
+/* ---------------- external references ---------------- */
+
+interface ReferenceRow {
+  id: string;
+  song_id: string;
+  kind: string;
+  title: string;
+  url: string;
+  note: string | null;
+  position: number;
+  created_at: string;
+}
+
+function toReferenceDto(r: ReferenceRow): SongReferenceDto {
+  return {
+    id: r.id,
+    songId: r.song_id,
+    kind: r.kind,
+    title: r.title,
+    url: r.url,
+    note: r.note,
+    position: r.position,
+    createdAt: r.created_at,
+  };
+}
+
+export async function listReferences(db: D1Database, songId: string): Promise<SongReferenceDto[]> {
+  const { results } = await db
+    .prepare("SELECT * FROM song_references WHERE song_id = ? ORDER BY position, created_at")
+    .bind(songId)
+    .all<ReferenceRow>();
+  return results.map(toReferenceDto);
+}
+
+/** Adds a link; the same URL is stored once per song (returns the existing row on repeats). */
+export async function addReference(
+  db: D1Database,
+  songId: string,
+  userId: string,
+  input: { kind: string; title: string; url: string; note?: string | null },
+): Promise<{ reference: SongReferenceDto; created: boolean }> {
+  const existing = await db
+    .prepare("SELECT * FROM song_references WHERE song_id = ? AND url = ?")
+    .bind(songId, input.url)
+    .first<ReferenceRow>();
+  if (existing) return { reference: toReferenceDto(existing), created: false };
+  const max = await db
+    .prepare("SELECT COALESCE(MAX(position), -1) AS m FROM song_references WHERE song_id = ?")
+    .bind(songId)
+    .first<{ m: number }>();
+  const row: ReferenceRow = {
+    id: newId(),
+    song_id: songId,
+    kind: input.kind,
+    title: input.title,
+    url: input.url,
+    note: input.note ?? null,
+    position: (max?.m ?? -1) + 1,
+    created_at: nowIso(),
+  };
+  await db
+    .prepare(
+      "INSERT INTO song_references (id, song_id, kind, title, url, note, position, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(
+      row.id,
+      row.song_id,
+      row.kind,
+      row.title,
+      row.url,
+      row.note,
+      row.position,
+      userId,
+      row.created_at,
+    )
+    .run();
+  return { reference: toReferenceDto(row), created: true };
+}
+
+export async function deleteReference(
+  db: D1Database,
+  songId: string,
+  referenceId: string,
+): Promise<boolean> {
+  const res = await db
+    .prepare("DELETE FROM song_references WHERE song_id = ? AND id = ?")
+    .bind(songId, referenceId)
     .run();
   return (res.meta.changes ?? 0) > 0;
 }

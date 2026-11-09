@@ -21,7 +21,7 @@
       "title": "Title",
       "artist": "Artist",
       "album": "Album",
-      "duration": "Duration (seconds)",
+      "duration": "Duration",
       "originalBpm": "Original BPM",
       "originalKey": "Original key",
       "bpm": "Band BPM",
@@ -30,11 +30,43 @@
       "beatsPerBar": "Beats per bar",
       "beatUnit": "Beat unit",
       "notes": "Notes",
-      "referenceUrl": "Reference link (video, streaming…)"
+      "referenceUrl": "Reference link (video, streaming…)",
+      "composer": "Composer",
+      "referenceArtist": "Artist of the reference recording",
+      "referenceRecording": "Reference recording / project",
+      "referenceYear": "Year",
+      "originalTimeSignature": "Reference time signature",
+      "originalBpmStatus": "Reference BPM status",
+      "originalKeyStatus": "Reference key status",
+      "meterConfirmed": "Band has confirmed the time signature"
     },
     "externalSearch": "External metadata search (MusicBrainz) is planned; nothing is fetched automatically yet.",
     "deleteConfirm": "Delete “{{title}}”? Materials will be removed as well.",
-    "saved": "Song saved"
+    "saved": "Song saved",
+    "sheet": "Song sheet",
+    "compare": {
+      "reference": "Reference recording",
+      "band": "Band version"
+    },
+    "factStatus": {
+      "unknown": "Not known",
+      "estimated": "Estimate, to confirm",
+      "confirmed": "Confirmed"
+    },
+    "bandPending": "Not set by the band",
+    "meterUnconfirmed": "To confirm",
+    "sources": "Sources",
+    "noSources": "No sources recorded.",
+    "sourceField": {
+      "bpm": "BPM",
+      "key": "Key",
+      "time_signature": "Time signature",
+      "duration": "Duration",
+      "composer": "Composition",
+      "recording": "Recording",
+      "structure": "Structure",
+      "other": "Other"
+    }
   },
   "sections": {
     "title": "Arrangement map",
@@ -73,7 +105,20 @@
     "version": "v{{version}}",
     "rights": "Only add materials you have the right to use. BandSync does not fetch lyrics or chords from third-party sites.",
     "deleteConfirm": "Delete this material?",
-    "openFile": "Open file"
+    "openFile": "Open file",
+    "status": "Status",
+    "statusReady": "Ready",
+    "statusPending": "Pending",
+    "isExample": "Original example (not a transcription of the song)",
+    "example": "Example, not a transcription",
+    "available": "Available",
+    "pendingList": "Pending",
+    "noneAvailable": "Nothing available yet.",
+    "nonePending": "Nothing pending.",
+    "pendingTitle": "Pending material",
+    "pendingBody": "This material has not been added yet.",
+    "addMaterial": "Add material",
+    "pendingHint": "Mark as pending to reserve a slot for an instrument before the transcription exists."
   },
   "repertoires": {
     "title": "Repertoires",
@@ -101,5 +146,26 @@
     "removeFromList": "Remove from list",
     "startRehearsal": "Rehearse this list",
     "deleteConfirm": "Delete repertoire “{{name}}”? Songs are kept."
+  },
+  "references": {
+    "title": "Reference links",
+    "linksOnly": "Links only: third-party lyrics, chord charts and tabs are not copied into BandSync.",
+    "none": "No reference links yet.",
+    "add": "Add link",
+    "kind": "Type",
+    "titleField": "Title",
+    "url": "Link (https://…)",
+    "note": "Note",
+    "kinds": {
+      "official_video": "Official video",
+      "official_audio": "Official audio",
+      "metadata": "Metadata",
+      "chords": "Chord chart",
+      "tabs": "Tab",
+      "lyrics": "Lyrics",
+      "article": "Article",
+      "other": "Other"
+    },
+    "deleteConfirm": "Remove this link?"
   }
 }

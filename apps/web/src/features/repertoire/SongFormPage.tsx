@@ -1,4 +1,4 @@
-import { COMMON_TIME_SIGNATURES } from "@bandsync/shared";
+import { COMMON_TIME_SIGNATURES, FACT_STATUSES } from "@bandsync/shared";
 import { Plus, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import {
   PageHeader,
   Select,
   Textarea,
+  Toggle,
   useToast,
 } from "../../components/ui";
 import { errorCode } from "../../lib/api";
@@ -37,6 +38,7 @@ export function SongFormPage() {
   const save = useSaveSong(band.id, songId);
   const [sections, setSections] = useState<SectionDraft[]>([]);
   const [meter, setMeter] = useState("4/4");
+  const [meterConfirmed, setMeterConfirmed] = useState(true);
 
   useEffect(() => {
     if (existing.data) {
@@ -49,6 +51,7 @@ export function SongFormPage() {
         })),
       );
       setMeter(`${existing.data.song.version.beatsPerBar}/${existing.data.song.version.beatUnit}`);
+      setMeterConfirmed(existing.data.song.version.meterConfirmed);
     }
   }, [existing.data]);
 
@@ -71,6 +74,12 @@ export function SongFormPage() {
         durationSeconds: num(fd.get("durationSeconds")),
         originalBpm: num(fd.get("originalBpm")),
         originalKey: str(fd.get("originalKey")),
+        composer: str(fd.get("composer")),
+        referenceRecording: str(fd.get("referenceRecording")),
+        referenceYear: num(fd.get("referenceYear")),
+        originalBpmStatus: String(fd.get("originalBpmStatus") ?? "unknown"),
+        originalKeyStatus: String(fd.get("originalKeyStatus") ?? "unknown"),
+        originalTimeSignature: str(fd.get("originalTimeSignature")),
         version: {
           bpm: num(fd.get("bpm")),
           key: str(fd.get("key")),
@@ -78,6 +87,7 @@ export function SongFormPage() {
           beatUnit: bu,
           notes: str(fd.get("notes")),
           referenceUrl: str(fd.get("referenceUrl")),
+          meterConfirmed,
         },
         sections: sections
           .filter((s) => s.name.trim())
@@ -110,8 +120,14 @@ export function SongFormPage() {
             autoFocus={!song}
           />
           <Input
+            name="composer"
+            label={t("repertoire:song.fields.composer")}
+            defaultValue={song?.composer ?? ""}
+            maxLength={200}
+          />
+          <Input
             name="artist"
-            label={t("repertoire:song.fields.artist")}
+            label={t("repertoire:song.fields.referenceArtist")}
             defaultValue={song?.artist ?? ""}
             maxLength={160}
           />
@@ -121,6 +137,22 @@ export function SongFormPage() {
             defaultValue={song?.album ?? ""}
             maxLength={160}
           />
+          <div className="grid grid-cols-[1fr_6rem] gap-3">
+            <Input
+              name="referenceRecording"
+              label={t("repertoire:song.fields.referenceRecording")}
+              defaultValue={song?.referenceRecording ?? ""}
+              maxLength={200}
+            />
+            <Input
+              name="referenceYear"
+              type="number"
+              min={1800}
+              max={2100}
+              label={t("repertoire:song.fields.referenceYear")}
+              defaultValue={song?.referenceYear ?? ""}
+            />
+          </div>
           <Input
             name="durationSeconds"
             type="number"
@@ -146,7 +178,36 @@ export function SongFormPage() {
               maxLength={12}
               placeholder="D, Am, Bb…"
             />
+            <Select
+              name="originalBpmStatus"
+              label={t("repertoire:song.fields.originalBpmStatus")}
+              defaultValue={song?.originalBpmStatus ?? "unknown"}
+            >
+              {FACT_STATUSES.map((st) => (
+                <option key={st} value={st}>
+                  {t(`repertoire:song.factStatus.${st}`)}
+                </option>
+              ))}
+            </Select>
+            <Select
+              name="originalKeyStatus"
+              label={t("repertoire:song.fields.originalKeyStatus")}
+              defaultValue={song?.originalKeyStatus ?? "unknown"}
+            >
+              {FACT_STATUSES.map((st) => (
+                <option key={st} value={st}>
+                  {t(`repertoire:song.factStatus.${st}`)}
+                </option>
+              ))}
+            </Select>
           </div>
+          <Input
+            name="originalTimeSignature"
+            label={t("repertoire:song.fields.originalTimeSignature")}
+            defaultValue={song?.originalTimeSignature ?? ""}
+            maxLength={5}
+            placeholder="4/4"
+          />
         </Card>
         <div className="flex flex-col gap-6">
           <Card className="flex flex-col gap-4">
@@ -187,6 +248,11 @@ export function SongFormPage() {
                 );
               })}
             </Select>
+            <Toggle
+              label={t("repertoire:song.fields.meterConfirmed")}
+              checked={meterConfirmed}
+              onChange={setMeterConfirmed}
+            />
             <Input
               name="referenceUrl"
               type="url"

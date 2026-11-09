@@ -23,6 +23,7 @@ import { useMembers } from "../bands/queries";
 import { MaterialEditor } from "./MaterialEditor";
 import { MaterialViewer } from "./MaterialViewer";
 import { useDeleteMaterial, useDeleteSong, useSong } from "./queries";
+import { MaterialsOverview, ReferencesCard, SongSheet } from "./SongSheet";
 
 export function SongDetailPage() {
   const { songId = "" } = useParams();
@@ -78,48 +79,17 @@ export function SongDetailPage() {
           ) : null
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[20rem_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
         <div className="flex flex-col gap-4">
-          <Card>
-            <h2 className="mb-3 font-semibold">{t("repertoire:song.bandVersion")}</h2>
-            <dl className="grid grid-cols-3 gap-3 text-center">
-              <Stat
-                label={t("common:music.bpm")}
-                value={song.version.bpm ?? "—"}
-                sub={
-                  song.originalBpm
-                    ? `${t("repertoire:song.original")}: ${song.originalBpm}`
-                    : undefined
-                }
-              />
-              <Stat
-                label={t("common:music.key")}
-                value={song.version.key ?? "—"}
-                sub={
-                  song.originalKey
-                    ? `${t("repertoire:song.original")}: ${song.originalKey}`
-                    : undefined
-                }
-              />
-              <Stat
-                label={t("common:music.timeSignature")}
-                value={`${song.version.beatsPerBar}/${song.version.beatUnit}`}
-              />
-            </dl>
-            {song.version.notes ? (
-              <p className="mt-4 whitespace-pre-wrap text-sm text-muted">{song.version.notes}</p>
-            ) : null}
-            {song.version.referenceUrl ? (
-              <a
-                href={song.version.referenceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 block truncate text-sm text-accent-600 underline dark:text-accent-300"
-              >
-                {song.version.referenceUrl}
-              </a>
-            ) : null}
-          </Card>
+          <SongSheet song={song} />
+          <MaterialsOverview materials={materials} />
+          <ReferencesCard bandId={band.id} song={song} canEdit={canEdit} />
+          {song.version.notes ? (
+            <Card>
+              <h2 className="mb-2 font-semibold">{t("repertoire:song.fields.notes")}</h2>
+              <p className="whitespace-pre-wrap text-sm text-muted">{song.version.notes}</p>
+            </Card>
+          ) : null}
           <Card>
             <h2 className="mb-3 font-semibold">{t("repertoire:sections.title")}</h2>
             {song.sections.length === 0 ? (
@@ -177,6 +147,10 @@ export function SongDetailPage() {
                       {t(`common:materialType.${m.type}`)}
                       {m.instrument ? ` · ${t(`common:instrument.${m.instrument}`)}` : ""} ·{" "}
                       {t("repertoire:materials.version", { version: m.version })}
+                      {m.status === "pending"
+                        ? ` · ${t("repertoire:materials.statusPending")}`
+                        : ""}
+                      {m.isExample ? ` · ${t("repertoire:materials.example")}` : ""}
                     </span>
                   </button>
                 ))}
@@ -212,6 +186,7 @@ export function SongDetailPage() {
                   </div>
                   <MaterialViewer
                     material={selected}
+                    onAddMaterial={canEdit ? () => setEditing(selected) : undefined}
                     options={{
                       zoom: 1,
                       notation: (preferences?.notation as Notation) ?? "english",
@@ -273,15 +248,5 @@ export function SongDetailPage() {
         }}
       />
     </>
-  );
-}
-
-function Stat({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
-  return (
-    <div className="rounded-xl bg-sunken p-3">
-      <dt className="text-xs uppercase tracking-wide text-muted">{label}</dt>
-      <dd className="mt-1 text-xl font-semibold">{value}</dd>
-      {sub ? <dd className="mt-0.5 text-[11px] text-muted">{sub}</dd> : null}
-    </div>
   );
 }

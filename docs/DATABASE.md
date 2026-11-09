@@ -101,7 +101,14 @@ Remote, production environment (after creating the database — see `DEPLOYMENT.
 pnpm --filter @bandsync/api exec wrangler d1 migrations apply bandsync-prod --remote --env production
 ```
 
-Add a migration by creating `apps/api/migrations/0002_<name>.sql`. Wrangler applies files in order and records them in the `d1_migrations` table. Tests apply every migration automatically before each test file through `test/apply-migrations.ts`.
+Applied migrations:
+
+| File                                   | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0001_init.sql`                        | Initial schema                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `0002_song_references_and_pending.sql` | Additive only. `songs`: `composer`, `reference_recording`, `reference_year`, `original_time_signature`, `original_bpm_status` / `original_key_status` (`unknown` \| `estimated` \| `confirmed`), `metadata_sources` (JSON list of `{field, value, url, note}`). `song_versions.meter_confirmed`. `song_materials.status` (`ready` \| `pending`) and `is_example`. New table `song_references` (external links, unique per song and URL). Existing rows get safe defaults. |
+
+Add a migration by creating the next numbered file in `apps/api/migrations/`. Wrangler applies files in order and records them in the `d1_migrations` table. Tests apply every migration automatically before each test file through `test/apply-migrations.ts`.
 
 Reset local state (destroys the local database, including seeded data and Durable Object storage):
 
@@ -111,4 +118,6 @@ pnpm db:reset:local
 
 ## Seed data
 
-`apps/api/seed/demo.sql` is loaded with `pnpm db:seed:local` and is **development-only**. It creates four demo users (password `bandsync-demo`), one band ("Sala 3"), three songs with fictional lyrics, chords, tabs and maps written for this repository, and two repertoires. The statements use `INSERT OR IGNORE`, so re-running is safe. Never run it against a remote database; nothing in the deployment scripts does so.
+`apps/api/seed/demo.sql` is loaded with `pnpm db:seed:local` and is **development-only**. It creates four demo users (password `bandsync-demo`), one band ("Sala 3"), three songs with fictional lyrics, chords, tabs and maps written for this repository, and two repertoires. The statements use `INSERT OR IGNORE`, so re-running is safe. Never run it against a remote database with its public password; staging uses `scripts/staging-credentials.mjs`, which replaces it.
+
+`apps/api/seed/real-repertoire.json` holds the real repertoire used for homologation (see `docs/REAL_REPERTOIRE.md`). It is applied through the REST API by `scripts/import-real-repertoire.mjs`, which only creates what is missing and never modifies existing rows.

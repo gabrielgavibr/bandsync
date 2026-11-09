@@ -56,7 +56,14 @@
       "not_running": "O metrônomo não está em execução.",
       "already_running": "O metrônomo já está em execução.",
       "conductor_connected": "O regente ainda está conectado."
-    }
+    },
+    "bpmSource": {
+      "band": "Andamento da banda",
+      "reference": "Andamento estimado da gravação de referência; a banda ainda não definiu o seu",
+      "manual": "Andamento ajustado pelo regente",
+      "none": "Nenhum andamento registrado para esta música; ajuste manualmente"
+    },
+    "meterUnconfirmed": "Compasso ainda não confirmado pela banda"
   },
   "controls": {
     "title": "Controles do regente",
@@ -114,7 +121,8 @@
     "notes": "Anotações pessoais",
     "transposeTo": "Mostrar no tom",
     "originalKey": "como escrito",
-    "sections": "Arranjo"
+    "sections": "Arranjo",
+    "pendingChip": "pendente"
   },
   "audio": {
     "enable": "Ativar som",

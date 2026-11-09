@@ -280,6 +280,7 @@ export class RehearsalSessionDO extends DurableObject<Env> {
       case "set_tempo": {
         const m = s.metronome;
         m.bpm = msg.bpm;
+        if (s.currentSong) s.currentSong.bpmSource = "manual";
         if (m.running && m.anchor) {
           m.anchor = retimeAtNextBar(
             m.anchor,
@@ -361,9 +362,18 @@ export class RehearsalSessionDO extends DurableObject<Env> {
       return;
     }
     const idx = s.repertoireSongIds.indexOf(songId);
-    s.currentSong = { ...song, repertoireIndex: idx === -1 ? null : idx };
     const m = s.metronome;
-    if (song.bpm) m.bpm = song.bpm;
+    // Prefer the band's tempo; fall back to the reference recording's (shown as such in the UI);
+    // otherwise keep the current tempo and say there is none, so nothing pretends to be confirmed.
+    let bpmSource: "band" | "reference" | "none" = "none";
+    if (song.bpm) {
+      m.bpm = song.bpm;
+      bpmSource = "band";
+    } else if (song.originalBpm) {
+      m.bpm = song.originalBpm;
+      bpmSource = "reference";
+    }
+    s.currentSong = { ...song, bpmSource, repertoireIndex: idx === -1 ? null : idx };
     m.beatsPerBar = song.beatsPerBar;
     m.beatUnit = song.beatUnit;
     this.stopMetronomeSilently();

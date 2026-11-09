@@ -1,0 +1,491 @@
+{
+  "_comment": "Real repertoire for homologation. Facts carry their sources; unverified values are listed as candidates in metadataSources and are NOT stored as the recording's BPM/key. No lyrics, chord charts or tabs are copied: third-party material is linked only. Applied by scripts/import-real-repertoire.mjs (create-only, idempotent).",
+  "repertoire": {
+    "name": "Repertório Real — Primeiro Ensaio",
+    "kind": "rehearsal",
+    "description": "Primeiro ensaio com repertório real. Ordem: Pérola Negra, Esotérico, O Segundo Sol."
+  },
+  "songs": [
+    {
+      "externalId": "bandsync:real:perola-negra",
+      "title": "Pérola Negra",
+      "artist": "Natiruts feat. Luiz Melodia",
+      "composer": "Luiz Melodia",
+      "referenceRecording": "Natiruts Acústico no Rio de Janeiro",
+      "referenceYear": 2012,
+      "durationSeconds": 209,
+      "originalBpm": null,
+      "originalBpmStatus": "unknown",
+      "originalKey": null,
+      "originalKeyStatus": "unknown",
+      "originalTimeSignature": null,
+      "version": {
+        "bpm": null,
+        "key": null,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "meterConfirmed": false,
+        "referenceUrl": "https://www.youtube.com/watch?v=JZqFoTIAJj8",
+        "notes": "Versão da banda ainda não definida. Referência principal: gravação do Natiruts com Luiz Melodia no Acústico no Rio de Janeiro (reggae/acústico). BPM, tom e compasso pendentes de confirmação pela banda; o compasso 4/4 é apenas o valor inicial do metrônomo."
+      },
+      "metadataSources": [
+        {
+          "field": "composer",
+          "value": "Luiz Melodia",
+          "url": "https://musicbrainz.org/artist/40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+          "note": "Composição informada pela banda; página do artista no MusicBrainz para conferência."
+        },
+        {
+          "field": "recording",
+          "value": "Acústico no Rio de Janeiro (2012), faixa 8",
+          "url": "https://en.wikipedia.org/wiki/Ac%C3%BAstico_(Natiruts_album)",
+          "note": "Lista de faixas da Wikipedia, lida por resumo de busca (página não aberta). Gravado no Mirante Dona Marta, Rio de Janeiro."
+        },
+        {
+          "field": "duration",
+          "value": "3:29",
+          "url": "https://www.discogs.com/master/2819027-Natiruts-Ac%C3%BAstico-No-Rio-De-Janeiro",
+          "note": "Mesma duração na Wikipedia e no Discogs (resumos de busca). Conferir na plataforma oficial."
+        },
+        {
+          "field": "bpm",
+          "value": "130 (candidato)",
+          "url": "https://tunebat.com/Info/Outra-Vida-Ao-Vivo-Armandinho/11h8rVb7ZQ21enNmHRraFj",
+          "note": "Estimativa algorítmica (análise de áudio) vista só numa lista de recomendações do Tunebat. Pode ser tempo dobrado (~65). Não registrada como BPM da gravação até ser conferida de ouvido."
+        },
+        {
+          "field": "key",
+          "value": "Lá# menor (candidato)",
+          "url": "https://tunebat.com/Info/Outra-Vida-Ao-Vivo-Armandinho/11h8rVb7ZQ21enNmHRraFj",
+          "note": "Estimativa algorítmica; conflita com as cifras publicadas (Fm no Cifra Club, G# no Cifras.com.br)."
+        },
+        {
+          "field": "key",
+          "value": "Fm (cifra de terceiros)",
+          "url": "https://www.cifraclub.com.br/natiruts/perola-negra/",
+          "note": "Tom da cifra principal do Cifra Club; pode não corresponder à gravação de referência."
+        },
+        {
+          "field": "structure",
+          "value": "não encontrada",
+          "note": "Nenhuma fonte confiável descreve a estrutura desta gravação. Registrar a partir da escuta."
+        }
+      ],
+      "references": [
+        {
+          "kind": "official_video",
+          "title": "Natiruts – Pérola Negra (feat. Luiz Melodia) · Acústico no Rio de Janeiro",
+          "url": "https://www.youtube.com/watch?v=JZqFoTIAJj8",
+          "note": "Vídeo oficial indicado pela banda como referência principal."
+        },
+        {
+          "kind": "metadata",
+          "title": "Wikipedia – Acústico (Natiruts)",
+          "url": "https://en.wikipedia.org/wiki/Ac%C3%BAstico_(Natiruts_album)",
+          "note": "Lista de faixas e dados de gravação."
+        },
+        {
+          "kind": "metadata",
+          "title": "Discogs – Acústico no Rio de Janeiro",
+          "url": "https://www.discogs.com/master/2819027-Natiruts-Ac%C3%BAstico-No-Rio-De-Janeiro",
+          "note": null
+        },
+        {
+          "kind": "metadata",
+          "title": "MusicBrainz – Natiruts",
+          "url": "https://musicbrainz.org/artist/917e448b-fbed-4062-b563-67566a3b3bb1",
+          "note": "Gravação específica ainda não localizada no MusicBrainz."
+        },
+        {
+          "kind": "metadata",
+          "title": "MusicBrainz – Luiz Melodia",
+          "url": "https://musicbrainz.org/artist/40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+          "note": null
+        },
+        {
+          "kind": "chords",
+          "title": "Cifra Club – Pérola Negra (Natiruts)",
+          "url": "https://www.cifraclub.com.br/natiruts/perola-negra/",
+          "note": "Cifra de terceiros (somente link). Conferir se segue a gravação de referência."
+        },
+        {
+          "kind": "chords",
+          "title": "Cifras.com.br – Pérola Negra (Natiruts)",
+          "url": "https://www.cifras.com.br/cifra/natiruts/perola-negra",
+          "note": "Cifra de terceiros (somente link)."
+        },
+        {
+          "kind": "lyrics",
+          "title": "Letra – Cifra Club",
+          "url": "https://www.cifraclub.com.br/natiruts/perola-negra/letra/",
+          "note": "Letra protegida por direitos autorais; somente link."
+        }
+      ],
+      "materials": [
+        {
+          "type": "arrangement_map",
+          "instrument": "drums",
+          "title": "Mapa de arranjo (bateria)",
+          "externalUrl": null,
+          "body": "Estrutura, compassos e convenções ainda não registrados. Nenhuma fonte confiável descreve a estrutura desta gravação: registre a partir da escuta da referência."
+        },
+        {
+          "type": "bass_tab",
+          "instrument": "bass",
+          "title": "Linha de baixo",
+          "externalUrl": null,
+          "body": "Sem tablatura licenciada disponível (o Songsterr não tem esta música). Importe uma transcrição que a banda tenha direito de usar ou escreva a sua."
+        },
+        {
+          "type": "chords",
+          "instrument": "guitar",
+          "title": "Cifra (guitarra/violão)",
+          "externalUrl": "https://www.cifraclub.com.br/natiruts/perola-negra/",
+          "body": "Cifra disponível apenas como link externo. Importe ou escreva a cifra da versão da banda."
+        },
+        {
+          "type": "chords",
+          "instrument": "keys",
+          "title": "Cifra / mapa harmônico (teclado)",
+          "externalUrl": "https://www.cifras.com.br/cifra/natiruts/perola-negra",
+          "body": "Mapa harmônico ainda não escrito. O tom da banda não foi definido."
+        },
+        {
+          "type": "lyrics",
+          "instrument": "vocals",
+          "title": "Letra e observações (voz)",
+          "externalUrl": "https://www.cifraclub.com.br/natiruts/perola-negra/letra/",
+          "body": "Letra protegida por direitos autorais: disponível apenas como link. Use este espaço para observações da voz."
+        }
+      ]
+    },
+    {
+      "externalId": "bandsync:real:esoterico",
+      "title": "Esotérico",
+      "artist": "Gilberto Gil",
+      "composer": "Gilberto Gil",
+      "referenceRecording": null,
+      "referenceYear": null,
+      "durationSeconds": null,
+      "originalBpm": null,
+      "originalBpmStatus": "unknown",
+      "originalKey": null,
+      "originalKeyStatus": "unknown",
+      "originalTimeSignature": null,
+      "version": {
+        "bpm": null,
+        "key": null,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "meterConfirmed": false,
+        "referenceUrl": null,
+        "notes": "Gravação de referência a definir. Candidatas: Doces Bárbaros (1976, ao vivo) e Um Banda Um (1982). Gravações diferentes podem ter andamento, tom e arranjo diferentes; escolha a referência antes de definir BPM e tom da banda."
+      },
+      "metadataSources": [
+        {
+          "field": "composer",
+          "value": "Gilberto Gil",
+          "url": "https://gilbertogil.com.br/musicas/",
+          "note": "Site oficial do artista (resumo de busca; página não aberta). Editora: Gege Edições Musicais."
+        },
+        {
+          "field": "recording",
+          "value": "Doces Bárbaros (1976), ao vivo – candidata",
+          "url": "https://musicbrainz.org/recording/d72d41dd-fb12-4775-8188-d95c1fdabfe3",
+          "note": "Duração 4:11 no MusicBrainz e 4:09 na Wikipedia (fontes divergem)."
+        },
+        {
+          "field": "recording",
+          "value": "Um Banda Um (1982) – candidata",
+          "url": "https://en.wikipedia.org/wiki/Um_Banda_Um",
+          "note": "Duração 4:22 na Wikipedia. Arranjo descrito como reggae por fonte secundária."
+        },
+        {
+          "field": "bpm",
+          "value": "96 (candidato, Doces Bárbaros)",
+          "url": "https://tunebat.com/Info/Tigresa-Original-Album-Caetano-Veloso/1DlMvkIrN7Rd1LYzy1MXpy",
+          "note": "Estimativa algorítmica vista em lista de recomendações; não confirmado que seja a faixa do álbum."
+        },
+        {
+          "field": "bpm",
+          "value": "111 (candidato, Um Banda Um)",
+          "url": "https://musicstax.com/track/sorte/0q36M0t8O2AZmlpHpOxq3f",
+          "note": "Estimativa algorítmica; associação à faixa feita apenas pela duração 4:22."
+        },
+        {
+          "field": "key",
+          "value": "Mi menor (candidato, Doces Bárbaros)",
+          "url": "https://tunebat.com/Info/Tigresa-Original-Album-Caetano-Veloso/1DlMvkIrN7Rd1LYzy1MXpy",
+          "note": "Estimativa algorítmica, mesma ressalva do BPM."
+        },
+        {
+          "field": "key",
+          "value": "Si menor (candidato, Um Banda Um)",
+          "url": "https://musicstax.com/track/sorte/0q36M0t8O2AZmlpHpOxq3f",
+          "note": "Estimativa algorítmica, mesma ressalva do BPM."
+        },
+        {
+          "field": "key",
+          "value": "G (cifra de terceiros)",
+          "url": "https://www.cifraclub.com.br/gilberto-gil/esoterico/",
+          "note": "Não foi possível saber qual gravação a cifra segue."
+        },
+        {
+          "field": "structure",
+          "value": "não encontrada",
+          "note": "Nenhuma fonte confiável descreve a estrutura de qualquer das gravações candidatas."
+        }
+      ],
+      "references": [
+        {
+          "kind": "metadata",
+          "title": "MusicBrainz – Esotérico (Doces Bárbaros, 1976)",
+          "url": "https://musicbrainz.org/recording/d72d41dd-fb12-4775-8188-d95c1fdabfe3",
+          "note": "Gravação candidata."
+        },
+        {
+          "kind": "metadata",
+          "title": "Wikipedia – Doces Bárbaros",
+          "url": "https://en.wikipedia.org/wiki/Doces_B%C3%A1rbaros",
+          "note": null
+        },
+        {
+          "kind": "metadata",
+          "title": "Discogs – Doces Bárbaros",
+          "url": "https://www.discogs.com/master/766329-Caetano-Gal-Gil-Beth%C3%A2nia-Doces-B%C3%A1rbaros",
+          "note": null
+        },
+        {
+          "kind": "metadata",
+          "title": "Wikipedia – Um Banda Um",
+          "url": "https://en.wikipedia.org/wiki/Um_Banda_Um",
+          "note": "Gravação candidata."
+        },
+        {
+          "kind": "article",
+          "title": "Gilberto Gil – músicas (site oficial)",
+          "url": "https://gilbertogil.com.br/musicas/",
+          "note": null
+        },
+        {
+          "kind": "chords",
+          "title": "Cifra Club – Esotérico (Gilberto Gil)",
+          "url": "https://www.cifraclub.com.br/gilberto-gil/esoterico/",
+          "note": "Cifra de terceiros (somente link); gravação seguida não identificada."
+        },
+        {
+          "kind": "chords",
+          "title": "Cifras.com.br – Esotérico (Gilberto Gil)",
+          "url": "https://www.cifras.com.br/cifra/gilberto-gil/esoterico",
+          "note": "Cifra de terceiros (somente link)."
+        },
+        {
+          "kind": "tabs",
+          "title": "Songsterr – Esotérico (baixo)",
+          "url": "https://www.songsterr.com/a/wsa/gilberto-gil-esoterico-bass-tab-s1114310",
+          "note": "Tablatura de terceiros (somente link); gravação seguida não identificada."
+        },
+        {
+          "kind": "lyrics",
+          "title": "Letra – Cifra Club",
+          "url": "https://www.cifraclub.com.br/gilberto-gil/esoterico/letra/",
+          "note": "Letra protegida por direitos autorais; somente link."
+        }
+      ],
+      "materials": [
+        {
+          "type": "arrangement_map",
+          "instrument": "drums",
+          "title": "Mapa de arranjo (bateria)",
+          "externalUrl": null,
+          "body": "Depende da gravação de referência escolhida. Nenhuma estrutura confiável encontrada."
+        },
+        {
+          "type": "bass_tab",
+          "instrument": "bass",
+          "title": "Linha de baixo",
+          "externalUrl": "https://www.songsterr.com/a/wsa/gilberto-gil-esoterico-bass-tab-s1114310",
+          "body": "Existe uma tablatura de baixo no Songsterr (somente link; não se sabe qual gravação ela segue). Importe uma transcrição autorizada ou escreva a da banda."
+        },
+        {
+          "type": "chords",
+          "instrument": "guitar",
+          "title": "Cifra (guitarra/violão)",
+          "externalUrl": "https://www.cifraclub.com.br/gilberto-gil/esoterico/",
+          "body": "Cifra disponível apenas como link externo. Importe ou escreva a cifra da versão da banda."
+        },
+        {
+          "type": "chords",
+          "instrument": "keys",
+          "title": "Cifra / mapa harmônico (teclado)",
+          "externalUrl": "https://www.cifras.com.br/cifra/gilberto-gil/esoterico",
+          "body": "Mapa harmônico ainda não escrito. O tom da banda não foi definido."
+        },
+        {
+          "type": "lyrics",
+          "instrument": "vocals",
+          "title": "Letra e observações (voz)",
+          "externalUrl": "https://www.cifraclub.com.br/gilberto-gil/esoterico/letra/",
+          "body": "Letra protegida por direitos autorais: disponível apenas como link. Use este espaço para observações da voz."
+        }
+      ]
+    },
+    {
+      "externalId": "bandsync:real:o-segundo-sol",
+      "title": "O Segundo Sol",
+      "artist": "Gilberto Gil",
+      "composer": "Nando Reis",
+      "referenceRecording": "Cássia Reggae — Vibrações de Paz e Amor para Cássia Eller",
+      "referenceYear": 2022,
+      "durationSeconds": null,
+      "originalBpm": null,
+      "originalBpmStatus": "unknown",
+      "originalKey": null,
+      "originalKeyStatus": "unknown",
+      "originalTimeSignature": null,
+      "version": {
+        "bpm": null,
+        "key": null,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "meterConfirmed": false,
+        "referenceUrl": "https://www.universalmusic.com.br/2022/07/01/cassia-reggae-vibracoes-de-paz-e-amor-para-cassia-eller-na-praia-do-reggae/",
+        "notes": "Referência: interpretação de Gilberto Gil no projeto Cássia Reggae (2022), em reggae. Não é a gravação original de Cássia Eller. Andamento, tom e duração desta versão não foram encontrados em fonte confiável."
+      },
+      "metadataSources": [
+        {
+          "field": "composer",
+          "value": "Nando Reis",
+          "url": "https://pt.wikipedia.org/wiki/O_Segundo_Sol",
+          "note": "Resumo de busca; página não aberta."
+        },
+        {
+          "field": "recording",
+          "value": "Cássia Reggae (2022), Universal Music",
+          "url": "https://www.universalmusic.com.br/2022/07/01/cassia-reggae-vibracoes-de-paz-e-amor-para-cassia-eller-na-praia-do-reggae/",
+          "note": "Lançado em 01/07/2022. Produção de Fernando Nunes e Sergio Fouad, segundo a imprensa."
+        },
+        {
+          "field": "bpm",
+          "value": "não encontrado",
+          "note": "Os valores publicados (≈145 BPM, Dó maior) são da gravação de Cássia Eller e não valem para a versão de Gilberto Gil."
+        },
+        {
+          "field": "key",
+          "value": "C (cifra da versão de Cássia Eller)",
+          "url": "https://www.cifraclub.com.br/cassia-eller/o-segundo-sol/",
+          "note": "A cifra segue a versão de Cássia Eller, não a de Gilberto Gil."
+        },
+        {
+          "field": "duration",
+          "value": "não encontrada",
+          "note": "Duração da faixa de Gilberto Gil no projeto não confirmada."
+        },
+        {
+          "field": "structure",
+          "value": "não encontrada",
+          "note": "Registrar a partir da escuta da referência."
+        }
+      ],
+      "references": [
+        {
+          "kind": "article",
+          "title": "Universal Music – Cássia Reggae (lançamento)",
+          "url": "https://www.universalmusic.com.br/2022/07/01/cassia-reggae-vibracoes-de-paz-e-amor-para-cassia-eller-na-praia-do-reggae/",
+          "note": "Referência oficial do projeto."
+        },
+        {
+          "kind": "official_video",
+          "title": "Gilberto Gil – O Segundo Sol (candidato)",
+          "url": "https://www.youtube.com/watch?v=7hWI-V9R9cs",
+          "note": "Candidato: canal e procedência não verificados. Confirmar antes de usar como referência."
+        },
+        {
+          "kind": "official_audio",
+          "title": "O Segundo Sol – áudio (candidato)",
+          "url": "https://www.youtube.com/watch?v=kd2tyfqgxio",
+          "note": "Candidato: não verificado."
+        },
+        {
+          "kind": "official_audio",
+          "title": "Spotify (candidato)",
+          "url": "https://open.spotify.com/track/2L8SSEroY1WFbk2vyqafQP",
+          "note": "Candidato: artista e álbum não verificados."
+        },
+        {
+          "kind": "metadata",
+          "title": "Qobuz – Cássia Reggae (Vol. 1)",
+          "url": "https://www.qobuz.com/br-pt/album/cassia-reggae-various-artists/rs15i2ocoudca",
+          "note": null
+        },
+        {
+          "kind": "article",
+          "title": "Popline – Cássia Reggae",
+          "url": "https://portalpopline.com.br/cassia-reggae-projeto-60-anos/",
+          "note": null
+        },
+        {
+          "kind": "metadata",
+          "title": "Wikipedia – O Segundo Sol",
+          "url": "https://pt.wikipedia.org/wiki/O_Segundo_Sol",
+          "note": null
+        },
+        {
+          "kind": "chords",
+          "title": "Cifra Club – O Segundo Sol (versão de Cássia Eller)",
+          "url": "https://www.cifraclub.com.br/cassia-eller/o-segundo-sol/",
+          "note": "Segue a versão de Cássia Eller, não a de referência."
+        },
+        {
+          "kind": "chords",
+          "title": "Cifras.com.br – O Segundo Sol (versão de Cássia Eller)",
+          "url": "https://www.cifras.com.br/cifra/cassia-eller/o-segundo-sol",
+          "note": "Segue a versão de Cássia Eller."
+        },
+        {
+          "kind": "tabs",
+          "title": "Songsterr – O Segundo Sol (versão de Cássia Eller)",
+          "url": "https://www.songsterr.com/a/wsa/cassia-eller-o-segundo-sol-tab-s382711",
+          "note": "Não há tablatura da versão de Gilberto Gil."
+        }
+      ],
+      "materials": [
+        {
+          "type": "arrangement_map",
+          "instrument": "drums",
+          "title": "Mapa de arranjo (bateria)",
+          "externalUrl": null,
+          "body": "Estrutura da versão de Gilberto Gil (reggae) ainda não registrada."
+        },
+        {
+          "type": "bass_tab",
+          "instrument": "bass",
+          "title": "Linha de baixo",
+          "externalUrl": null,
+          "body": "Sem tablatura da versão de referência. As tablaturas encontradas seguem a gravação de Cássia Eller."
+        },
+        {
+          "type": "chords",
+          "instrument": "guitar",
+          "title": "Cifra (guitarra/violão)",
+          "externalUrl": "https://www.cifraclub.com.br/cassia-eller/o-segundo-sol/",
+          "body": "A cifra externa segue a versão de Cássia Eller; adapte à versão de referência ou escreva a da banda."
+        },
+        {
+          "type": "chords",
+          "instrument": "keys",
+          "title": "Cifra / mapa harmônico (teclado)",
+          "externalUrl": null,
+          "body": "Mapa harmônico ainda não escrito. O tom da banda não foi definido."
+        },
+        {
+          "type": "lyrics",
+          "instrument": "vocals",
+          "title": "Letra e observações (voz)",
+          "externalUrl": null,
+          "body": "Letra protegida por direitos autorais; não copiada. Use este espaço para observações da voz."
+        }
+      ]
+    }
+  ]
+}

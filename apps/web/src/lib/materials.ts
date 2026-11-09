@@ -8,9 +8,11 @@ import {
 
 /**
  * Resolve the material a musician should see for a song.
- * Order: explicit user preference for the instrument → default preference for the instrument →
- * any material tagged for the instrument → any lyrics/chords → first material.
- * Materials tagged with the musician's instrument win over untagged ones of the same type.
+ * Walk the instrument's preference order (explicit user preference, then the instrument default):
+ * for each type, a material tagged with the musician's instrument wins (ready before pending), then an
+ * untagged ready one. So a pending slot for the musician's own part is shown as "pending" instead of
+ * being hidden behind shared notes, while ready material of a more preferred type still comes first.
+ * Fallbacks: anything tagged for the instrument, any ready lyrics/chords, any ready material, anything.
  */
 export function resolvePreferredMaterial(
   materials: SongMaterialDto[],
@@ -21,17 +23,22 @@ export function resolvePreferredMaterial(
   const inst = (INSTRUMENTS as readonly string[]).includes(instrument ?? "")
     ? (instrument as Instrument)
     : "other";
+  const isReady = (m: SongMaterialDto) => m.status !== "pending";
   const order = [...(preferences?.[inst] ?? []), ...DEFAULT_MATERIAL_PREFERENCE[inst]];
   for (const type of order) {
-    const tagged = materials.find((m) => m.type === type && m.instrument === inst);
-    if (tagged) return tagged;
-    const generic = materials.find((m) => m.type === type && !m.instrument);
+    const tagged = materials.filter((m) => m.type === type && m.instrument === inst);
+    const best = tagged.find(isReady) ?? tagged[0];
+    if (best) return best;
+    const generic = materials.find((m) => m.type === type && !m.instrument && isReady(m));
     if (generic) return generic;
   }
-  const anyTagged = materials.find((m) => m.instrument === inst);
-  if (anyTagged) return anyTagged;
-  const fallback = materials.find((m) => m.type === "lyrics" || m.type === "chords");
-  return fallback ?? materials[0] ?? null;
+  return (
+    materials.find((m) => m.instrument === inst) ??
+    materials.find((m) => isReady(m) && (m.type === "lyrics" || m.type === "chords")) ??
+    materials.find(isReady) ??
+    materials[0] ??
+    null
+  );
 }
 
 export function isTextMaterial(type: string): boolean {

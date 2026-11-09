@@ -152,3 +152,21 @@ export function useRepertoireMutations(bandId: string, id?: string) {
   });
   return { create, update, remove, addItem, removeItem, reorder };
 }
+
+export function useAddReference(bandId: string, songId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { kind: string; title: string; url: string; note: string | null }) =>
+      http.post(`/api/bands/${bandId}/songs/${songId}/references`, input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: repKeys.song(bandId, songId) }),
+  });
+}
+
+export function useDeleteReference(bandId: string, songId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (referenceId: string) =>
+      http.delete(`/api/bands/${bandId}/songs/${songId}/references/${referenceId}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: repKeys.song(bandId, songId) }),
+  });
+}

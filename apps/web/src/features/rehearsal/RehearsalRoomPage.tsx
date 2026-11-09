@@ -245,7 +245,14 @@ export function RehearsalRoomPage() {
       {/* Beat + musical info */}
       <section className="flex items-center justify-between gap-3 border-b border-line px-4 py-2">
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-semibold tabular-nums">{Math.round(m.bpm)}</span>
+          <span
+            className={cn(
+              "text-3xl font-semibold tabular-nums",
+              state.currentSong?.bpmSource === "none" && "text-muted",
+            )}
+          >
+            {Math.round(m.bpm)}
+          </span>
           <span className="text-xs uppercase text-muted">{t("common:music.bpm")}</span>
           <span className="ml-2 text-xl font-medium tabular-nums">
             {m.beatsPerBar}/{m.beatUnit}
@@ -254,6 +261,22 @@ export function RehearsalRoomPage() {
         </div>
         <BeatIndicator beat={beat} beatsPerBar={m.beatsPerBar} running={m.running} compact />
       </section>
+      {state.currentSong &&
+      (state.currentSong.bpmSource !== "band" || !state.currentSong.meterConfirmed) ? (
+        <p
+          className="border-b border-line bg-warn-500/10 px-4 py-1.5 text-xs text-warn-500"
+          role="status"
+          data-testid="tempo-source"
+        >
+          {state.currentSong.bpmSource !== "band"
+            ? t(`rehearsal:room.bpmSource.${state.currentSong.bpmSource}`)
+            : null}
+          {state.currentSong.bpmSource !== "band" && !state.currentSong.meterConfirmed
+            ? " · "
+            : null}
+          {!state.currentSong.meterConfirmed ? t("rehearsal:room.meterUnconfirmed") : null}
+        </p>
+      ) : null}
 
       {/* Material */}
       <main className="relative flex-1 overflow-y-auto">
@@ -283,6 +306,7 @@ export function RehearsalRoomPage() {
                 >
                   {t(`common:materialType.${mat.type}`)}
                   {mat.instrument ? ` · ${t(`common:instrument.${mat.instrument}`)}` : ""}
+                  {mat.status === "pending" ? ` · ${t("rehearsal:member.pendingChip")}` : ""}
                 </button>
               ))}
               <span className="ml-auto flex shrink-0 items-center gap-1">

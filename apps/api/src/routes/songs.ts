@@ -1,5 +1,6 @@
 import {
   createMaterialSchema,
+  createReferenceSchema,
   createSongSchema,
   updateMaterialSchema,
   updateSongSchema,
@@ -8,13 +9,16 @@ import { Hono } from "hono";
 import { audit } from "../db/audit";
 import { getFile } from "../db/files";
 import {
+  addReference,
   createMaterial,
   createSong,
   deleteMaterial,
+  deleteReference,
   deleteSong,
   getMaterial,
   getSong,
   listMaterials,
+  listReferences,
   listSongs,
   updateMaterial,
   updateSong,
@@ -84,7 +88,8 @@ songRoutes.post("/:songId/materials", requireRepertoireEditor, async (c) => {
   const song = await getSong(c.env.DB, bandId, p(c, "songId"));
   if (!song) throw notFound("song");
   const input = await parseBody(c, createMaterialSchema);
-  if (!input.body && !input.externalUrl && !input.fileId) {
+  // A ready material must have content; a pending one is a placeholder (an optional note is enough).
+  if (input.status !== "pending" && !input.body && !input.externalUrl && !input.fileId) {
     throw new ApiError("validation_error", "a material needs a body, an external URL or a file");
   }
   if (input.fileId && !(await getFile(c.env.DB, bandId, input.fileId))) throw notFound("file");
@@ -106,5 +111,31 @@ songRoutes.delete("/:songId/materials/:materialId", requireRepertoireEditor, asy
   const existing = await getMaterial(c.env.DB, p(c, "bandId"), p(c, "songId"), p(c, "materialId"));
   if (!existing) throw notFound("material");
   await deleteMaterial(c.env.DB, existing.id);
+  return c.json({ ok: true });
+});
+
+/* ---------------- external references (links, never copied content) ---------------- */
+
+songRoutes.get("/:songId/references", async (c) => {
+  const song = await getSong(c.env.DB, p(c, "bandId"), p(c, "songId"));
+  if (!song) throw notFound("song");
+  return c.json({ references: await listReferences(c.env.DB, song.id) });
+});
+
+songRoutes.post("/:songId/references", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const song = await getSong(c.env.DB, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const input = await parseBody(c, createReferenceSchema);
+  const { reference, created } = await addReference(c.env.DB, song.id, c.get("user").id, input);
+  return c.json({ reference, created }, created ? 201 : 200);
+});
+
+songRoutes.delete("/:songId/references/:referenceId", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const song = await getSong(c.env.DB, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const ok = await deleteReference(c.env.DB, song.id, p(c, "referenceId"));
+  if (!ok) throw notFound("reference");
   return c.json({ ok: true });
 });

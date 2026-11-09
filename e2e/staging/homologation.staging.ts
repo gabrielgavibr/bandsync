@@ -74,58 +74,75 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await ana.page.getByRole("radio", { name: "Português (Brasil)" }).click();
   await expect(ana.page.getByRole("heading", { name: "Perfil e preferências" })).toBeVisible();
 
-  // Band pages.
+  // Band pages: the real repertoire and a real song sheet.
+  const REAL = "Repertório Real — Primeiro Ensaio";
   await ana.page.getByRole("link", { name: "Bandas" }).first().click();
   await ana.page.getByRole("link", { name: /Sala 3/ }).click();
   await expect(ana.page.getByRole("heading", { name: "Sala 3" })).toBeVisible();
   await expect(ana.page.getByRole("link", { name: "Repertórios" }).last()).toBeVisible();
   await ana.page.screenshot({ path: `${SHOTS}/03-desktop-dashboard.png` });
-  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
-  await ana.page.getByRole("link", { name: /Luz da Garagem/ }).click();
-  await expect(ana.page.getByText("Mapa de bateria").first()).toBeVisible();
-  await expect(ana.page.getByText("Mapa de arranjo").first()).toBeVisible();
-  await ana.page.screenshot({ path: `${SHOTS}/04-desktop-song.png` });
+  await ana.page.getByRole("link", { name: "Repertórios" }).first().click();
+  await ana.page.getByRole("link", { name: new RegExp(REAL) }).click();
+  const rows = ana.page.locator("ol > li");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("Pérola Negra");
+  await expect(rows.nth(1)).toContainText("Esotérico");
+  await expect(rows.nth(2)).toContainText("O Segundo Sol");
+  await ana.page.screenshot({ path: `${SHOTS}/04-desktop-repertorio-real.png` });
+  await ana.page.getByRole("link", { name: /Pérola Negra/ }).click();
+  await expect(ana.page.getByRole("heading", { name: "Ficha da música" })).toBeVisible();
+  await expect(ana.page.getByText("Luiz Melodia").first()).toBeVisible();
+  await expect(ana.page.getByText("Não definido pela banda").first()).toBeVisible();
+  await expect(ana.page.getByText("Links de referência")).toBeVisible();
+  await ana.page.screenshot({ path: `${SHOTS}/04b-desktop-ficha-perola.png`, fullPage: true });
 
-  // Start (or rejoin) a live session with the Thursday repertoire.
+  // Start (or rejoin) a live session.
   await ana.page.getByRole("link", { name: "Ensaio ao vivo" }).first().click();
   const join = ana.page.getByRole("button", { name: "Entrar na sessão" });
-  if (await join.isVisible().catch(() => false)) {
+  const startBtn = ana.page.getByRole("button", { name: "Iniciar sessão" });
+  await expect(join.or(startBtn)).toBeVisible();
+  if (await join.isVisible()) {
     await join.click();
   } else {
-    await ana.page.getByLabel("Repertório desta sessão").selectOption({ index: 1 });
+    const select = ana.page.getByLabel("Repertório desta sessão");
+    const value = await select.locator("option", { hasText: REAL }).getAttribute("value");
+    await select.selectOption(value!);
     await ana.page.getByRole("button", { name: "Iniciar sessão" }).click();
   }
   await expect(ana.page).toHaveURL(/\/rehearsal\/[0-9a-f-]+$/);
   const roomUrl = new URL(ana.page.url()).pathname;
   await ana.page.getByRole("button", { name: "Ativar som" }).click();
 
-  // Bassist on a phone, English UI (Bruno's account prefers pt-BR; switch it in profile first).
+  // Bassist on a phone.
   const bruno = await enter(browser, c.key, { ...devices["iPhone 13"] });
   await login(bruno.page, "bruno@bandsync.demo", c.bruno);
   await expect(bruno.page.getByRole("heading", { name: "Minhas bandas" })).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/05-mobile-bandas.png` });
-  // Mobile navigation through the band pages.
   await bruno.page.getByRole("link", { name: /Sala 3/ }).click();
   await bruno.page.getByRole("link", { name: "Repertórios" }).first().click();
-  await expect(bruno.page.getByText("Ensaio de quinta")).toBeVisible();
+  await expect(bruno.page.getByText(REAL)).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/05b-mobile-repertorios.png` });
   await bruno.page.goto(roomUrl);
   await bruno.page.getByRole("button", { name: "Ativar som" }).click();
   await expect(bruno.page.getByText("Regente: Ana Ribeiro")).toBeVisible();
 
-  // Conductor selects a song; the phone follows and shows the bass material.
+  // Conductor switches the session to the real repertoire and picks Pérola Negra.
   await ana.page.getByRole("button", { name: "Escolher música" }).click();
-  await ana.page.getByRole("button", { name: /Luz da Garagem/ }).click();
-  await expect(bruno.page.getByText("Luz da Garagem").first()).toBeVisible();
-  await expect(
-    bruno.page
-      .getByText("Linha de baixo", { exact: false })
-      .or(bruno.page.getByText("A|-3-3-3-3"))
-      .first(),
-  ).toBeVisible();
-  await expect(ana.page.getByText("Intro (4)").first()).toBeVisible(); // drum map on the conductor
+  const repSelect = ana.page.getByLabel("Repertório", { exact: true });
+  const repValue = await repSelect.locator("option", { hasText: REAL }).getAttribute("value");
+  await repSelect.selectOption(repValue!);
+  await ana.page.getByRole("button", { name: /Pérola Negra/ }).click();
+  await expect(bruno.page.getByText("Pérola Negra").first()).toBeVisible();
+  await expect(bruno.page.getByText("1 de 3")).toBeVisible();
+  // Each musician gets their own slot, clearly pending.
+  await expect(bruno.page.getByText("Tablatura de baixo · Baixo").first()).toBeVisible();
+  await expect(bruno.page.getByText("Este material ainda não foi adicionado.")).toBeVisible();
+  await expect(ana.page.getByText("Mapa de arranjo · Bateria").first()).toBeVisible();
+  await expect(bruno.page.getByTestId("tempo-source")).toBeVisible();
 
-  // Start the click: both devices go through count-in into playing.
+  // The conductor sets a tempo and runs the click.
+  await ana.page.getByRole("spinbutton", { name: "BPM" }).fill("70");
+  await expect(bruno.page.getByText("70", { exact: true }).first()).toBeVisible();
   await ana.page.getByRole("button", { name: "Iniciar", exact: true }).click();
   await expect(bruno.page.getByText("Executando").first()).toBeVisible({ timeout: 15_000 });
   await bruno.page.getByRole("button", { name: "Qualidade da sincronização" }).click();
@@ -135,10 +152,19 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await ana.page.screenshot({ path: `${SHOTS}/07-desktop-room-conductor.png` });
   await ana.page.getByRole("button", { name: "Parar" }).click();
   await expect(bruno.page.getByText("Parada").first()).toBeVisible();
-  // The member's volume slider must be usable on a phone (full row, real width).
   const slider = bruno.page.getByRole("slider", { name: "Volume do clique" });
   expect((await slider.boundingBox())!.width).toBeGreaterThan(200);
-  await bruno.page.screenshot({ path: `${SHOTS}/08-mobile-room-member.png` });
+  await bruno.page.screenshot({ path: `${SHOTS}/08-mobile-room-perola.png` });
+
+  // Next songs reach the phone.
+  await ana.page.getByRole("button", { name: "Próxima música" }).click();
+  await expect(bruno.page.getByText("Esotérico").first()).toBeVisible();
+  await expect(bruno.page.getByText("2 de 3")).toBeVisible();
+  await bruno.page.screenshot({ path: `${SHOTS}/09-mobile-room-esoterico.png` });
+  await ana.page.getByRole("button", { name: "Próxima música" }).click();
+  await expect(bruno.page.getByText("O Segundo Sol").first()).toBeVisible();
+  await expect(bruno.page.getByText("3 de 3")).toBeVisible();
+  await bruno.page.screenshot({ path: `${SHOTS}/10-mobile-room-segundo-sol.png` });
 
   // Leave the session running so testers find it; just close the browsers.
   await ana.context.close();
