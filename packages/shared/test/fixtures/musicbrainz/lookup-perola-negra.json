@@ -1,0 +1,464 @@
+{
+  "artist-credit": [
+    {
+      "artist": {
+        "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+        "sort-name": "Natiruts",
+        "type": "Group",
+        "disambiguation": "",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "name": "Natiruts",
+        "country": "BR"
+      },
+      "joinphrase": " Part. Especial ",
+      "name": "Natiruts"
+    },
+    {
+      "artist": {
+        "name": "Luiz Melodia",
+        "country": "BR",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "sort-name": "Melodia, Luiz",
+        "type": "Person",
+        "id": "40bee6cd-8f0c-407e-8e90-d5bdb9231a2d"
+      },
+      "name": "Luiz Melodia",
+      "joinphrase": ""
+    }
+  ],
+  "relations": [
+    {
+      "direction": "forward",
+      "target-type": "work",
+      "attribute-ids": { "live": "70007db6-a8bc-46d7-a770-80e6a0bb551a" },
+      "source-credit": "",
+      "attribute-values": {},
+      "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+      "ended": false,
+      "begin": null,
+      "type": "performance",
+      "work": {
+        "type": "Song",
+        "id": "39fe8e07-adc0-4d8d-8e46-7ec134ae6ec1",
+        "languages": ["por"],
+        "attributes": [],
+        "title": "Pérola negra",
+        "language": "por",
+        "relations": [
+          {
+            "target-credit": "",
+            "attributes": [],
+            "end": null,
+            "type": "composer",
+            "ended": false,
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "name": "Luiz Melodia",
+              "country": "BR",
+              "id": "40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+              "sort-name": "Melodia, Luiz",
+              "type": "Person"
+            },
+            "begin": null,
+            "direction": "backward",
+            "source-credit": "",
+            "attribute-values": {},
+            "type-id": "d59d99ea-23d4-4a80-b066-edca32ee158f",
+            "target-type": "artist",
+            "attribute-ids": {}
+          },
+          {
+            "attribute-ids": {},
+            "target-type": "artist",
+            "attribute-values": {},
+            "type-id": "3e48faba-ec01-47fd-8e89-30e81161661c",
+            "source-credit": "",
+            "direction": "backward",
+            "artist": {
+              "id": "40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+              "sort-name": "Melodia, Luiz",
+              "type": "Person",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Luiz Melodia",
+              "country": "BR"
+            },
+            "begin": null,
+            "ended": false,
+            "type": "lyricist",
+            "end": null,
+            "attributes": [],
+            "target-credit": ""
+          },
+          {
+            "attribute-ids": {},
+            "target-type": "url",
+            "type-id": "9900c8c5-9844-4f10-8403-23aabafd913c",
+            "attribute-values": {},
+            "url": {
+              "resource": "https://ecadnet.ecad.org.br/consulta/detalhes/obras-musicais/7335",
+              "id": "f2d03205-a2a4-428e-a0cc-6f10ffc036d5"
+            },
+            "source-credit": "",
+            "direction": "backward",
+            "begin": null,
+            "ended": false,
+            "type": "work list entry",
+            "end": null,
+            "attributes": [],
+            "target-credit": ""
+          }
+        ],
+        "disambiguation": "",
+        "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+        "iswcs": ["T-039.001.549-2"]
+      },
+      "target-credit": "",
+      "end": null,
+      "attributes": ["live"]
+    }
+  ],
+  "isrcs": ["BR4W41200009"],
+  "disambiguation": "live, 2012-02-01: Mirante Dona Marta, Rio de Janeiro, RJ, Brazil",
+  "releases": [
+    {
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging": "None",
+      "artist-credit": [
+        {
+          "artist": {
+            "type": "Group",
+            "sort-name": "Natiruts",
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "country": "BR",
+            "name": "Natiruts",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": ""
+          },
+          "name": "Natiruts",
+          "joinphrase": ""
+        }
+      ],
+      "title": "Acústico no Rio de Janeiro",
+      "disambiguation": "Deluxe",
+      "release-group": {
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Natiruts",
+            "artist": {
+              "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+              "type": "Group",
+              "sort-name": "Natiruts",
+              "disambiguation": "",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "country": "BR",
+              "name": "Natiruts"
+            }
+          }
+        ],
+        "primary-type": "Album",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "disambiguation": "",
+        "first-release-date": "2012-09-17",
+        "secondary-types": ["Live"],
+        "releases": [],
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"],
+        "title": "Acústico no Rio de Janeiro",
+        "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6"
+      },
+      "barcode": null,
+      "quality": "normal",
+      "country": "BR",
+      "id": "488ca169-58b9-46ac-a267-5c72189a1f3b",
+      "status": "Official",
+      "text-representation": { "script": "Latn", "language": "por" },
+      "release-events": [
+        {
+          "date": "2012-09-17",
+          "area": {
+            "type-id": null,
+            "iso-3166-1-codes": ["BR"],
+            "disambiguation": "",
+            "name": "Brazil",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "type": null,
+            "sort-name": "Brazil"
+          }
+        }
+      ],
+      "date": "2012-09-17"
+    },
+    {
+      "barcode": "886446877907",
+      "release-group": {
+        "disambiguation": "",
+        "primary-type": "Album",
+        "artist-credit": [
+          {
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "",
+              "country": "BR",
+              "name": "Natiruts",
+              "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+              "type": "Group",
+              "sort-name": "Natiruts"
+            },
+            "joinphrase": "",
+            "name": "Natiruts"
+          }
+        ],
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "title": "Acústico no Rio de Janeiro",
+        "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+        "releases": [],
+        "secondary-types": ["Live"],
+        "first-release-date": "2012-09-17",
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+      },
+      "disambiguation": "",
+      "quality": "normal",
+      "country": "XW",
+      "text-representation": { "language": "por", "script": "Latn" },
+      "id": "cf76b0a6-5b88-4b7f-98e5-4befc2933626",
+      "status": "Official",
+      "date": "2012-09-18",
+      "release-events": [
+        {
+          "date": "2012-09-18",
+          "area": {
+            "sort-name": "[Worldwide]",
+            "type": null,
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "name": "[Worldwide]",
+            "disambiguation": "",
+            "type-id": null,
+            "iso-3166-1-codes": ["XW"]
+          }
+        }
+      ],
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "packaging": "None",
+      "artist-credit": [
+        {
+          "artist": {
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "sort-name": "Natiruts",
+            "type": "Group",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "",
+            "name": "Natiruts",
+            "country": "BR"
+          },
+          "name": "Natiruts",
+          "joinphrase": ""
+        }
+      ],
+      "title": "Natiruts Acústico no Rio de Janeiro"
+    },
+    {
+      "quality": "normal",
+      "country": null,
+      "barcode": null,
+      "release-group": {
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "name": "Natiruts",
+            "artist": {
+              "type": "Group",
+              "sort-name": "Natiruts",
+              "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+              "country": "BR",
+              "name": "Natiruts",
+              "disambiguation": "",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+            }
+          }
+        ],
+        "primary-type": "Album",
+        "disambiguation": "",
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"],
+        "first-release-date": "2012-09-17",
+        "releases": [],
+        "secondary-types": ["Live"],
+        "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+        "title": "Acústico no Rio de Janeiro"
+      },
+      "disambiguation": "",
+      "date": "2012",
+      "release-events": [{ "date": "2012", "area": null }],
+      "text-representation": { "script": "Latn", "language": "por" },
+      "status": "Official",
+      "id": "3cf24cad-5f33-4ef4-9157-21599b2ddc98",
+      "artist-credit": [
+        {
+          "artist": {
+            "disambiguation": "",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "name": "Natiruts",
+            "country": "BR",
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "sort-name": "Natiruts",
+            "type": "Group"
+          },
+          "name": "Natiruts",
+          "joinphrase": ""
+        }
+      ],
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": null,
+      "title": "Acústico no Rio de Janeiro"
+    },
+    {
+      "date": "2012",
+      "release-events": [
+        {
+          "area": {
+            "sort-name": "Brazil",
+            "type": null,
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "name": "Brazil",
+            "iso-3166-1-codes": ["BR"],
+            "type-id": null,
+            "disambiguation": ""
+          },
+          "date": "2012"
+        }
+      ],
+      "text-representation": { "script": "Latn", "language": "por" },
+      "id": "c26e426b-0961-473f-a775-1c061e1ec846",
+      "status": "Official",
+      "quality": "normal",
+      "country": "BR",
+      "barcode": "887254522423",
+      "release-group": {
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "artist": {
+              "name": "Natiruts",
+              "country": "BR",
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "",
+              "sort-name": "Natiruts",
+              "type": "Group",
+              "id": "917e448b-fbed-4062-b563-67566a3b3bb1"
+            },
+            "joinphrase": "",
+            "name": "Natiruts"
+          }
+        ],
+        "primary-type": "Album",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "title": "Acústico no Rio de Janeiro",
+        "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+        "first-release-date": "2012-09-17",
+        "secondary-types": ["Live"],
+        "releases": [],
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+      },
+      "disambiguation": "",
+      "title": "Acústico no Rio de Janeiro",
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "name": "Natiruts",
+          "artist": {
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "",
+            "name": "Natiruts",
+            "country": "BR",
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "sort-name": "Natiruts",
+            "type": "Group"
+          }
+        }
+      ],
+      "packaging": null,
+      "packaging-id": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    },
+    {
+      "date": "2020-05-08",
+      "release-events": [
+        {
+          "area": {
+            "name": "Brazil",
+            "type-id": null,
+            "iso-3166-1-codes": ["BR"],
+            "disambiguation": "",
+            "sort-name": "Brazil",
+            "type": null,
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8"
+          },
+          "date": "2020-05-08"
+        }
+      ],
+      "text-representation": { "script": "Latn", "language": "por" },
+      "status": "Official",
+      "id": "2f6d1e48-042e-4297-8f5e-22c8545a40e9",
+      "country": "BR",
+      "quality": "normal",
+      "barcode": "886448460558",
+      "release-group": {
+        "disambiguation": "",
+        "artist-credit": [
+          {
+            "name": "Natiruts",
+            "joinphrase": "",
+            "artist": {
+              "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+              "disambiguation": "",
+              "name": "Natiruts",
+              "country": "BR",
+              "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+              "sort-name": "Natiruts",
+              "type": "Group"
+            }
+          }
+        ],
+        "primary-type": "Album",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "title": "Melhores Natiruts",
+        "id": "4f5c837c-71c5-495d-aedc-dbea77704b54",
+        "first-release-date": "2020-05-08",
+        "releases": [],
+        "secondary-types": ["Compilation"],
+        "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+      },
+      "disambiguation": "",
+      "title": "Melhores Natiruts",
+      "artist-credit": [
+        {
+          "artist": {
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "type": "Group",
+            "sort-name": "Natiruts",
+            "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+            "disambiguation": "",
+            "country": "BR",
+            "name": "Natiruts"
+          },
+          "joinphrase": "",
+          "name": "Natiruts"
+        }
+      ],
+      "packaging": "None",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe"
+    }
+  ],
+  "first-release-date": "2012-09-17",
+  "video": false,
+  "title": "Pérola negra",
+  "length": 209626,
+  "id": "0dea3c9a-ef6b-4707-90d8-685b2f4a2cd8"
+}

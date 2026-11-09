@@ -2,6 +2,7 @@ import type {
   FactStatus,
   MaterialStatus,
   MetadataSource,
+  SectionCue,
   SongDto,
   SongMaterialDto,
   SongReferenceDto,
@@ -21,6 +22,7 @@ interface SongRow {
   original_bpm: number | null;
   original_key: string | null;
   composer: string | null;
+  work_mbid: string | null;
   reference_recording: string | null;
   reference_year: number | null;
   original_time_signature: string | null;
@@ -40,7 +42,7 @@ interface SongRow {
 }
 
 const SONG_SELECT = `SELECT s.id, s.band_id, s.title, s.artist, s.album, s.external_id, s.duration_seconds, s.original_bpm,
-  s.original_key, s.composer, s.reference_recording, s.reference_year, s.original_time_signature, s.original_bpm_status,
+  s.original_key, s.composer, s.work_mbid, s.reference_recording, s.reference_year, s.original_time_signature, s.original_bpm_status,
   s.original_key_status, s.metadata_sources, s.created_at, s.updated_at, v.id AS version_id, v.bpm, v.key, v.beats_per_bar,
   v.beat_unit, v.notes, v.reference_url, v.meter_confirmed
   FROM songs s JOIN song_versions v ON v.song_id = s.id AND v.is_current = 1`;
@@ -66,6 +68,7 @@ function toSongDto(
     title: r.title,
     artist: r.artist,
     composer: r.composer,
+    workMbid: r.work_mbid,
     album: r.album,
     referenceRecording: r.reference_recording,
     referenceYear: r.reference_year,
@@ -166,14 +169,69 @@ export async function getSongForSession(db: D1Database, bandId: string, songId: 
   };
 }
 
+interface SectionRow {
+  id: string;
+  name: string;
+  position: number;
+  bars: number;
+  notes: string | null;
+  kind: string | null;
+  start_ms: number | null;
+  end_ms: number | null;
+  cues: string;
+  origin: string;
+}
+
 async function listSections(db: D1Database, versionId: string): Promise<SongSectionDto[]> {
   const { results } = await db
     .prepare(
-      "SELECT id, name, position, bars, notes FROM song_sections WHERE version_id = ? ORDER BY position",
+      "SELECT id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin FROM song_sections WHERE version_id = ? ORDER BY position",
     )
     .bind(versionId)
-    .all<SongSectionDto>();
-  return results;
+    .all<SectionRow>();
+  return results.map((r) => {
+    let cues: SectionCue[] = [];
+    try {
+      const parsed = JSON.parse(r.cues ?? "[]");
+      if (Array.isArray(parsed)) cues = parsed;
+    } catch {
+      cues = [];
+    }
+    return {
+      id: r.id,
+      name: r.name,
+      position: r.position,
+      bars: r.bars,
+      notes: r.notes,
+      kind: r.kind,
+      startMs: r.start_ms,
+      endMs: r.end_ms,
+      cues,
+      origin: r.origin ?? "band",
+    };
+  });
+}
+
+type SectionInput = NonNullable<SongInput["sections"]>[number];
+
+function insertSection(db: D1Database, versionId: string, s: SectionInput, position: number) {
+  return db
+    .prepare(
+      `INSERT INTO song_sections (id, version_id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'band')`,
+    )
+    .bind(
+      newId(),
+      versionId,
+      s.name,
+      position,
+      s.bars,
+      s.notes ?? null,
+      s.kind ?? null,
+      s.startMs ?? null,
+      s.endMs ?? null,
+      JSON.stringify(s.cues ?? []),
+    );
 }
 
 async function materialSummary(db: D1Database, songId: string) {
@@ -190,6 +248,7 @@ export interface SongInput {
   title: string;
   artist?: string | null;
   composer?: string | null;
+  workMbid?: string | null;
   referenceRecording?: string | null;
   referenceYear?: number | null;
   originalBpmStatus?: FactStatus;
@@ -210,7 +269,15 @@ export interface SongInput {
     referenceUrl?: string | null;
     meterConfirmed?: boolean;
   };
-  sections?: { name: string; bars: number; notes?: string | null }[];
+  sections?: {
+    name: string;
+    bars: number;
+    notes?: string | null;
+    kind?: string | null;
+    startMs?: number | null;
+    endMs?: number | null;
+    cues?: SectionCue[];
+  }[];
 }
 
 export async function createSong(
@@ -272,13 +339,7 @@ export async function createSong(
       ),
   ];
   (input.sections ?? []).forEach((s, i) => {
-    stmts.push(
-      db
-        .prepare(
-          "INSERT INTO song_sections (id, version_id, name, position, bars, notes) VALUES (?, ?, ?, ?, ?, ?)",
-        )
-        .bind(newId(), versionId, s.name, i, s.bars, s.notes ?? null),
-    );
+    stmts.push(insertSection(db, versionId, s, i));
   });
   await db.batch(stmts);
   return id;
@@ -308,6 +369,7 @@ export async function updateSong(
     ["originalBpm", "original_bpm"],
     ["originalKey", "original_key"],
     ["composer", "composer"],
+    ["workMbid", "work_mbid"],
     ["referenceRecording", "reference_recording"],
     ["referenceYear", "reference_year"],
     ["originalTimeSignature", "original_time_signature"],
@@ -373,13 +435,7 @@ export async function updateSong(
       db.prepare("DELETE FROM song_sections WHERE version_id = ?").bind(current.version_id),
     );
     patch.sections.forEach((s, i) => {
-      stmts.push(
-        db
-          .prepare(
-            "INSERT INTO song_sections (id, version_id, name, position, bars, notes) VALUES (?, ?, ?, ?, ?, ?)",
-          )
-          .bind(newId(), current.version_id, s.name, i, s.bars, s.notes ?? null),
-      );
+      stmts.push(insertSection(db, current.version_id, s, i));
     });
   }
   await db.batch(stmts);
@@ -480,6 +536,9 @@ export interface MaterialInput {
   key?: string | null;
   status?: MaterialStatus;
   isExample?: boolean;
+  /** "band" (default) or "autoarrange" for slots and drafts created by a preparation job. */
+  origin?: "band" | "autoarrange";
+  originJobId?: string | null;
 }
 
 export async function createMaterial(
@@ -494,8 +553,8 @@ export async function createMaterial(
   await db
     .prepare(
       `INSERT INTO song_materials (id, song_id, version_id, type, title, instrument, body, external_url, file_id, key, status,
-         is_example, version, created_by, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+         is_example, origin, origin_job_id, version, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
     )
     .bind(
       id,
@@ -510,6 +569,8 @@ export async function createMaterial(
       input.key ?? null,
       input.status ?? "ready",
       input.isExample ? 1 : 0,
+      input.origin ?? "band",
+      input.originJobId ?? null,
       userId,
       ts,
       ts,

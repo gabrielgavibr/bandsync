@@ -1,0 +1,645 @@
+{
+  "id": "d72d41dd-fb12-4775-8188-d95c1fdabfe3",
+  "first-release-date": "1976",
+  "releases": [
+    {
+      "title": "Doces bárbaros",
+      "packaging": "Gatefold Cover",
+      "country": "BR",
+      "release-events": [
+        {
+          "date": "1976",
+          "area": {
+            "type-id": null,
+            "disambiguation": "",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "name": "Brazil",
+            "type": null,
+            "sort-name": "Brazil",
+            "iso-3166-1-codes": ["BR"]
+          }
+        }
+      ],
+      "release-group": {
+        "first-release-date": "1976",
+        "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "primary-type": "Album",
+        "artist-credit": [
+          {
+            "joinphrase": ", ",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+              "country": "BR",
+              "name": "Caetano Veloso",
+              "type": "Person",
+              "sort-name": "Veloso, Caetano"
+            },
+            "name": "Caetano"
+          },
+          {
+            "name": "Gal",
+            "artist": {
+              "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+              "country": "BR",
+              "name": "Gal Costa",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "Costa, Gal"
+            },
+            "joinphrase": ", "
+          },
+          {
+            "name": "Gil",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Gil, Gilberto",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+              "country": "BR",
+              "name": "Gilberto Gil"
+            },
+            "joinphrase": " & "
+          },
+          {
+            "joinphrase": "",
+            "name": "Bethânia",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+              "country": "BR",
+              "name": "Maria Bethânia",
+              "type": "Person",
+              "sort-name": "Bethânia, Maria"
+            }
+          }
+        ],
+        "title": "Doces bárbaros",
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"],
+        "secondary-types": ["Live"],
+        "releases": [],
+        "disambiguation": ""
+      },
+      "text-representation": { "script": "Latn", "language": "por" },
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "artist": {
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "name": "Caetano Veloso",
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "country": "BR",
+            "sort-name": "Veloso, Caetano",
+            "type": "Person"
+          },
+          "name": "Caetano"
+        },
+        {
+          "joinphrase": ", ",
+          "name": "Gal",
+          "artist": {
+            "type": "Person",
+            "sort-name": "Costa, Gal",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "country": "BR",
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "name": "Gal Costa"
+          }
+        },
+        {
+          "joinphrase": " & ",
+          "artist": {
+            "type": "Person",
+            "sort-name": "Gil, Gilberto",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "country": "BR",
+            "name": "Gilberto Gil"
+          },
+          "name": "Gil"
+        },
+        {
+          "name": "Bethânia",
+          "artist": {
+            "sort-name": "Bethânia, Maria",
+            "type": "Person",
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "name": "Maria Bethânia",
+            "country": "BR",
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
+      "status": "Official",
+      "disambiguation": "",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "",
+      "date": "1976",
+      "quality": "normal",
+      "id": "4ead1fc5-e22b-41c7-a9a3-2fd3158286c1"
+    },
+    {
+      "release-group": {
+        "primary-type": "Album",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "id": "475f40a5-f6f5-4cd4-9a58-3c7a1adb0d4a",
+        "first-release-date": "2002",
+        "disambiguation": "",
+        "releases": [],
+        "secondary-types": ["Compilation"],
+        "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"],
+        "title": "Todo Caetano",
+        "artist-credit": [
+          {
+            "name": "Caetano Veloso",
+            "artist": {
+              "sort-name": "Veloso, Caetano",
+              "type": "Person",
+              "name": "Caetano Veloso",
+              "country": "BR",
+              "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "joinphrase": ""
+          }
+        ]
+      },
+      "text-representation": { "language": "por", "script": "Latn" },
+      "title": "Todo Caetano",
+      "country": "BR",
+      "packaging": "Box",
+      "release-events": [
+        {
+          "area": {
+            "name": "Brazil",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "disambiguation": "",
+            "type-id": null,
+            "sort-name": "Brazil",
+            "iso-3166-1-codes": ["BR"],
+            "type": null
+          },
+          "date": "2002"
+        }
+      ],
+      "date": "2002",
+      "id": "91dd5b21-2cca-456a-8327-798bd9965b64",
+      "quality": "normal",
+      "artist-credit": [
+        {
+          "name": "Caetano Veloso",
+          "artist": {
+            "sort-name": "Veloso, Caetano",
+            "type": "Person",
+            "name": "Caetano Veloso",
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "country": "BR",
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "packaging-id": "c1668fc7-8944-4a00-bc3e-46e8d861d211",
+      "status": "Official",
+      "barcode": "0044006631608",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": ""
+    },
+    {
+      "release-group": {
+        "first-release-date": "2005-04-25",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "id": "c3b95ecb-8301-4359-959b-24d0e767df43",
+        "primary-type": "Album",
+        "artist-credit": [
+          {
+            "joinphrase": "",
+            "artist": {
+              "sort-name": "Bethânia, Maria",
+              "type": "Person",
+              "name": "Maria Bethânia",
+              "country": "BR",
+              "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "Maria Bethânia"
+          }
+        ],
+        "title": "Novo Millennium",
+        "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"],
+        "secondary-types": ["Compilation"],
+        "releases": [],
+        "disambiguation": ""
+      },
+      "text-representation": { "script": "Latn", "language": "por" },
+      "title": "Novo Millennium",
+      "country": "BR",
+      "packaging": "Jewel Case",
+      "release-events": [
+        {
+          "area": {
+            "iso-3166-1-codes": ["BR"],
+            "sort-name": "Brazil",
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Brazil",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8"
+          },
+          "date": "2005-04-25"
+        }
+      ],
+      "date": "2005-04-25",
+      "id": "f43c796d-cbc3-418d-8ca8-7486acd1d9ec",
+      "quality": "normal",
+      "artist-credit": [
+        {
+          "artist": {
+            "type": "Person",
+            "sort-name": "Bethânia, Maria",
+            "country": "BR",
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "name": "Maria Bethânia",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": ""
+          },
+          "name": "Maria Bethânia",
+          "joinphrase": ""
+        }
+      ],
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "602498230992",
+      "disambiguation": ""
+    },
+    {
+      "date": "2011",
+      "id": "8cdf9f36-2a98-42eb-bfce-ddf27b128f40",
+      "quality": "normal",
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "country": "BR",
+            "name": "Caetano Veloso",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "type": "Person",
+            "sort-name": "Veloso, Caetano"
+          }
+        },
+        {
+          "joinphrase": ", ",
+          "artist": {
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "name": "Gal Costa",
+            "country": "BR",
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "sort-name": "Costa, Gal",
+            "type": "Person"
+          },
+          "name": "Gal Costa"
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "sort-name": "Gil, Gilberto",
+            "type": "Person",
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "name": "Gilberto Gil",
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "country": "BR"
+          },
+          "joinphrase": ", "
+        },
+        {
+          "joinphrase": "",
+          "artist": {
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "country": "BR",
+            "name": "Maria Bethânia",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "type": "Person",
+            "sort-name": "Bethânia, Maria"
+          },
+          "name": "Maria Bethânia"
+        }
+      ],
+      "packaging-id": null,
+      "status": "Official",
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "602527679051",
+      "disambiguation": "",
+      "release-group": {
+        "disambiguation": "",
+        "releases": [],
+        "secondary-types": ["Live"],
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"],
+        "title": "Doces bárbaros",
+        "artist-credit": [
+          {
+            "name": "Caetano",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Veloso, Caetano",
+              "country": "BR",
+              "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+              "name": "Caetano Veloso",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": ""
+            },
+            "joinphrase": ", "
+          },
+          {
+            "joinphrase": ", ",
+            "name": "Gal",
+            "artist": {
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "country": "BR",
+              "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+              "name": "Gal Costa",
+              "type": "Person",
+              "sort-name": "Costa, Gal"
+            }
+          },
+          {
+            "joinphrase": " & ",
+            "name": "Gil",
+            "artist": {
+              "type": "Person",
+              "sort-name": "Gil, Gilberto",
+              "country": "BR",
+              "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+              "name": "Gilberto Gil",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": ""
+            }
+          },
+          {
+            "joinphrase": "",
+            "name": "Bethânia",
+            "artist": {
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Maria Bethânia",
+              "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+              "country": "BR",
+              "sort-name": "Bethânia, Maria",
+              "type": "Person"
+            }
+          }
+        ],
+        "primary-type": "Album",
+        "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "first-release-date": "1976"
+      },
+      "text-representation": { "language": "eng", "script": "Latn" },
+      "title": "Doces Bárbaros",
+      "country": "BR",
+      "packaging": null,
+      "release-events": [
+        {
+          "date": "2011",
+          "area": {
+            "sort-name": "Brazil",
+            "iso-3166-1-codes": ["BR"],
+            "type": null,
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Brazil",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8"
+          }
+        }
+      ]
+    },
+    {
+      "date": "",
+      "id": "35822d44-ebf8-4d5c-a4b3-b08fa99134a2",
+      "quality": "normal",
+      "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
+      "artist-credit": [
+        {
+          "artist": {
+            "name": "Caetano Veloso",
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "country": "BR",
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "sort-name": "Veloso, Caetano",
+            "type": "Person"
+          },
+          "name": "Caetano",
+          "joinphrase": ", "
+        },
+        {
+          "artist": {
+            "type": "Person",
+            "sort-name": "Costa, Gal",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "country": "BR",
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "name": "Gal Costa"
+          },
+          "name": "Gal",
+          "joinphrase": ", "
+        },
+        {
+          "joinphrase": " & ",
+          "name": "Gil",
+          "artist": {
+            "country": "BR",
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "type": "Person",
+            "sort-name": "Gil, Gilberto"
+          }
+        },
+        {
+          "artist": {
+            "name": "Maria Bethânia",
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "country": "BR",
+            "disambiguation": "",
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "sort-name": "Bethânia, Maria",
+            "type": "Person"
+          },
+          "name": "Bethânia",
+          "joinphrase": ""
+        }
+      ],
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "barcode": "042284292023",
+      "disambiguation": "",
+      "status": "Official",
+      "release-group": {
+        "first-release-date": "1976",
+        "primary-type": "Album",
+        "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"],
+        "title": "Doces bárbaros",
+        "artist-credit": [
+          {
+            "artist": {
+              "sort-name": "Veloso, Caetano",
+              "type": "Person",
+              "name": "Caetano Veloso",
+              "country": "BR",
+              "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+            },
+            "name": "Caetano",
+            "joinphrase": ", "
+          },
+          {
+            "joinphrase": ", ",
+            "name": "Gal",
+            "artist": {
+              "country": "BR",
+              "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+              "name": "Gal Costa",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "Costa, Gal"
+            }
+          },
+          {
+            "joinphrase": " & ",
+            "artist": {
+              "sort-name": "Gil, Gilberto",
+              "type": "Person",
+              "disambiguation": "",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "name": "Gilberto Gil",
+              "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+              "country": "BR"
+            },
+            "name": "Gil"
+          },
+          {
+            "joinphrase": "",
+            "name": "Bethânia",
+            "artist": {
+              "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+              "country": "BR",
+              "name": "Maria Bethânia",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "Bethânia, Maria"
+            }
+          }
+        ],
+        "disambiguation": "",
+        "releases": [],
+        "secondary-types": ["Live"]
+      },
+      "text-representation": { "language": "por", "script": "Latn" },
+      "title": "Doces bárbaros",
+      "release-events": [
+        {
+          "date": "",
+          "area": {
+            "disambiguation": "",
+            "type-id": null,
+            "name": "Brazil",
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "sort-name": "Brazil",
+            "iso-3166-1-codes": ["BR"],
+            "type": null
+          }
+        }
+      ],
+      "country": "BR",
+      "packaging": "Jewel Case"
+    }
+  ],
+  "disambiguation": "",
+  "length": 250733,
+  "relations": [],
+  "isrcs": [],
+  "title": "Esotérico",
+  "artist-credit": [
+    {
+      "joinphrase": ", ",
+      "artist": {
+        "name": "Caetano Veloso",
+        "country": "BR",
+        "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "sort-name": "Veloso, Caetano",
+        "type": "Person"
+      },
+      "name": "Caetano Veloso"
+    },
+    {
+      "joinphrase": ", ",
+      "artist": {
+        "sort-name": "Costa, Gal",
+        "type": "Person",
+        "name": "Gal Costa",
+        "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+        "country": "BR",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+      },
+      "name": "Gal Costa"
+    },
+    {
+      "artist": {
+        "sort-name": "Gil, Gilberto",
+        "type": "Person",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "name": "Gilberto Gil",
+        "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+        "country": "BR"
+      },
+      "name": "Gilberto Gil",
+      "joinphrase": " & "
+    },
+    {
+      "artist": {
+        "sort-name": "Bethânia, Maria",
+        "type": "Person",
+        "name": "Maria Bethânia",
+        "country": "BR",
+        "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+      },
+      "name": "Maria Bethânia",
+      "joinphrase": ""
+    }
+  ],
+  "video": false
+}

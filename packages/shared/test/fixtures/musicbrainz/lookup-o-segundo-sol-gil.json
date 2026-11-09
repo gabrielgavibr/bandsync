@@ -1,0 +1,96 @@
+{
+  "isrcs": [],
+  "disambiguation": "",
+  "title": "O segundo sol",
+  "id": "790c0007-1df2-4d2e-bd34-8a772894e800",
+  "releases": [
+    {
+      "barcode": "602448093493",
+      "country": "BR",
+      "title": "Cássia Reggae, Vol. 1",
+      "date": "2022-07-01",
+      "id": "433f921c-c83b-4591-87cc-217cedce60b5",
+      "text-representation": { "language": "por", "script": "Latn" },
+      "quality": "normal",
+      "release-group": {
+        "secondary-types": ["Compilation"],
+        "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"],
+        "releases": [],
+        "disambiguation": "",
+        "title": "Cássia Reggae, Vol. 1",
+        "id": "1e3451c7-c239-467a-9f93-a9b429138e51",
+        "primary-type": "Album",
+        "artist-credit": [
+          {
+            "name": "Various Artists",
+            "artist": {
+              "type-id": "ac897045-5043-3294-969b-187360e45d86",
+              "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+              "country": null,
+              "disambiguation": "add compilations to this artist",
+              "type": "Other",
+              "name": "Various Artists",
+              "sort-name": "Various Artists"
+            },
+            "joinphrase": ""
+          }
+        ],
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "first-release-date": "2022-07-01"
+      },
+      "artist-credit": [
+        {
+          "name": "Various Artists",
+          "artist": {
+            "type-id": "ac897045-5043-3294-969b-187360e45d86",
+            "country": null,
+            "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+            "type": "Other",
+            "disambiguation": "add compilations to this artist",
+            "sort-name": "Various Artists",
+            "name": "Various Artists"
+          },
+          "joinphrase": ""
+        }
+      ],
+      "status": "Official",
+      "disambiguation": "",
+      "packaging": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "release-events": [
+        {
+          "date": "2022-07-01",
+          "area": {
+            "name": "Brazil",
+            "sort-name": "Brazil",
+            "iso-3166-1-codes": ["BR"],
+            "type-id": null,
+            "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+            "type": null,
+            "disambiguation": ""
+          }
+        }
+      ],
+      "packaging-id": null
+    }
+  ],
+  "length": 257546,
+  "relations": [],
+  "video": false,
+  "artist-credit": [
+    {
+      "name": "Gilberto Gil",
+      "joinphrase": "",
+      "artist": {
+        "name": "Gilberto Gil",
+        "sort-name": "Gil, Gilberto",
+        "country": "BR",
+        "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+        "disambiguation": "",
+        "type": "Person",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+      }
+    }
+  ],
+  "first-release-date": "2022-07-01"
+}

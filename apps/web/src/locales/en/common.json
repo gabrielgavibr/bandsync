@@ -1,5 +1,8 @@
 {
-  "app": { "name": "BandSync", "tagline": "Your band. Your music. In sync." },
+  "app": {
+    "name": "BandSync",
+    "tagline": "Your band. Your music. In sync."
+  },
   "nav": {
     "bands": "Bands",
     "dashboard": "Overview",
@@ -51,7 +54,10 @@
     "notFoundBody": "The address you opened does not exist or you no longer have access to it.",
     "optional": "optional"
   },
-  "confirm": { "deleteTitle": "Delete?", "deleteBody": "This action cannot be undone." },
+  "confirm": {
+    "deleteTitle": "Delete?",
+    "deleteBody": "This action cannot be undone."
+  },
   "errors": {
     "validation_error": "Please check the highlighted fields.",
     "unauthorized": "Please sign in to continue.",
@@ -69,7 +75,8 @@
     "payload_too_large": "The file is too large.",
     "unsupported_media": "This file type is not supported.",
     "internal_error": "Unexpected server error. Please try again.",
-    "network": "Could not reach the server. Check your connection."
+    "network": "Could not reach the server. Check your connection.",
+    "upstream_unavailable": "A music data service did not respond. Please try again in a moment."
   },
   "instrument": {
     "vocals": "Vocals",
@@ -102,9 +109,21 @@
     "video_reference": "Video reference",
     "notes": "Notes"
   },
-  "role": { "admin": "Admin", "member": "Member" },
-  "theme": { "label": "Theme", "system": "System", "light": "Light", "dark": "Dark" },
-  "language": { "label": "Language", "pt-BR": "Português (Brasil)", "en": "English" },
+  "role": {
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "language": {
+    "label": "Language",
+    "pt-BR": "Português (Brasil)",
+    "en": "English"
+  },
   "notation": {
     "label": "Note names",
     "english": "C D E F G A B",

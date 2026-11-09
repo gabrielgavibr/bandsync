@@ -1,0 +1,4139 @@
+{
+  "created": "2026-11-09T19:48:12.806Z",
+  "count": 22,
+  "offset": 0,
+  "recordings": [
+    {
+      "id": "c7791215-c2a3-4fa0-9b26-7c516931d232",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 291387,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2022-06-24",
+      "releases": [
+        {
+          "id": "1faa4fa0-c96d-44a4-8427-6a805cad0537",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Em Casa Com os Gil",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "704f85ef-b475-4f3e-9d1e-b7834aceb19b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Em Casa Com os Gil",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2022-06-24",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2022-06-24",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "92a90889-c828-38ec-bd5c-bca60120b43b",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "325c8154-1d38-4673-b445-63d25ace533e",
+                  "number": "4",
+                  "title": "Esotérico",
+                  "length": 291387
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4ed0391b-a8a8-47c6-90fb-8f8482c73c66",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 261000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "releases": [
+        {
+          "id": "5386dd1a-2340-41f5-8b98-aa5aa2d95724",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "949a7fd5-fe73-3e8f-922e-01ff4ca958f7",
+          "count": 1,
+          "title": "Coleção Som do Brasil - MPB",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Various Artists",
+              "artist": {
+                "id": "89ad4ac3-39f7-470e-963a-56509c546377",
+                "name": "Various Artists",
+                "sort-name": "Various Artists",
+                "disambiguation": "add compilations to this artist"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "259c6049-5e71-3334-8594-390ac39d74f7",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Coleção Som do Brasil - MPB",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "track-count": 14,
+          "media": [
+            {
+              "id": "38d7d30c-48fe-3403-96ad-d080e880438b",
+              "position": 1,
+              "track": [
+                {
+                  "id": "58da3065-1f2f-3876-a356-f91581e3e47a",
+                  "number": "8",
+                  "title": "Esotérico",
+                  "length": 261000
+                }
+              ],
+              "track-count": 14,
+              "track-offset": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8379142a-fe4e-4da2-8edf-fb493665a54f",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 262400,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1982",
+      "releases": [
+        {
+          "id": "3a7a9915-07b0-4d56-b29a-002d5fd6a9f5",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Um Banda Um",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "e35da729-8ac2-390f-81e8-8cd5bc0326eb",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Um Banda Um",
+            "primary-type": "Album"
+          },
+          "date": "1982",
+          "country": "US",
+          "release-events": [
+            {
+              "date": "1982",
+              "area": {
+                "id": "489ce91b-6658-3307-9877-795b68554c98",
+                "name": "United States",
+                "sort-name": "United States",
+                "iso-3166-1-codes": ["US"]
+              }
+            }
+          ],
+          "track-count": 11,
+          "media": [
+            {
+              "id": "044ec81c-0a21-3634-ae50-9343877189a9",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "ddab83ae-488c-3503-916a-91709de9631b",
+                  "number": "8",
+                  "title": "Esotérico",
+                  "length": 262400
+                }
+              ],
+              "track-count": 11,
+              "track-offset": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4f565867-f96a-4b32-bf86-cc7f4f640d2c",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 317706,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1994",
+      "releases": [
+        {
+          "id": "548aeeed-a312-4cdc-bd5e-eadfd07b28c9",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Unplugged",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2003",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2003",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "8b4690ac-f797-385d-a436-309ede9a9bf1",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "54b7738b-c493-4dcc-8873-7187be143780",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 317666
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        },
+        {
+          "id": "0ae7eb40-7dad-4969-abb5-b188c740fff3",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Unplugged",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "1994",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "7e0356e0-e455-3afa-858e-c948fb81cffb",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "95925c95-80ea-332c-aff5-67ce983eaaa5",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 317706
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        },
+        {
+          "id": "6f684ba8-e46d-4174-925d-6d3f6de370e7",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Unplugged",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994",
+          "country": "DE",
+          "release-events": [
+            {
+              "date": "1994",
+              "area": {
+                "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                "name": "Germany",
+                "sort-name": "Germany",
+                "iso-3166-1-codes": ["DE"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "2b365db0-1da7-3a31-bce5-54cc9eff780c",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "231ee14f-2491-436f-9c3a-ba9b0a97b398",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 317706
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cc60f52a-befd-4876-931f-d7bf7d427458",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 294000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2009-05-11",
+      "releases": [
+        {
+          "id": "eb0d09a9-c5de-48ae-9e01-6f5a21d3a69a",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "BandaDois",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "3361fac6-9e0e-42db-92e0-3c66d00599f1",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "BandaDois",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2009-05-11",
+          "country": "XW",
+          "release-events": [
+            {
+              "date": "2009-05-11",
+              "area": {
+                "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                "name": "[Worldwide]",
+                "sort-name": "[Worldwide]",
+                "iso-3166-1-codes": ["XW"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "6902fa49-3545-3c89-bc19-059ac4ff8d2d",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "69930bb4-414a-4926-9612-f0ec6e0e4e8e",
+                  "number": "1",
+                  "title": "Esotérico",
+                  "length": 294973
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 0
+            }
+          ]
+        },
+        {
+          "id": "140e5bae-3f50-4822-931f-c4a0fbc4c16d",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "BandaDois",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "3361fac6-9e0e-42db-92e0-3c66d00599f1",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "BandaDois",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2010-03-16",
+          "country": "US",
+          "release-events": [
+            {
+              "date": "2010-03-16",
+              "area": {
+                "id": "489ce91b-6658-3307-9877-795b68554c98",
+                "name": "United States",
+                "sort-name": "United States",
+                "iso-3166-1-codes": ["US"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "597c7207-79ac-3ed0-a4a5-4cf49bf07e4b",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "cee9c403-540a-3f78-98b1-1e1874494d98",
+                  "number": "1",
+                  "title": "Esotérico",
+                  "length": 294000
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 0
+            }
+          ]
+        },
+        {
+          "id": "adfc7901-d3dc-3a9b-8ffa-49173a0e49c2",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "BandaDois",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "3361fac6-9e0e-42db-92e0-3c66d00599f1",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "BandaDois",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2009-12-09",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2009-12-09",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "438bf1f3-ca88-3a84-89c6-13a539c5f47f",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "7cb48748-1b91-30f4-a24f-14b54be14c13",
+                  "number": "1",
+                  "title": "Esotérico",
+                  "length": 294000
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7080e1df-b540-4f5b-a6e2-80847eced5ab",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 319733,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1994-06-07",
+      "releases": [
+        {
+          "id": "03651685-7a3b-4592-84f8-ac4fb222fb05",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Acoustic",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994",
+          "country": "DE",
+          "release-events": [
+            {
+              "date": "1994",
+              "area": {
+                "id": "85752fda-13c4-31a3-bee5-0e5cb1f51dad",
+                "name": "Germany",
+                "sort-name": "Germany",
+                "iso-3166-1-codes": ["DE"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "e5c6b3fa-38e7-3d0d-a854-6375de2e141b",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "bc3a0734-86fa-4aa9-869c-1e6f517d5719",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 319733
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        },
+        {
+          "id": "864655f7-8674-4908-b9a1-96cd47fb73b4",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Acoustic",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994-06-07",
+          "country": "US",
+          "release-events": [
+            {
+              "date": "1994-06-07",
+              "area": {
+                "id": "489ce91b-6658-3307-9877-795b68554c98",
+                "name": "United States",
+                "sort-name": "United States",
+                "iso-3166-1-codes": ["US"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "b08eb08c-6ffe-3246-9e64-a0c3fad10661",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "931da34a-02b9-3380-9c6d-3be7111897fc",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 319733
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        },
+        {
+          "id": "6d50febf-4346-3bf1-80eb-8058ab7f03a0",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Acoustic",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "1994",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 16,
+          "media": [
+            {
+              "id": "45add995-a854-3344-9ea9-a2f641db48b6",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "388687ea-73de-3d22-a4e1-40ad826aa585",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 319733
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 4
+            }
+          ]
+        }
+      ],
+      "tags": [
+        { "count": 1, "name": "mpb" },
+        { "count": 2, "name": "brazilian" },
+        { "count": 1, "name": "bossa nova" },
+        { "count": 2, "name": "latin" },
+        { "count": 1, "name": "brazilian pop" }
+      ]
+    },
+    {
+      "id": "8683a9c9-d269-408b-8da8-4ea06c4b760f",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esoterico",
+      "length": 252333,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2003",
+      "releases": [
+        {
+          "id": "cefeca96-a59f-49ed-a488-60f6fdd71d80",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Aquarela Do Brasil - 16 Grandes Éxitos",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "8988f285-7306-4ce9-a591-0350e0ef4596",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Aquarela Do Brasil - 16 Grandes Éxitos",
+            "primary-type": "Album"
+          },
+          "track-count": 16,
+          "media": [
+            {
+              "id": "38515b3a-fb7d-356d-abf5-81520cc7cc3e",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "a8db61cd-e680-417e-8de9-0c59fc09c149",
+                  "number": "12",
+                  "title": "Esoterico",
+                  "length": 252333
+                }
+              ],
+              "track-count": 16,
+              "track-offset": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a66d331a-f7c9-4a90-9456-cf282f5733f6",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 311534,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1994",
+      "releases": [
+        {
+          "id": "67da4ab9-6e41-44c1-b314-a64574c9b526",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Unplugged (Ao Vivo)",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "97c7de57-4700-36eb-a5fa-64da5915673b",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Unplugged",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1994",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "1994",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 22,
+          "media": [
+            {
+              "id": "30f35364-3504-3091-bafd-517ba94138eb",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "84576a11-8eae-4934-b1c6-eac0d2f3d538",
+                  "number": "16",
+                  "title": "Esotérico",
+                  "length": 311534
+                }
+              ],
+              "track-count": 22,
+              "track-offset": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "550f0160-9ba7-44b3-bafd-d6728a55e4a8",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 262000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2002",
+      "releases": [
+        {
+          "id": "e43e4652-56d8-486b-b139-cda641afb549",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Um Banda Um",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "e35da729-8ac2-390f-81e8-8cd5bc0326eb",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Um Banda Um",
+            "primary-type": "Album"
+          },
+          "date": "2002",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2002",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 17,
+          "media": [
+            {
+              "id": "b5b94832-9472-3e79-bd60-8f2504aae377",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "ef0c649b-49b8-40e6-9e2a-9de51d3a621d",
+                  "number": "8",
+                  "title": "Esotérico",
+                  "length": 262000
+                }
+              ],
+              "track-count": 17,
+              "track-offset": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0cf70816-069b-4a1a-9552-f7b9994fe13b",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 262079,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2000",
+      "releases": [
+        {
+          "id": "3462dd0d-29b3-4c74-a11c-00a04fa869ad",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 2,
+          "title": "e‐Collection: sucessos + raridades",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "927cdd0b-571c-4e6b-8e0b-fa5ca1f8faff",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "e‐Collection: sucessos + raridades",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2000",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2000",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 27,
+          "media": [
+            {
+              "id": "bfb06232-1fe1-308a-9c31-ccd77a678626",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "b55620f8-27e1-459c-8abe-76e6d2f884fa",
+                  "number": "6",
+                  "title": "Esotérico",
+                  "length": 262079
+                }
+              ],
+              "track-count": 14,
+              "track-offset": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7a778440-c36e-48f1-b409-82172665226d",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 314000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2007",
+      "releases": [
+        {
+          "id": "19faa0de-ea2a-4ab5-9fb0-4a2b8027b89b",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Nova Série - No Palco",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "9356d166-ed47-4a16-8939-2a51d5bcee86",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Nova Série - No Palco",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2007",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2007",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 14,
+          "media": [
+            {
+              "id": "1e1ace0d-af6d-3a5b-8283-abcb89318d9d",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "b8b1cc5c-8d9c-4628-be77-aa5ab22eb1f8",
+                  "number": "11",
+                  "title": "Esotérico",
+                  "length": 314000
+                }
+              ],
+              "track-count": 14,
+              "track-offset": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d02d7675-9af3-4fa8-8a90-09d63d03d644",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esoterico",
+      "length": 263000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1996-11-27",
+      "releases": [
+        {
+          "id": "dc49c3f1-81c0-4a76-94b6-7421c7750be0",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Les incontournables du Jazz - Gilberto Gil",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "71035c0b-05e6-4dac-b0be-23237040de2b",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Les incontournables du Jazz - Gilberto Gil",
+            "primary-type": "Album"
+          },
+          "date": "1996-11-27",
+          "country": "FR",
+          "release-events": [
+            {
+              "date": "1996-11-27",
+              "area": {
+                "id": "08310658-51eb-3801-80de-5a0739207115",
+                "name": "France",
+                "sort-name": "France",
+                "iso-3166-1-codes": ["FR"]
+              }
+            }
+          ],
+          "track-count": 13,
+          "media": [
+            {
+              "id": "3705be3a-d0cc-34d7-9ffb-1af83328f928",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "6dc177e5-362f-364a-84f3-b7c995d07256",
+                  "number": "2",
+                  "title": "Esoterico",
+                  "length": 263000
+                }
+              ],
+              "track-count": 13,
+              "track-offset": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b9205ff4-b8f0-4ce5-89db-2b8109652fda",
+      "score": 100,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico",
+      "length": 291387,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2022-06-24",
+      "releases": [
+        {
+          "id": "320f14e6-59fa-4f68-839d-054f4ee82945",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Em Casa Com os Gil",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "38de0a4a-d8a4-40f2-a105-0d7d794ab765",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Em Casa Com os Gil",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2022-06-24",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2022-06-24",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 15,
+          "media": [
+            {
+              "id": "0deb5e88-c71d-3c60-be49-c6d63a10f18f",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "9c3d30c9-fca8-4e0a-afdd-5a1ec80cf37f",
+                  "number": "4",
+                  "title": "Esotérico",
+                  "length": 291387
+                }
+              ],
+              "track-count": 15,
+              "track-offset": 3
+            }
+          ]
+        },
+        {
+          "id": "250ccc4c-581c-4fdd-b33c-fda92dfeda31",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Em Casa Com os Gil",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "d78a25f1-b8f7-4d72-ac54-ecb33d0d0e74",
+            "type-id": "22a628ad-c082-3c4f-b1b6-d41665107b88",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Em Casa Com os Gil",
+            "primary-type": "Album",
+            "secondary-types": ["Soundtrack"],
+            "secondary-type-ids": ["22a628ad-c082-3c4f-b1b6-d41665107b88"]
+          },
+          "date": "2022-06-24",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2022-06-24",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 15,
+          "media": [
+            {
+              "id": "34d2a858-6d84-3396-9d83-340b89c735ba",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "d856193a-2c9a-4153-bc34-14908ed02f97",
+                  "number": "4",
+                  "title": "Esotérico",
+                  "length": 291387
+                }
+              ],
+              "track-count": 15,
+              "track-offset": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "84de8a50-c5ef-4c3b-9161-c7066341fd71",
+      "score": 87,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico (first version)",
+      "length": 237000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2002",
+      "releases": [
+        {
+          "id": "e43e4652-56d8-486b-b139-cda641afb549",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Um Banda Um",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "e35da729-8ac2-390f-81e8-8cd5bc0326eb",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Um Banda Um",
+            "primary-type": "Album"
+          },
+          "date": "2002",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2002",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 17,
+          "media": [
+            {
+              "id": "b5b94832-9472-3e79-bd60-8f2504aae377",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "51d0a7ed-b2b6-4445-865a-a8ba857b018b",
+                  "number": "14",
+                  "title": "Esotérico (first version)",
+                  "length": 237000
+                }
+              ],
+              "track-count": 17,
+              "track-offset": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "63fd26a0-1aa2-46f6-9844-f739e07deab2",
+      "score": 87,
+      "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+      "title": "Esotérico (take 1)",
+      "length": 268000,
+      "video": null,
+      "artist-credit": [
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2002",
+      "releases": [
+        {
+          "id": "e43e4652-56d8-486b-b139-cda641afb549",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 1,
+          "title": "Um Banda Um",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "e35da729-8ac2-390f-81e8-8cd5bc0326eb",
+            "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Um Banda Um",
+            "primary-type": "Album"
+          },
+          "date": "2002",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2002",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 17,
+          "media": [
+            {
+              "id": "b5b94832-9472-3e79-bd60-8f2504aae377",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "2c87d8cf-f1f7-4f7b-bb8e-7865457e1ca9",
+                  "number": "17",
+                  "title": "Esotérico (take 1)",
+                  "length": 268000
+                }
+              ],
+              "track-count": 17,
+              "track-offset": 16
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3cffc647-2549-406b-bcc0-19fbc5609d75",
+      "score": 83,
+      "artist-credit-id": "f851c671-a56d-3fb4-b071-de32850a3325",
+      "title": "Esotérico",
+      "length": 262431,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": " & ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2014",
+      "releases": [
+        {
+          "id": "94657e05-b233-476a-92d3-60d4c0d2e409",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "f851c671-a56d-3fb4-b071-de32850a3325",
+          "count": 2,
+          "title": "Up From The Skies",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": " & ",
+              "name": "Caetano Veloso",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "eec0685d-dfdc-430b-baac-e56c878d403d",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Up From The Skies",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "track-count": 23,
+          "media": [
+            {
+              "id": "7f40dc08-43b4-33d1-a01b-6eca18c50f58",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "21ebdc31-b4b3-4d05-90d5-e3bcfd6aab14",
+                  "number": "5",
+                  "title": "Esotérico",
+                  "length": 262431
+                }
+              ],
+              "track-count": 13,
+              "track-offset": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6efd7db6-4739-452a-8b07-791a1f673a99",
+      "score": 83,
+      "artist-credit-id": "ff610082-2148-44ab-b1bc-9274fdebbdfe",
+      "title": "Esotérico",
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": " / ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2016",
+      "releases": [
+        {
+          "id": "85d9fcb2-cbb5-4a22-956e-97ac16537a4c",
+          "artist-credit-id": "ff610082-2148-44ab-b1bc-9274fdebbdfe",
+          "count": 1,
+          "title": "Dois Amigos, Um Século De Música / Multishow Live",
+          "artist-credit": [
+            {
+              "joinphrase": " / ",
+              "name": "Caetano Veloso",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "1726a09e-07ba-4af5-b7ad-6e1004c91a25",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Dois Amigos, Um Século De Música",
+            "disambiguation": "Multishow Ao Vivo",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2016",
+          "country": "US",
+          "release-events": [
+            {
+              "date": "2016",
+              "area": {
+                "id": "489ce91b-6658-3307-9877-795b68554c98",
+                "name": "United States",
+                "sort-name": "United States",
+                "iso-3166-1-codes": ["US"]
+              }
+            }
+          ],
+          "track-count": 28,
+          "media": [
+            {
+              "id": "c9bd75df-41c3-3a64-acbe-7fcfb45672d4",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "b3c3e87c-7b24-4914-8126-c69d83820b9a",
+                  "number": "16",
+                  "title": "Esotérico"
+                }
+              ],
+              "track-count": 28,
+              "track-offset": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "59f9ce0a-3ed8-4cd1-9a6f-87ef428cc114",
+      "score": 83,
+      "artist-credit-id": "f851c671-a56d-3fb4-b071-de32850a3325",
+      "title": "Esotérico",
+      "length": 257000,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": " & ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2015-12-04",
+      "releases": [
+        {
+          "id": "863affce-94a7-4922-bc70-51c005e58d9d",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "f851c671-a56d-3fb4-b071-de32850a3325",
+          "count": 2,
+          "title": "Dois amigos, um século de música",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": " & ",
+              "name": "Caetano Veloso",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "776894aa-2993-46ca-81a5-6ecf2c2e1a05",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Dois amigos, um século de música",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2015-12-04",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2015-12-04",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 28,
+          "media": [
+            {
+              "id": "6b60f557-c5d6-3a87-b4e7-e1284847a5a6",
+              "position": 2,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "fa4da830-a821-4dbe-ad15-9895c0761db1",
+                  "number": "3",
+                  "title": "Esotérico",
+                  "length": 257000
+                }
+              ],
+              "track-count": 15,
+              "track-offset": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "215669be-6254-4382-8dbc-a51f12ace80f",
+      "score": 77,
+      "artist-credit-id": "946b9ece-690a-33b4-bd4f-dd0494f75fd6",
+      "title": "Esotérico",
+      "length": 290000,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": " & ",
+          "name": "Nando Reis",
+          "artist": {
+            "id": "cda86e8a-a26a-4b3a-959c-bc9f8a88a1c1",
+            "name": "Nando Reis",
+            "sort-name": "Reis, Nando",
+            "aliases": [
+              {
+                "sort-name": "Reis, José Fernando Gomes dos",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "José Fernando Gomes dos Reis",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gal Gosta",
+          "artist": {
+            "id": "804101f7-146b-49dd-9753-e1814a86bb4b",
+            "name": "Gal Gosta",
+            "sort-name": "Gosta, Gal"
+          }
+        }
+      ],
+      "first-release-date": "2017",
+      "releases": [
+        {
+          "id": "4427ec8b-14f9-447d-aa21-9cf2ab4eb74b",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "9685dbc0-b570-4979-b052-c42489612096",
+          "count": 2,
+          "title": "Trinca de Ases",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": ", ",
+              "name": "Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            },
+            {
+              "joinphrase": " & ",
+              "name": "Nando",
+              "artist": {
+                "id": "cda86e8a-a26a-4b3a-959c-bc9f8a88a1c1",
+                "name": "Nando Reis",
+                "sort-name": "Reis, Nando"
+              }
+            },
+            {
+              "name": "Gal",
+              "artist": {
+                "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+                "name": "Gal Costa",
+                "sort-name": "Costa, Gal"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "b2faad37-20c3-4445-be41-1216daf7374a",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Trinca de Ases (Ao Vivo)",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2017",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2017",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 25,
+          "media": [
+            {
+              "id": "d2f82662-c7ab-3d0c-a371-59bdc62b0e32",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "eece5b16-d4a8-40ac-81ab-1d1c147b5055",
+                  "number": "8",
+                  "title": "Esotérico"
+                }
+              ],
+              "track-count": 13,
+              "track-offset": 7
+            }
+          ]
+        },
+        {
+          "id": "454c95bc-06a8-40cc-837f-222cf322cbf9",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "946b9ece-690a-33b4-bd4f-dd0494f75fd6",
+          "count": 2,
+          "title": "Trinca de Ases (Ao Vivo)",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": ", ",
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            },
+            {
+              "joinphrase": " & ",
+              "name": "Nando Reis",
+              "artist": {
+                "id": "cda86e8a-a26a-4b3a-959c-bc9f8a88a1c1",
+                "name": "Nando Reis",
+                "sort-name": "Reis, Nando"
+              }
+            },
+            {
+              "name": "Gal Gosta",
+              "artist": {
+                "id": "804101f7-146b-49dd-9753-e1814a86bb4b",
+                "name": "Gal Gosta",
+                "sort-name": "Gosta, Gal"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "b2faad37-20c3-4445-be41-1216daf7374a",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Trinca de Ases (Ao Vivo)",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2018-03-09",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2018-03-09",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 25,
+          "media": [
+            {
+              "id": "4b07accc-7ef0-30fb-8e2a-bd2e10e1604a",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "b5de6d33-b67b-4e75-9b7c-9ef044a27233",
+                  "number": "8",
+                  "title": "Esotérico",
+                  "length": 290000
+                }
+              ],
+              "track-count": 13,
+              "track-offset": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ff8e1a34-7a98-4355-8285-c8c72ab217f6",
+      "score": 73,
+      "artist-credit-id": "0fbde5bc-a039-3d2e-9566-babbe1b8ae7a",
+      "title": "Esotérico",
+      "length": 252000,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "name": "Maria Bethânia",
+          "artist": {
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "name": "Maria Bethânia",
+            "sort-name": "Bethânia, Maria",
+            "aliases": [
+              {
+                "sort-name": "マリア・ベターニア",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "マリア・ベターニア",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethânia",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria Bethânia",
+                "locale": "pt",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Maria Bethânia Vianna Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria Bethânia Vianna Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Beth, Maria",
+                "name": "Maria Beth",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethania",
+                "name": "Maria Bethania",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethãnia",
+                "name": "Maria Bethãnia",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": ", ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": " & ",
+          "name": "Gal Costa",
+          "artist": {
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "name": "Gal Costa",
+            "sort-name": "Costa, Gal",
+            "aliases": [
+              {
+                "sort-name": "Maria da Graça",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria da Graça",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Burgos, Maria da Graça Costa Penna",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria da Graça Costa Penna Burgos",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1999-12-31",
+      "releases": [
+        {
+          "id": "483a5c50-6bb4-471a-95b6-8b3665ec1895",
+          "artist-credit-id": "0bb52930-a8c7-3a8a-b48b-367c7ff82c9b",
+          "count": 1,
+          "title": "Brincar De Viver",
+          "artist-credit": [
+            {
+              "name": "Maria Bethânia",
+              "artist": {
+                "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+                "name": "Maria Bethânia",
+                "sort-name": "Bethânia, Maria"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "a3b054ea-4190-4103-8d28-19aae571b2ed",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Brincar De Viver",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "1999-12-31",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "1999-12-31",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 14,
+          "media": [
+            {
+              "id": "bf250f2d-535d-3fcb-bebb-5cee82252d88",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "20c62b5a-a9ce-4728-9c38-fb002dcc802f",
+                  "number": "3",
+                  "title": "Esotérico",
+                  "length": 252000
+                }
+              ],
+              "track-count": 14,
+              "track-offset": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a7edd80e-3bab-4a68-91ed-64c58c985bf8",
+      "score": 73,
+      "artist-credit-id": "9f60d75d-6b57-4204-bfdc-883bde86c0d6",
+      "title": "Esotérico",
+      "length": 249000,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "name": "Maria Bethânia",
+          "artist": {
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "name": "Maria Bethânia",
+            "sort-name": "Bethânia, Maria",
+            "aliases": [
+              {
+                "sort-name": "マリア・ベターニア",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "マリア・ベターニア",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethânia",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria Bethânia",
+                "locale": "pt",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Maria Bethânia Vianna Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria Bethânia Vianna Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Beth, Maria",
+                "name": "Maria Beth",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethania",
+                "name": "Maria Bethania",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethãnia",
+                "name": "Maria Bethãnia",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": ", ",
+          "name": "Gal Costa",
+          "artist": {
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "name": "Gal Costa",
+            "sort-name": "Costa, Gal",
+            "aliases": [
+              {
+                "sort-name": "Maria da Graça",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria da Graça",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Burgos, Maria da Graça Costa Penna",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria da Graça Costa Penna Burgos",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": " e ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2001",
+      "releases": [
+        {
+          "id": "97a12dd7-8e7b-4ecd-ae87-70bd0c326d23",
+          "artist-credit-id": "a3dcf7eb-c8ec-3010-957a-05794489d6d7",
+          "count": 2,
+          "title": "Sem Limite",
+          "artist-credit": [
+            {
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "a1e813c3-9800-41a6-9c47-6c9725ce8fe6",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Sem Limite",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2001",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2001",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 30,
+          "media": [
+            {
+              "id": "4b80fc30-219f-392a-b355-4a314ddb4439",
+              "position": 2,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "ae5a0f4e-1a27-4cab-9c5a-39a156406e2d",
+                  "number": "14",
+                  "title": "Esotérico",
+                  "length": 249000
+                }
+              ],
+              "track-count": 15,
+              "track-offset": 13
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d72d41dd-fb12-4775-8188-d95c1fdabfe3",
+      "score": 73,
+      "artist-credit-id": "247afa76-f0c7-3206-bd1c-dbf2961cadc8",
+      "title": "Esotérico",
+      "length": 250733,
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": ", ",
+          "name": "Caetano Veloso",
+          "artist": {
+            "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+            "name": "Caetano Veloso",
+            "sort-name": "Veloso, Caetano",
+            "aliases": [
+              {
+                "sort-name": "カエターノ・ヴェローゾ",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "カエターノ・ヴェローゾ",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Velloso, Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano Velloso",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Caetano",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetaqno Veloso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetaqno Veloso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosos",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosos",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Velosa",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Velosa",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Caetano Emanuel Viana Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Caetano Emanuel Viana Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Caetano Valeso",
+                "type-id": "1937e404-b981-3cb7-8151-4c86ebfc8d8e",
+                "name": "Caetano Valeso",
+                "locale": null,
+                "type": "Search hint",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, C.",
+                "name": "C. Veloso",
+                "locale": "en",
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": ", ",
+          "name": "Gal Costa",
+          "artist": {
+            "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+            "name": "Gal Costa",
+            "sort-name": "Costa, Gal",
+            "aliases": [
+              {
+                "sort-name": "Maria da Graça",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria da Graça",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Burgos, Maria da Graça Costa Penna",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria da Graça Costa Penna Burgos",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "joinphrase": " & ",
+          "name": "Gilberto Gil",
+          "artist": {
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "sort-name": "Gil, Gilberto",
+            "aliases": [
+              {
+                "sort-name": "ジルベルト・ジル",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "ジルベルト・ジル",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Gilberto Passos Gil Moreira",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Gilberto Passos Gil Moreira",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "[Gilberto Gil]",
+                "name": "[Gilberto Gil]",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Maria Bethânia",
+          "artist": {
+            "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+            "name": "Maria Bethânia",
+            "sort-name": "Bethânia, Maria",
+            "aliases": [
+              {
+                "sort-name": "マリア・ベターニア",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "マリア・ベターニア",
+                "locale": "ja",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethânia",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Maria Bethânia",
+                "locale": "pt",
+                "type": "Artist name",
+                "primary": true,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Veloso, Maria Bethânia Vianna Telles",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Maria Bethânia Vianna Telles Veloso",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Beth, Maria",
+                "name": "Maria Beth",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethania",
+                "name": "Maria Bethania",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Maria Bethãnia",
+                "name": "Maria Bethãnia",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "1976",
+      "releases": [
+        {
+          "id": "91dd5b21-2cca-456a-8327-798bd9965b64",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "cf1e66ea-f1be-36fd-a2a0-c3d15011264f",
+          "count": 42,
+          "title": "Todo Caetano",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Caetano Veloso",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "475f40a5-f6f5-4cd4-9a58-3c7a1adb0d4a",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Todo Caetano",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2002",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2002",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 510,
+          "media": [
+            {
+              "id": "eb783861-2b64-374a-b516-09d12ac5704e",
+              "position": 14,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "6a9a49f2-dd35-4f7a-8b96-33a5201b04cd",
+                  "number": "2",
+                  "title": "Esotérico",
+                  "length": 250000
+                }
+              ],
+              "track-count": 11,
+              "track-offset": 1
+            }
+          ]
+        },
+        {
+          "id": "8cdf9f36-2a98-42eb-bfce-ddf27b128f40",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "3ed529bd-f349-3c1a-aafb-b6749409ec73",
+          "count": 2,
+          "title": "Doces Bárbaros",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": ", ",
+              "name": "Caetano Veloso",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "joinphrase": ", ",
+              "name": "Gal Costa",
+              "artist": {
+                "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+                "name": "Gal Costa",
+                "sort-name": "Costa, Gal"
+              }
+            },
+            {
+              "joinphrase": ", ",
+              "name": "Gilberto Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            },
+            {
+              "name": "Maria Bethânia",
+              "artist": {
+                "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+                "name": "Maria Bethânia",
+                "sort-name": "Bethânia, Maria"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Doces bárbaros",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2011",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2011",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 18,
+          "media": [
+            {
+              "id": "9040ac78-3296-39bd-be6d-4a1527e3a1f8",
+              "position": 2,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "ea4e5b54-8661-4e08-b435-8d8453ee8b75",
+                  "number": "2",
+                  "title": "Esotérico",
+                  "length": 250733
+                }
+              ],
+              "track-count": 11,
+              "track-offset": 1
+            }
+          ]
+        },
+        {
+          "id": "4ead1fc5-e22b-41c7-a9a3-2fd3158286c1",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "7a2d9dbf-3fd8-35f8-a1fb-c2cadf4ae5f3",
+          "count": 2,
+          "title": "Doces bárbaros",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": ", ",
+              "name": "Caetano",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "joinphrase": ", ",
+              "name": "Gal",
+              "artist": {
+                "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+                "name": "Gal Costa",
+                "sort-name": "Costa, Gal"
+              }
+            },
+            {
+              "joinphrase": " & ",
+              "name": "Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            },
+            {
+              "name": "Bethânia",
+              "artist": {
+                "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+                "name": "Maria Bethânia",
+                "sort-name": "Bethânia, Maria"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Doces bárbaros",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "1976",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "1976",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 18,
+          "media": [
+            {
+              "id": "6cfe1b86-c39a-39f8-af07-b75b369a4e5b",
+              "position": 2,
+              "format": "Vinyl",
+              "track": [
+                {
+                  "id": "3832a83d-33ac-4c58-b1e7-35a87cc65d89",
+                  "number": "2",
+                  "title": "Esotérico",
+                  "length": 250733
+                }
+              ],
+              "track-count": 11,
+              "track-offset": 1
+            }
+          ]
+        },
+        {
+          "id": "f43c796d-cbc3-418d-8ca8-7486acd1d9ec",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "0bb52930-a8c7-3a8a-b48b-367c7ff82c9b",
+          "count": 1,
+          "title": "Novo Millennium",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Maria Bethânia",
+              "artist": {
+                "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+                "name": "Maria Bethânia",
+                "sort-name": "Bethânia, Maria"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "c3b95ecb-8301-4359-959b-24d0e767df43",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Novo Millennium",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2005-04-25",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2005-04-25",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 20,
+          "media": [
+            {
+              "id": "851ad75b-3e40-3227-99e4-c796d14bcdbf",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "c6f636d3-0333-42eb-8660-b2b2e75b3775",
+                  "number": "19",
+                  "title": "Esotérico (ao vivo)",
+                  "length": 251000
+                }
+              ],
+              "track-count": 20,
+              "track-offset": 18
+            }
+          ]
+        },
+        {
+          "id": "35822d44-ebf8-4d5c-a4b3-b08fa99134a2",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "7a2d9dbf-3fd8-35f8-a1fb-c2cadf4ae5f3",
+          "count": 2,
+          "title": "Doces bárbaros",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "joinphrase": ", ",
+              "name": "Caetano",
+              "artist": {
+                "id": "f07dbc2f-317b-470f-bad4-5f1b0eb6faf1",
+                "name": "Caetano Veloso",
+                "sort-name": "Veloso, Caetano"
+              }
+            },
+            {
+              "joinphrase": ", ",
+              "name": "Gal",
+              "artist": {
+                "id": "fc63a914-272d-4b95-9221-61adcce6f793",
+                "name": "Gal Costa",
+                "sort-name": "Costa, Gal"
+              }
+            },
+            {
+              "joinphrase": " & ",
+              "name": "Gil",
+              "artist": {
+                "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+                "name": "Gilberto Gil",
+                "sort-name": "Gil, Gilberto"
+              }
+            },
+            {
+              "name": "Bethânia",
+              "artist": {
+                "id": "b3998c06-04e6-4b1d-bd2a-d5b83572ae7b",
+                "name": "Maria Bethânia",
+                "sort-name": "Bethânia, Maria"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "4cbda678-176e-3aac-aa6b-3d234558bdda",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Doces bárbaros",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 18,
+          "media": [
+            {
+              "id": "32e74a23-f720-379f-84c8-5ef961a98114",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "d6d7487e-7dfd-39a1-8dab-753d1373d89e",
+                  "number": "2",
+                  "title": "Esotérico",
+                  "length": 250733
+                }
+              ],
+              "track-count": 11,
+              "track-offset": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

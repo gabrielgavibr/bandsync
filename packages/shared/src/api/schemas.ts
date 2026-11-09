@@ -29,6 +29,7 @@ export const API_ERROR_CODES = [
   "conflict",
   "payload_too_large",
   "unsupported_media",
+  "upstream_unavailable",
   "internal_error",
 ] as const;
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
@@ -203,11 +204,40 @@ export interface InviteDto {
 /* ------------------------------------------------------------------ */
 const bpmSchema = z.number().min(LIMITS.bpmMin).max(LIMITS.bpmMax);
 
+export const SECTION_KINDS = [
+  "intro",
+  "verse",
+  "pre_chorus",
+  "chorus",
+  "bridge",
+  "solo",
+  "instrumental",
+  "interlude",
+  "outro",
+  "other",
+] as const;
+export type SectionKind = (typeof SECTION_KINDS)[number];
+
+/** Something the band must remember at a point of a section: a convention, an entry, a stop. */
+export const sectionCueSchema = z.object({
+  type: z.enum(["convention", "entry", "stop", "note"]),
+  text: z.string().trim().min(1).max(200),
+  instrument: instrumentSchema.optional().nullable(),
+  /** Bar inside the section (1-based) where the cue happens, when known. */
+  bar: z.number().int().min(1).max(999).optional().nullable(),
+});
+export type SectionCue = z.infer<typeof sectionCueSchema>;
+
 export const songSectionSchema = z.object({
   id: idSchema.optional(),
   name: z.string().trim().min(1).max(60),
   bars: z.number().int().min(0).max(999),
   notes: z.string().trim().max(500).optional().nullable(),
+  kind: z.enum(SECTION_KINDS).optional().nullable(),
+  /** Position in the reference recording, in milliseconds, when the section was timed. */
+  startMs: z.number().int().min(0).max(36_000_000).optional().nullable(),
+  endMs: z.number().int().min(0).max(36_000_000).optional().nullable(),
+  cues: z.array(sectionCueSchema).max(30).optional(),
 });
 
 export const FACT_STATUSES = ["unknown", "estimated", "confirmed"] as const;
@@ -221,6 +251,7 @@ export const REFERENCE_KINDS = [
   "tabs",
   "lyrics",
   "article",
+  "video",
   "other",
 ] as const;
 export type ReferenceKind = (typeof REFERENCE_KINDS)[number];
@@ -326,6 +357,12 @@ export interface SongSectionDto {
   position: number;
   bars: number;
   notes: string | null;
+  kind: string | null;
+  startMs: number | null;
+  endMs: number | null;
+  cues: SectionCue[];
+  /** "band": written by the band; "detected": copied from an analysis and not yet edited. */
+  origin: string;
 }
 
 export interface SongMaterialDto {
@@ -354,6 +391,8 @@ export interface SongDto {
   title: string;
   artist: string | null;
   composer: string | null;
+  /** MusicBrainz identifier of the composition (work), when identified. */
+  workMbid: string | null;
   album: string | null;
   referenceRecording: string | null;
   referenceYear: number | null;

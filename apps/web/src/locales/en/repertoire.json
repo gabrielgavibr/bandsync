@@ -164,7 +164,8 @@
       "tabs": "Tab",
       "lyrics": "Lyrics",
       "article": "Article",
-      "other": "Other"
+      "other": "Other",
+      "video": "Video"
     },
     "deleteConfirm": "Remove this link?"
   }

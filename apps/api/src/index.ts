@@ -6,6 +6,7 @@ import { newId } from "./lib/ids";
 import { log } from "./lib/logger";
 import { stagingGate } from "./middleware/stagingGate";
 import { authRoutes } from "./routes/auth";
+import { autoArrangeRoutes } from "./routes/autoarrange";
 import { bandRoutes, inviteRoutes } from "./routes/bands";
 import { fileRoutes } from "./routes/files";
 import { meRoutes } from "./routes/me";
@@ -13,6 +14,8 @@ import { rehearsalRoutes } from "./routes/rehearsals";
 import { repertoireRoutes } from "./routes/repertoires";
 import { songRoutes } from "./routes/songs";
 
+export { MusicBrainzGatewayDO } from "./durable/MusicBrainzGatewayDO";
+export { PrepareJobDO } from "./durable/PrepareJobDO";
 export { RehearsalSessionDO } from "./durable/RehearsalSessionDO";
 
 const app = new Hono<AppEnv>();
@@ -66,6 +69,7 @@ app.route("/api/bands/:bandId/songs", songRoutes);
 app.route("/api/bands/:bandId/repertoires", repertoireRoutes);
 app.route("/api/bands/:bandId/rehearsals", rehearsalRoutes);
 app.route("/api/bands/:bandId/files", fileRoutes);
+app.route("/api/bands/:bandId/autoarrange", autoArrangeRoutes);
 
 app.notFound((c) => {
   if (c.req.path.startsWith("/api/") && c.env.APP_ENV !== "test") {

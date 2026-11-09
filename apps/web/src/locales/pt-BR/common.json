@@ -1,5 +1,8 @@
 {
-  "app": { "name": "BandSync", "tagline": "Sua banda. Sua música. Todo mundo em sintonia." },
+  "app": {
+    "name": "BandSync",
+    "tagline": "Sua banda. Sua música. Todo mundo em sintonia."
+  },
   "nav": {
     "bands": "Bandas",
     "dashboard": "Visão geral",
@@ -51,7 +54,10 @@
     "notFoundBody": "O endereço aberto não existe ou você não tem mais acesso a ele.",
     "optional": "opcional"
   },
-  "confirm": { "deleteTitle": "Excluir?", "deleteBody": "Esta ação não pode ser desfeita." },
+  "confirm": {
+    "deleteTitle": "Excluir?",
+    "deleteBody": "Esta ação não pode ser desfeita."
+  },
   "errors": {
     "validation_error": "Verifique os campos destacados.",
     "unauthorized": "Entre na sua conta para continuar.",
@@ -69,7 +75,8 @@
     "payload_too_large": "O arquivo é grande demais.",
     "unsupported_media": "Este tipo de arquivo não é aceito.",
     "internal_error": "Erro inesperado no servidor. Tente novamente.",
-    "network": "Não foi possível falar com o servidor. Verifique sua conexão."
+    "network": "Não foi possível falar com o servidor. Verifique sua conexão.",
+    "upstream_unavailable": "Um serviço de dados musicais não respondeu. Tente de novo em instantes."
   },
   "instrument": {
     "vocals": "Voz",
@@ -102,9 +109,21 @@
     "video_reference": "Referência em vídeo",
     "notes": "Anotações"
   },
-  "role": { "admin": "Administrador", "member": "Integrante" },
-  "theme": { "label": "Tema", "system": "Sistema", "light": "Claro", "dark": "Escuro" },
-  "language": { "label": "Idioma", "pt-BR": "Português (Brasil)", "en": "English" },
+  "role": {
+    "admin": "Administrador",
+    "member": "Integrante"
+  },
+  "theme": {
+    "label": "Tema",
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Escuro"
+  },
+  "language": {
+    "label": "Idioma",
+    "pt-BR": "Português (Brasil)",
+    "en": "English"
+  },
   "notation": {
     "label": "Nomes das notas",
     "english": "C D E F G A B",

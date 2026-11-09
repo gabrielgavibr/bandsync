@@ -1,0 +1,471 @@
+{
+  "created": "2026-11-09T19:47:21.937Z",
+  "count": 2,
+  "offset": 0,
+  "recordings": [
+    {
+      "id": "9df62182-b989-4dcf-9520-6250bda5d902",
+      "score": 100,
+      "artist-credit-id": "34ace811-a950-3f50-b569-2ebad65710de",
+      "title": "Pérola negra",
+      "length": 210000,
+      "video": true,
+      "artist-credit": [
+        {
+          "joinphrase": " participação especial ",
+          "name": "Natiruts",
+          "artist": {
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "name": "Natiruts",
+            "sort-name": "Natiruts",
+            "aliases": [
+              {
+                "sort-name": "Nativus",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Nativus",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Luiz Melodia",
+          "artist": {
+            "id": "40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+            "name": "Luiz Melodia",
+            "sort-name": "Melodia, Luiz",
+            "aliases": [
+              {
+                "sort-name": "Luiz Carlos dos Santos",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Luiz Carlos dos Santos",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Melodia, Luís",
+                "name": "Luís Melodia",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2012",
+      "releases": [
+        {
+          "id": "0f00b634-a064-4a90-8165-667031e7ba5d",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Acústico no Rio de Janeiro",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Acústico no Rio de Janeiro",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2012",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2012",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 21,
+          "media": [
+            {
+              "id": "27098176-33db-3aa4-ba9a-fe494ad6a7c2",
+              "position": 1,
+              "format": "DVD-Video",
+              "track": [
+                {
+                  "id": "0d99fe58-6543-4843-91ab-562ed2c84615",
+                  "number": "11",
+                  "title": "Pérola negra",
+                  "length": 210000
+                }
+              ],
+              "track-count": 21,
+              "track-offset": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0dea3c9a-ef6b-4707-90d8-685b2f4a2cd8",
+      "score": 100,
+      "artist-credit-id": "e742d627-49fe-3f76-809e-4463e3de512a",
+      "title": "Pérola negra",
+      "length": 209626,
+      "disambiguation": "live, 2012-02-01: Mirante Dona Marta, Rio de Janeiro, RJ, Brazil",
+      "video": null,
+      "artist-credit": [
+        {
+          "joinphrase": " Part. Especial ",
+          "name": "Natiruts",
+          "artist": {
+            "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+            "name": "Natiruts",
+            "sort-name": "Natiruts",
+            "aliases": [
+              {
+                "sort-name": "Nativus",
+                "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+                "name": "Nativus",
+                "locale": null,
+                "type": "Artist name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        },
+        {
+          "name": "Luiz Melodia",
+          "artist": {
+            "id": "40bee6cd-8f0c-407e-8e90-d5bdb9231a2d",
+            "name": "Luiz Melodia",
+            "sort-name": "Melodia, Luiz",
+            "aliases": [
+              {
+                "sort-name": "Luiz Carlos dos Santos",
+                "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+                "name": "Luiz Carlos dos Santos",
+                "locale": null,
+                "type": "Legal name",
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              },
+              {
+                "sort-name": "Melodia, Luís",
+                "name": "Luís Melodia",
+                "locale": null,
+                "type": null,
+                "primary": null,
+                "begin-date": null,
+                "end-date": null
+              }
+            ]
+          }
+        }
+      ],
+      "first-release-date": "2012-09-17",
+      "releases": [
+        {
+          "id": "2f6d1e48-042e-4297-8f5e-22c8545a40e9",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Melhores Natiruts",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "4f5c837c-71c5-495d-aedc-dbea77704b54",
+            "type-id": "dd2a21e1-0c00-3729-a7a0-de60b84eb5d1",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Melhores Natiruts",
+            "primary-type": "Album",
+            "secondary-types": ["Compilation"],
+            "secondary-type-ids": ["dd2a21e1-0c00-3729-a7a0-de60b84eb5d1"]
+          },
+          "date": "2020-05-08",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2020-05-08",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 36,
+          "media": [
+            {
+              "id": "9f84a4c7-353d-3e0e-aa2e-0ab5e4b2a8fa",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "d88d43aa-3c48-4add-90fd-b09c2a27d5e0",
+                  "number": "20",
+                  "title": "Pérola negra (ao vivo)",
+                  "length": 209306
+                }
+              ],
+              "track-count": 36,
+              "track-offset": 19
+            }
+          ]
+        },
+        {
+          "id": "cf76b0a6-5b88-4b7f-98e5-4befc2933626",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Natiruts Acústico no Rio de Janeiro",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Acústico no Rio de Janeiro",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2012-09-18",
+          "country": "XW",
+          "release-events": [
+            {
+              "date": "2012-09-18",
+              "area": {
+                "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+                "name": "[Worldwide]",
+                "sort-name": "[Worldwide]",
+                "iso-3166-1-codes": ["XW"]
+              }
+            }
+          ],
+          "track-count": 20,
+          "media": [
+            {
+              "id": "bcb7bb32-b8b0-35bc-bed2-43c5c89ae391",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "8e166f5e-0819-47da-9245-3a62ee86fc82",
+                  "number": "8",
+                  "title": "Pérola Negra",
+                  "length": 209000
+                }
+              ],
+              "track-count": 20,
+              "track-offset": 7
+            }
+          ]
+        },
+        {
+          "id": "488ca169-58b9-46ac-a267-5c72189a1f3b",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Acústico no Rio de Janeiro",
+          "status": "Official",
+          "disambiguation": "Deluxe",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Acústico no Rio de Janeiro",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2012-09-17",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2012-09-17",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 19,
+          "media": [
+            {
+              "id": "8ffa9dbc-7bd9-3302-a7bf-e4090f46f69b",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "18da7603-5813-4963-813b-0a2202a3e1c5",
+                  "number": "8",
+                  "title": "Pérola negra",
+                  "length": 209626
+                }
+              ],
+              "track-count": 19,
+              "track-offset": 7
+            }
+          ]
+        },
+        {
+          "id": "3cf24cad-5f33-4ef4-9157-21599b2ddc98",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Acústico no Rio de Janeiro",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Acústico no Rio de Janeiro",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "track-count": 18,
+          "media": [
+            {
+              "id": "8c2c6bf0-32eb-30ee-acc3-3533d2e19f09",
+              "position": 1,
+              "format": "Digital Media",
+              "track": [
+                {
+                  "id": "0a991b37-dadc-413e-a045-701999b862ca",
+                  "number": "8",
+                  "title": "Pérola negra",
+                  "length": 210000
+                }
+              ],
+              "track-count": 18,
+              "track-offset": 7
+            }
+          ]
+        },
+        {
+          "id": "c26e426b-0961-473f-a775-1c061e1ec846",
+          "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+          "artist-credit-id": "6159196c-dedc-3727-87d6-342e9a8f1e13",
+          "count": 1,
+          "title": "Acústico no Rio de Janeiro",
+          "status": "Official",
+          "artist-credit": [
+            {
+              "name": "Natiruts",
+              "artist": {
+                "id": "917e448b-fbed-4062-b563-67566a3b3bb1",
+                "name": "Natiruts",
+                "sort-name": "Natiruts"
+              }
+            }
+          ],
+          "release-group": {
+            "id": "83eda4cd-bb86-44ef-a8a4-1e83e572dce6",
+            "type-id": "6fd474e2-6b58-3102-9d17-d6f7eb7da0a0",
+            "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+            "title": "Acústico no Rio de Janeiro",
+            "primary-type": "Album",
+            "secondary-types": ["Live"],
+            "secondary-type-ids": ["6fd474e2-6b58-3102-9d17-d6f7eb7da0a0"]
+          },
+          "date": "2012",
+          "country": "BR",
+          "release-events": [
+            {
+              "date": "2012",
+              "area": {
+                "id": "f45b47f8-5796-386e-b172-6c31b009a5d8",
+                "name": "Brazil",
+                "sort-name": "Brazil",
+                "iso-3166-1-codes": ["BR"]
+              }
+            }
+          ],
+          "track-count": 18,
+          "media": [
+            {
+              "id": "fd6575cf-161a-39e7-ba3c-bd3b0221c71b",
+              "position": 1,
+              "format": "CD",
+              "track": [
+                {
+                  "id": "b9b70c4a-d9a0-48d6-80ec-77257e2c85f2",
+                  "number": "8",
+                  "title": "Pérola negra",
+                  "length": 210000
+                }
+              ],
+              "track-count": 18,
+              "track-offset": 7
+            }
+          ]
+        }
+      ],
+      "isrcs": ["BR4W41200009"]
+    }
+  ]
+}

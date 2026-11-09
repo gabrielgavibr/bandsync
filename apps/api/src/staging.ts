@@ -8,6 +8,8 @@ import type { Env } from "./env";
 import { webAssets } from "./generated/webAssets";
 import app from "./index";
 
+export { MusicBrainzGatewayDO } from "./durable/MusicBrainzGatewayDO";
+export { PrepareJobDO } from "./durable/PrepareJobDO";
 export { RehearsalSessionDO } from "./durable/RehearsalSessionDO";
 
 const decoded = new Map<string, Uint8Array>();

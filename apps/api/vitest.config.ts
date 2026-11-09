@@ -1,6 +1,7 @@
 import path from "node:path";
 import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
+import { outboundService } from "./test/outbound.ts";
 
 export default defineConfig(async () => {
   const migrations = await readD1Migrations(path.join(import.meta.dirname, "migrations"));
@@ -14,7 +15,11 @@ export default defineConfig(async () => {
             APP_ENV: "test",
             PBKDF2_ITERATIONS: "1000",
             RATE_LIMITS: "on",
+            // No pause between MusicBrainz calls in tests; the fake service does not rate-limit.
+            MUSICBRAINZ_MIN_INTERVAL_MS: "0",
           },
+          // Every outbound request from the Worker goes to the in-process fake (no network in tests).
+          outboundService,
         },
       }),
     ],

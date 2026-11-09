@@ -1,0 +1,96 @@
+{
+  "id": "8379142a-fe4e-4da2-8edf-fb493665a54f",
+  "first-release-date": "1982",
+  "length": 262400,
+  "releases": [
+    {
+      "date": "1982",
+      "id": "3a7a9915-07b0-4d56-b29a-002d5fd6a9f5",
+      "quality": "normal",
+      "packaging-id": null,
+      "artist-credit": [
+        {
+          "joinphrase": "",
+          "artist": {
+            "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+            "disambiguation": "",
+            "country": "BR",
+            "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+            "name": "Gilberto Gil",
+            "type": "Person",
+            "sort-name": "Gil, Gilberto"
+          },
+          "name": "Gilberto Gil"
+        }
+      ],
+      "barcode": null,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "disambiguation": "",
+      "status": "Official",
+      "release-group": {
+        "title": "Um Banda Um",
+        "secondary-type-ids": [],
+        "artist-credit": [
+          {
+            "artist": {
+              "country": "BR",
+              "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+              "name": "Gilberto Gil",
+              "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+              "disambiguation": "",
+              "type": "Person",
+              "sort-name": "Gil, Gilberto"
+            },
+            "name": "Gilberto Gil",
+            "joinphrase": ""
+          }
+        ],
+        "releases": [],
+        "disambiguation": "",
+        "secondary-types": [],
+        "first-release-date": "1982",
+        "primary-type": "Album",
+        "id": "e35da729-8ac2-390f-81e8-8cd5bc0326eb",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc"
+      },
+      "text-representation": { "script": "Latn", "language": "por" },
+      "title": "Um Banda Um",
+      "release-events": [
+        {
+          "area": {
+            "disambiguation": "",
+            "type-id": null,
+            "name": "United States",
+            "id": "489ce91b-6658-3307-9877-795b68554c98",
+            "sort-name": "United States",
+            "iso-3166-1-codes": ["US"],
+            "type": null
+          },
+          "date": "1982"
+        }
+      ],
+      "country": "US",
+      "packaging": null
+    }
+  ],
+  "disambiguation": "",
+  "artist-credit": [
+    {
+      "joinphrase": "",
+      "artist": {
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "disambiguation": "",
+        "country": "BR",
+        "id": "cf6b70f6-2616-481c-912c-0263cabfc974",
+        "name": "Gilberto Gil",
+        "type": "Person",
+        "sort-name": "Gil, Gilberto"
+      },
+      "name": "Gilberto Gil"
+    }
+  ],
+  "video": false,
+  "relations": [],
+  "isrcs": [],
+  "title": "Esotérico"
+}

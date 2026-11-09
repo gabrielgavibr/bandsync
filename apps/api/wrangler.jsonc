@@ -21,9 +21,16 @@
   ],
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files" }],
   "durable_objects": {
-    "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+    "bindings": [
+      { "name": "REHEARSAL", "class_name": "RehearsalSessionDO" },
+      { "name": "MB_GATEWAY", "class_name": "MusicBrainzGatewayDO" },
+      { "name": "PREPARE_JOB", "class_name": "PrepareJobDO" }
+    ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] },
+    { "tag": "v2", "new_sqlite_classes": ["MusicBrainzGatewayDO", "PrepareJobDO"] }
+  ],
   "env": {
     // Homologation / staging: separate Worker, database, bucket and Durable Object namespace.
     // D1 and R2 are created automatically by `wrangler deploy` (no IDs needed).
@@ -44,9 +51,16 @@
       ],
       "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files-staging" }],
       "durable_objects": {
-        "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+        "bindings": [
+          { "name": "REHEARSAL", "class_name": "RehearsalSessionDO" },
+          { "name": "MB_GATEWAY", "class_name": "MusicBrainzGatewayDO" },
+          { "name": "PREPARE_JOB", "class_name": "PrepareJobDO" }
+        ]
       },
-      "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] }],
+      "migrations": [
+        { "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] },
+        { "tag": "v2", "new_sqlite_classes": ["MusicBrainzGatewayDO", "PrepareJobDO"] }
+      ],
       // No static-assets binding: the built web app is embedded in the bundle (scripts/embed-web.mjs)
       // and served by src/staging.ts after the access gate.
       "main": "src/staging.ts"
@@ -68,7 +82,11 @@
       ],
       "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files-prod" }],
       "durable_objects": {
-        "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+        "bindings": [
+          { "name": "REHEARSAL", "class_name": "RehearsalSessionDO" },
+          { "name": "MB_GATEWAY", "class_name": "MusicBrainzGatewayDO" },
+          { "name": "PREPARE_JOB", "class_name": "PrepareJobDO" }
+        ]
       },
       "assets": {
         "directory": "../web/dist",
