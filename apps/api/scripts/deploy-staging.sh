@@ -11,8 +11,9 @@ fi
 
 echo "==> Building the web app"
 pnpm --filter @bandsync/web build
+node scripts/embed-web.mjs
 
-echo "==> Deploying Worker bandsync-staging (D1 and R2 are provisioned automatically)"
+echo "==> Deploying Worker bandsync-staging (web app embedded; D1 and R2 provisioned automatically)"
 npx wrangler deploy --env staging
 
 echo "==> Applying D1 migrations to bandsync-staging"

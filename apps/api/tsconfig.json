@@ -4,5 +4,6 @@
     "lib": ["ES2022"],
     "types": []
   },
-  "include": ["src", "worker-configuration.d.ts"]
+  "include": ["src", "worker-configuration.d.ts"],
+  "exclude": ["src/staging.ts", "src/generated"]
 }

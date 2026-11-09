@@ -48,10 +48,16 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await pp.locator("button[type=submit]").click();
   await expect(pp.locator(".err")).toBeVisible();
   // The well-known local demo password must not work here.
-  const res = await pp.request.post("/api/auth/login", {
-    data: { email: "ana@bandsync.demo", password: "bandsync-demo" },
+  // Sent from inside the page so it uses the same network path as a real browser.
+  const status = await pp.evaluate(async () => {
+    const r = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: "ana@bandsync.demo", password: "bandsync-demo" }),
+    });
+    return r.status;
   });
-  expect(res.status()).toBe(403); // blocked by the gate before even reaching login
+  expect(status).toBe(403); // blocked by the gate before even reaching login
   await probe.close();
 
   // Conductor on desktop. Ana's account prefers pt-BR.
