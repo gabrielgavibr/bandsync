@@ -185,7 +185,9 @@
     "saveLink": "Save link",
     "confirmAndPrepare": "Confirm and prepare song",
     "saved": "Link saved",
-    "optionalHeading": "Recording link (optional)"
+    "optionalHeading": "Recording link (optional)",
+    "usedBy_one": "Careful: this link is already the reference recording of {{titles}} in this band. Check that it really is this song's recording.",
+    "usedBy_other": "Careful: this link is already the reference recording of {{titles}} in this band. Check that it really is this song's recording."
   },
   "reference": {
     "heading": "Reference recording",

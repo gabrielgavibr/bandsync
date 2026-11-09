@@ -181,6 +181,26 @@ export async function listReferenceSummaries(
   return new Map(results.map((r) => [r.song_id, toReferenceSummary(toRecordingDto(r))]));
 }
 
+/** Songs of a band whose current reference is this video or track (any platform it lives on). */
+export async function songsUsingLink(
+  db: D1Database,
+  bandId: string,
+  link: ParsedReferenceLink,
+  exceptSongId: string | null,
+): Promise<{ songId: string; title: string }[]> {
+  const platforms = sameRecordingPlatforms(link.platform);
+  const { results } = await db
+    .prepare(
+      `SELECT s.id AS song_id, s.title FROM song_recordings r JOIN songs s ON s.id = r.song_id
+       WHERE s.band_id = ? AND s.deleted_at IS NULL AND r.is_reference = 1 AND r.external_id = ?
+         AND r.platform IN (${platforms.map(() => "?").join(", ")}) AND s.id != ?
+       ORDER BY s.title COLLATE NOCASE`,
+    )
+    .bind(bandId, link.externalId, ...platforms, exceptSongId ?? "")
+    .all<{ song_id: string; title: string }>();
+  return results.map((r) => ({ songId: r.song_id, title: r.title }));
+}
+
 /** Reference of every song in one repertoire. */
 export async function listReferenceSummariesOfRepertoire(
   db: D1Database,

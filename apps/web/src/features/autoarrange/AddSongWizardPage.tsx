@@ -305,11 +305,12 @@ function LinkPreview({
   testId = "reference-preview",
   children,
 }: {
-  info: ReferenceLinkInfo;
+  info: ReferenceLinkInfo & { usedBy?: { songId: string; title: string }[] };
   testId?: string;
   children?: ReactNode;
 }) {
   const { t } = useTranslation("autoarrange");
+  const usedBy = info.usedBy ?? [];
   const [listening, setListening] = useState(false);
   const canEmbed = info.embeddable !== false;
   return (
@@ -345,6 +346,18 @@ function LinkPreview({
           </a>
         </div>
       </div>
+      {usedBy.length > 0 ? (
+        <p
+          className="rounded-xl border border-warn-500/60 bg-warn-500/10 p-3 text-sm"
+          role="alert"
+          data-testid="link-used-by"
+        >
+          {t("link.usedBy", {
+            titles: usedBy.map((u) => `“${u.title}”`).join(", "),
+            count: usedBy.length,
+          })}
+        </p>
+      ) : null}
       {canEmbed ? (
         <div>
           <Button
@@ -386,7 +399,7 @@ function LinkFlow({
   const { t, i18n } = useTranslation(["autoarrange", "common"]);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const identify = useIdentifyReference(bandId);
+  const identify = useIdentifyReference(bandId, song?.id);
   const setLink = useSetReferenceLink(bandId, song?.id ?? "");
   const flow = usePrepareFlow(bandId, onPrepared);
   const [url, setUrl] = useState("");
@@ -609,7 +622,7 @@ function CatalogueFlow({
   const search = useRecordingSearch(bandId, query);
   const mbid = choice?.kind === "musicbrainz" ? choice.candidate.mbid : null;
   const details = useRecordingDetails(bandId, mbid);
-  const identify = useIdentifyReference(bandId);
+  const identify = useIdentifyReference(bandId, song?.id);
   const flow = usePrepareFlow(bandId, onPrepared);
   const problem = identify.isError ? linkProblem(identify.error) : null;
 

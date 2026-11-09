@@ -185,7 +185,9 @@
     "saveLink": "Salvar link",
     "confirmAndPrepare": "Confirmar e preparar música",
     "saved": "Link salvo",
-    "optionalHeading": "Link da gravação (opcional)"
+    "optionalHeading": "Link da gravação (opcional)",
+    "usedBy_one": "Atenção: este link já é a gravação de referência de {{titles}} nesta banda. Confira se é mesmo a gravação desta música.",
+    "usedBy_other": "Atenção: este link já é a gravação de referência de {{titles}} nesta banda. Confira se é mesmo a gravação desta música."
   },
   "reference": {
     "heading": "Gravação de referência",

@@ -772,6 +772,83 @@ describe("changing the reference", () => {
   });
 });
 
+describe("a link that belongs to another song", () => {
+  it("warns that the link is already another song's reference, and a restore brings everything back", async () => {
+    const { ana, bandId } = await setup();
+    // Pérola Negra has its video; Esotérico has its catalogue recording, link pending.
+    const perola = await json(
+      await prepare(ana, bandId, {
+        newSong: { title: "Pérola Negra" },
+        recording: { source: "link", title: "Pérola Negra" },
+        referenceUrl: YT,
+      }),
+    );
+    const esoterico = await json(
+      await prepare(ana, bandId, {
+        newSong: { title: "Esotérico" },
+        recording: { source: "musicbrainz", mbid: "8379142a-fe4e-4da2-8edf-fb493665a54f" },
+      }),
+    );
+    await waitForJob(ana, bandId, esoterico.job.id);
+
+    // Pasting Pérola Negra's video while working on Esotérico: identified, with a warning.
+    const forEsoterico = await json(
+      await api(
+        "POST",
+        `${aa(bandId)}/reference/identify`,
+        { url: "https://youtu.be/JZqFoTIAJj8", songId: esoterico.song.id },
+        ana.cookie,
+      ),
+    );
+    expect(forEsoterico.usedBy).toEqual([{ songId: perola.song.id, title: "Pérola Negra" }]);
+    // Not reported for the song that owns it, and the YouTube Music page counts as the same.
+    const forPerola = await json(
+      await api(
+        "POST",
+        `${aa(bandId)}/reference/identify`,
+        { url: "https://music.youtube.com/watch?v=JZqFoTIAJj8", songId: perola.song.id },
+        ana.cookie,
+      ),
+    );
+    expect(forPerola.usedBy).toEqual([]);
+
+    // The member confirmed anyway (the mistake that happened on staging)…
+    const wrong = await prepare(ana, bandId, {
+      songId: esoterico.song.id,
+      recording: { source: "link", artistCredit: "Gilberto Gil" },
+      referenceUrl: YT,
+      confirmReplace: true,
+    });
+    expect(wrong.status).toBe(201);
+    let o = await overview(ana, bandId, esoterico.song.id);
+    expect(o.song.reference.url).toBe(YT);
+    expect(o.song.version.referenceUrl).toBe(YT);
+
+    // …and the restore: back to the catalogue recording, which was only retired.
+    const restored = await prepare(ana, bandId, {
+      songId: esoterico.song.id,
+      recording: { source: "musicbrainz", mbid: "8379142a-fe4e-4da2-8edf-fb493665a54f" },
+      confirmReplace: true,
+    });
+    expect(restored.status).toBe(201);
+    const body = await json(restored);
+    expect(body.recording.id).toBe(esoterico.recording.id); // the same row, not a new one
+    o = await overview(ana, bandId, esoterico.song.id);
+    expect(o.song.reference).toMatchObject({
+      recordingId: esoterico.recording.id,
+      releaseTitle: "Um Banda Um",
+      url: null,
+    });
+    // The wrong link does not linger on the band version.
+    expect(o.song.version.referenceUrl).toBeNull();
+    expect(o.recordings).toHaveLength(2);
+    // Pérola Negra was never touched.
+    const p = await overview(ana, bandId, perola.song.id);
+    expect(p.song.reference.url).toBe(YT);
+    expect(p.recordings).toHaveLength(1);
+  });
+});
+
 describe("live rehearsal", () => {
   it("finds the reference on the song the room loads, next to the band's own values", async () => {
     const { ana, bandId } = await setup();

@@ -50,6 +50,7 @@ import {
   referenceDependents,
   setRecordingLink,
   setResultReview,
+  songsUsingLink,
   toJobDto,
   toReferenceSummary,
   updateJob,
@@ -165,8 +166,11 @@ async function resolveReferenceLink(c: Context<AppEnv>, raw: string): Promise<Re
 
 autoArrangeRoutes.post("/reference/identify", requireRepertoireEditor, async (c) => {
   await limitExternal(c, "ref-identify", 30);
-  const { url } = await parseBody(c, identifyReferenceSchema);
-  return c.json({ reference: await resolveReferenceLink(c, url) });
+  const { url, songId } = await parseBody(c, identifyReferenceSchema);
+  const reference = await resolveReferenceLink(c, url);
+  // Not forbidden (a medley may share a recording), but almost always a mistake worth a warning.
+  const usedBy = await songsUsingLink(c.env.DB, p(c, "bandId"), reference, songId ?? null);
+  return c.json({ reference, usedBy });
 });
 
 /* ---------------- prepare ---------------- */
@@ -357,7 +361,9 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
               (typedArtist !== null && typedArtist !== link.artistGuess)),
         },
   );
-  if (link) {
+  // The band version's link always follows the reference: a replaced reference takes its link
+  // (or the lack of one) with it, so the previous recording's link does not linger.
+  if (link || replacing) {
     await updateSong(db, bandId, songId, {
       version: { ...versionOf(song), referenceUrl: recording.link?.url ?? null },
     });

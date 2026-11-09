@@ -9,6 +9,7 @@ import {
   type RecordingRelease,
   type ReferenceDependents,
   type ReferenceLinkInfo,
+  type ReferenceUsedBy,
   type ReviewEventDto,
   type ReviewInput,
   type SongDto,
@@ -87,12 +88,17 @@ export function useRecordingDetails(bandId: string, mbid: string | null) {
 }
 
 /** Asks the platform of a pasted link what it says about that recording. */
-export function useIdentifyReference(bandId: string) {
+export type IdentifiedLink = ReferenceLinkInfo & { usedBy: ReferenceUsedBy[] };
+
+export function useIdentifyReference(bandId: string, songId?: string | null) {
   return useMutation({
     mutationFn: (url: string) =>
       http
-        .post<{ reference: ReferenceLinkInfo }>(`${base(bandId)}/reference/identify`, { url })
-        .then((r) => r.reference),
+        .post<{ reference: ReferenceLinkInfo; usedBy?: ReferenceUsedBy[] }>(
+          `${base(bandId)}/reference/identify`,
+          { url, songId: songId ?? null },
+        )
+        .then((r): IdentifiedLink => ({ ...r.reference, usedBy: r.usedBy ?? [] })),
   });
 }
 

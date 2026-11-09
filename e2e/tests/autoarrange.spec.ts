@@ -472,6 +472,18 @@ test("preparing a song that already has a reference: no raw error, three clear c
   await expect(page.getByTestId("replace-warning")).toHaveCount(0);
   await noRawKeys();
 
+  // Pasting that same video for another song warns that it already belongs to Esotérico.
+  const other = await ana.api.post(`/api/bands/${bandId}/songs`, {
+    data: { title: "Outra música", version: { beatsPerBar: 4, beatUnit: 4 } },
+  });
+  const otherId = (await other.json()).song.id as string;
+  await page.goto(`/bands/${bandId}/songs/add?song=${otherId}`);
+  await identify(page, `https://youtu.be/${YT_ID}`, pt);
+  await expect(page.getByTestId("link-used-by")).toContainText(
+    "já é a gravação de referência de “Esotérico”",
+  );
+  await page.screenshot({ path: "test-results/confirm-00-used-by-pt.png" });
+
   // Work done on that recording: a ready material.
   const material = await ana.api.post(`/api/bands/${bandId}/songs/${songId}/materials`, {
     data: {

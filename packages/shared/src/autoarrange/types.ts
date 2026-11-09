@@ -337,7 +337,17 @@ export const youtubeLookupSchema = z.object({ url: httpUrlSchema });
 
 /** A pasted reference link. Deliberately loose here: the connector decides what is acceptable. */
 const referenceUrlSchema = z.string().trim().min(1).max(2000);
-export const identifyReferenceSchema = z.object({ url: referenceUrlSchema });
+export const identifyReferenceSchema = z.object({
+  url: referenceUrlSchema,
+  /** The song the link is for, so it is not reported as "already used" by itself. */
+  songId: idSchema.optional().nullable(),
+});
+
+/** Another song of the band whose reference is the same recording as a pasted link. */
+export interface ReferenceUsedBy {
+  songId: string;
+  title: string;
+}
 /** Attach or change the link of the current reference recording (same recording, other link). */
 export const setReferenceLinkSchema = z.object({ url: referenceUrlSchema });
 /** Manual correction of what identifies the reference recording. */
