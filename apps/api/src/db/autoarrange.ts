@@ -8,14 +8,20 @@ import {
   type JobStatus,
   type JobStepRecord,
   jobProgress,
+  type ParsedReferenceLink,
   type RecordingLink,
+  type RecordingReferenceLink,
   type RecordingWork,
+  type ReferenceDependents,
+  type ReferenceLinkInfo,
   type ResultKind,
   type ResultOrigin,
   type ReviewEventDto,
   type ReviewStatus,
+  referenceLinkFrom,
   type SongRecordingDto,
-  type YouTubeVideoInfo,
+  type SongReferenceSummary,
+  safeThumbnailUrl,
 } from "@bandsync/shared";
 import { newId } from "../lib/ids";
 import { nowIso } from "../lib/time";
@@ -48,18 +54,44 @@ interface RecordingRow {
   isrcs: string;
   works: string;
   links: string;
-  youtube: string | null;
   is_reference: number;
   source_url: string | null;
   fetched_at: string | null;
   created_at: string;
+  platform: string | null;
+  external_id: string | null;
+  link_title: string | null;
+  link_author: string | null;
+  thumbnail_url: string | null;
+  embeddable: number | null;
+  link_checked_at: string | null;
+  metadata_edited_by: string | null;
+  metadata_edited_at: string | null;
+  reference_since: string | null;
+  retired_at: string | null;
+}
+
+/** The link is always rebuilt from (platform, id); a row with an unknown pair simply has no link. */
+function linkOf(r: RecordingRow): RecordingReferenceLink | null {
+  const parsed = referenceLinkFrom(r.platform, r.external_id);
+  if (!parsed) return null;
+  return {
+    ...parsed,
+    title: r.link_title,
+    author: r.link_author,
+    thumbnailUrl: safeThumbnailUrl(r.thumbnail_url),
+    embeddable: r.embeddable === null ? null : r.embeddable === 1,
+    checkedAt: r.link_checked_at,
+  };
 }
 
 function toRecordingDto(r: RecordingRow): SongRecordingDto {
+  const link = linkOf(r);
   return {
     id: r.id,
     songId: r.song_id,
     source: r.source,
+    identifiedBy: r.mbid ? "musicbrainz" : link ? "link" : "manual",
     mbid: r.mbid,
     title: r.title,
     artistCredit: r.artist_credit,
@@ -71,18 +103,39 @@ function toRecordingDto(r: RecordingRow): SongRecordingDto {
     isrcs: parse<string[]>(r.isrcs, []),
     works: parse<RecordingWork[]>(r.works, []),
     links: parse<RecordingLink[]>(r.links, []),
-    youtube: parse<YouTubeVideoInfo | null>(r.youtube, null),
+    link,
     isReference: r.is_reference === 1,
+    referenceSince: r.reference_since,
+    retiredAt: r.retired_at,
+    metadataEditedBy: r.metadata_edited_by,
+    metadataEditedAt: r.metadata_edited_at,
     sourceUrl: r.source_url,
     fetchedAt: r.fetched_at,
     createdAt: r.created_at,
   };
 }
 
+/** What every member sees of a song's reference: sheet, repertoire and live rehearsal. */
+export function toReferenceSummary(r: SongRecordingDto): SongReferenceSummary {
+  return {
+    recordingId: r.id,
+    title: r.title,
+    artist: r.artistCredit,
+    releaseTitle: r.releaseTitle,
+    year: /^\d{4}/.test(r.releaseDate ?? "") ? r.releaseDate!.slice(0, 4) : null,
+    durationMs: r.durationMs,
+    platform: r.link?.platform ?? null,
+    externalId: r.link?.externalId ?? null,
+    url: r.link?.url ?? null,
+    thumbnailUrl: r.link?.thumbnailUrl ?? null,
+    embeddable: r.link?.embeddable ?? null,
+  };
+}
+
 export async function listRecordings(db: D1Database, songId: string): Promise<SongRecordingDto[]> {
   const { results } = await db
     .prepare(
-      "SELECT * FROM song_recordings WHERE song_id = ? ORDER BY is_reference DESC, created_at",
+      "SELECT * FROM song_recordings WHERE song_id = ? ORDER BY is_reference DESC, created_at DESC",
     )
     .bind(songId)
     .all<RecordingRow>();
@@ -101,6 +154,78 @@ export async function getRecording(
   return row ? toRecordingDto(row) : null;
 }
 
+export async function getReferenceRecording(
+  db: D1Database,
+  songId: string,
+): Promise<SongRecordingDto | null> {
+  const row = await db
+    .prepare("SELECT * FROM song_recordings WHERE song_id = ? AND is_reference = 1")
+    .bind(songId)
+    .first<RecordingRow>();
+  return row ? toRecordingDto(row) : null;
+}
+
+/** Reference of every song of a band, for lists (songs, repertoires). */
+export async function listReferenceSummaries(
+  db: D1Database,
+  bandId: string,
+): Promise<Map<string, SongReferenceSummary>> {
+  const { results } = await db
+    .prepare(
+      `SELECT r.* FROM song_recordings r JOIN songs s ON s.id = r.song_id
+       WHERE s.band_id = ? AND s.deleted_at IS NULL AND r.is_reference = 1`,
+    )
+    .bind(bandId)
+    .all<RecordingRow>();
+  return new Map(results.map((r) => [r.song_id, toReferenceSummary(toRecordingDto(r))]));
+}
+
+/** Reference of every song in one repertoire. */
+export async function listReferenceSummariesOfRepertoire(
+  db: D1Database,
+  repertoireId: string,
+): Promise<Map<string, SongReferenceSummary>> {
+  const { results } = await db
+    .prepare(
+      `SELECT r.* FROM song_recordings r JOIN repertoire_items i ON i.song_id = r.song_id
+       WHERE i.repertoire_id = ? AND r.is_reference = 1`,
+    )
+    .bind(repertoireId)
+    .all<RecordingRow>();
+  return new Map(results.map((r) => [r.song_id, toReferenceSummary(toRecordingDto(r))]));
+}
+
+/**
+ * The row of a song that already stands for the same recording: same catalogue id, or (when
+ * there is none) the same video / track on the same platform.
+ */
+export async function findRecordingMatch(
+  db: D1Database,
+  songId: string,
+  key: { mbid?: string | null; link?: ParsedReferenceLink | null },
+): Promise<SongRecordingDto | null> {
+  let row: RecordingRow | null = null;
+  if (key.mbid) {
+    row = await db
+      .prepare("SELECT * FROM song_recordings WHERE song_id = ? AND mbid = ?")
+      .bind(songId, key.mbid)
+      .first<RecordingRow>();
+  }
+  if (!row && key.link) {
+    // With a catalogue id in hand, a row found by link only counts if nobody identified it yet
+    // (the band pasted the link first and found the catalogue entry later).
+    row = await db
+      .prepare(
+        `SELECT * FROM song_recordings WHERE song_id = ? AND platform = ? AND external_id = ?
+           ${key.mbid ? "AND mbid IS NULL" : ""}
+         ORDER BY is_reference DESC, created_at DESC LIMIT 1`,
+      )
+      .bind(songId, key.link.platform, key.link.externalId)
+      .first<RecordingRow>();
+  }
+  return row ? toRecordingDto(row) : null;
+}
+
 export interface RecordingInput {
   source: "musicbrainz" | "manual";
   mbid?: string | null;
@@ -114,14 +239,35 @@ export interface RecordingInput {
   isrcs?: string[];
   works?: RecordingWork[];
   links?: RecordingLink[];
-  youtube?: YouTubeVideoInfo | null;
+  /** undefined keeps the link the row already has; null removes it. */
+  link?: ReferenceLinkInfo | null;
+  /** The member typed the title / artist instead of accepting what the platform said. */
+  metadataEdited?: boolean;
   sourceUrl?: string | null;
   fetched?: boolean;
 }
 
+function linkColumns(link: ReferenceLinkInfo | null, ts: string) {
+  return link
+    ? [
+        link.platform,
+        link.externalId,
+        link.url,
+        link.title,
+        link.author,
+        link.thumbnailUrl,
+        link.embeddable === null ? null : link.embeddable ? 1 : 0,
+        ts,
+      ]
+    : [null, null, null, null, null, null, null, null];
+}
+const LINK_SET =
+  "platform = ?, external_id = ?, link_url = ?, link_title = ?, link_author = ?, thumbnail_url = ?, embeddable = ?, link_checked_at = ?";
+
 /**
- * Attaches a recording to a song and makes it the reference. The same MusicBrainz recording is
- * stored once per song: attaching it again refreshes that row instead of creating another.
+ * Attaches a recording to a song and makes it the reference. The same recording is stored once
+ * per song (see findRecordingMatch): attaching it again refreshes that row. The previous
+ * reference is never deleted, only retired, so its analyses and history stay reachable.
  */
 export async function upsertReferenceRecording(
   db: D1Database,
@@ -130,64 +276,140 @@ export async function upsertReferenceRecording(
   input: RecordingInput,
 ): Promise<SongRecordingDto> {
   const ts = nowIso();
-  const existing = input.mbid
-    ? await db
-        .prepare("SELECT * FROM song_recordings WHERE song_id = ? AND mbid = ?")
-        .bind(songId, input.mbid)
-        .first<RecordingRow>()
-    : null;
+  const existing = await findRecordingMatch(db, songId, { mbid: input.mbid, link: input.link });
   const id = existing?.id ?? newId();
-  const youtube =
-    input.youtube === undefined
-      ? (existing?.youtube ?? null)
-      : input.youtube
-        ? JSON.stringify(input.youtube)
-        : null;
   const stmts: D1PreparedStatement[] = [
-    // Clear the previous reference first: the unique index allows only one per song.
+    // Retire the previous reference first: the unique index allows only one per song.
     db
-      .prepare("UPDATE song_recordings SET is_reference = 0 WHERE song_id = ? AND id != ?")
-      .bind(songId, id),
+      .prepare(
+        "UPDATE song_recordings SET is_reference = 0, retired_at = ? WHERE song_id = ? AND id != ? AND is_reference = 1",
+      )
+      .bind(ts, songId, id),
   ];
-  const values = [
-    input.title,
-    input.artistCredit ?? null,
-    input.disambiguation ?? null,
-    input.releaseTitle ?? null,
-    input.releaseMbid ?? null,
-    input.releaseDate ?? null,
-    input.durationMs ?? null,
-    JSON.stringify(input.isrcs ?? []),
-    JSON.stringify(input.works ?? []),
-    JSON.stringify(input.links ?? []),
-    youtube,
-    input.sourceUrl ?? null,
-    input.fetched ? ts : (existing?.fetched_at ?? null),
-  ];
+  const edited = input.metadataEdited ? [userId, ts] : [null, null];
   if (existing) {
+    // A catalogue entry is refreshed from the catalogue; a row identified by link or by hand
+    // only takes the title / artist the member confirmed just now.
+    if (input.source === "musicbrainz") {
+      stmts.push(
+        db
+          .prepare(
+            `UPDATE song_recordings SET source = 'musicbrainz', mbid = ?, title = ?, artist_credit = ?, disambiguation = ?,
+               release_title = ?, release_mbid = ?, release_date = ?, duration_ms = ?, isrcs = ?, works = ?, links = ?,
+               source_url = ?, fetched_at = ? WHERE id = ?`,
+          )
+          .bind(
+            input.mbid ?? null,
+            input.title,
+            input.artistCredit ?? null,
+            input.disambiguation ?? null,
+            input.releaseTitle ?? null,
+            input.releaseMbid ?? null,
+            input.releaseDate ?? null,
+            input.durationMs ?? null,
+            JSON.stringify(input.isrcs ?? []),
+            JSON.stringify(input.works ?? []),
+            JSON.stringify(input.links ?? []),
+            input.sourceUrl ?? null,
+            input.fetched ? ts : existing.fetchedAt,
+            id,
+          ),
+      );
+    } else if (!existing.mbid) {
+      stmts.push(
+        db
+          .prepare(
+            `UPDATE song_recordings SET title = ?, artist_credit = ?,
+               metadata_edited_by = COALESCE(?, metadata_edited_by), metadata_edited_at = COALESCE(?, metadata_edited_at)
+             WHERE id = ?`,
+          )
+          .bind(input.title, input.artistCredit ?? null, ...edited, id),
+      );
+    }
+    if (input.link !== undefined) {
+      stmts.push(
+        db
+          .prepare(`UPDATE song_recordings SET ${LINK_SET} WHERE id = ?`)
+          .bind(...linkColumns(input.link, ts), id),
+      );
+    }
     stmts.push(
       db
         .prepare(
-          `UPDATE song_recordings SET title = ?, artist_credit = ?, disambiguation = ?, release_title = ?, release_mbid = ?,
-             release_date = ?, duration_ms = ?, isrcs = ?, works = ?, links = ?, youtube = ?, source_url = ?, fetched_at = ?,
-             is_reference = 1 WHERE id = ?`,
+          `UPDATE song_recordings SET is_reference = 1, retired_at = NULL,
+             reference_since = CASE WHEN is_reference = 1 AND reference_since IS NOT NULL THEN reference_since ELSE ? END
+           WHERE id = ?`,
         )
-        .bind(...values, id),
+        .bind(ts, id),
     );
   } else {
     stmts.push(
       db
         .prepare(
-          `INSERT INTO song_recordings (title, artist_credit, disambiguation, release_title, release_mbid, release_date,
-             duration_ms, isrcs, works, links, youtube, source_url, fetched_at, id, song_id, source, mbid, is_reference,
-             created_by, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`,
+          `INSERT INTO song_recordings (id, song_id, source, mbid, title, artist_credit, disambiguation, release_title,
+             release_mbid, release_date, duration_ms, isrcs, works, links, source_url, fetched_at,
+             platform, external_id, link_url, link_title, link_author, thumbnail_url, embeddable, link_checked_at,
+             metadata_edited_by, metadata_edited_at, is_reference, reference_since, created_by, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
         )
-        .bind(...values, id, songId, input.source, input.mbid ?? null, userId, ts),
+        .bind(
+          id,
+          songId,
+          input.source,
+          input.mbid ?? null,
+          input.title,
+          input.artistCredit ?? null,
+          input.disambiguation ?? null,
+          input.releaseTitle ?? null,
+          input.releaseMbid ?? null,
+          input.releaseDate ?? null,
+          input.durationMs ?? null,
+          JSON.stringify(input.isrcs ?? []),
+          JSON.stringify(input.works ?? []),
+          JSON.stringify(input.links ?? []),
+          input.sourceUrl ?? null,
+          input.fetched ? ts : null,
+          ...linkColumns(input.link ?? null, ts),
+          ...edited,
+          ts,
+          userId,
+          ts,
+        ),
     );
   }
   await db.batch(stmts);
   return (await getRecording(db, songId, id))!;
+}
+
+/** Changes only the link of a recording (same recording, another platform or a corrected link). */
+export async function setRecordingLink(db: D1Database, id: string, link: ReferenceLinkInfo | null) {
+  await db
+    .prepare(`UPDATE song_recordings SET ${LINK_SET} WHERE id = ?`)
+    .bind(...linkColumns(link, nowIso()), id)
+    .run();
+}
+
+/** A member corrects the title or artist. What the platform said stays in link_title / link_author. */
+export async function editRecordingMetadata(
+  db: D1Database,
+  id: string,
+  userId: string,
+  patch: { title?: string; artistCredit?: string | null },
+) {
+  const sets: string[] = ["metadata_edited_by = ?", "metadata_edited_at = ?"];
+  const vals: unknown[] = [userId, nowIso()];
+  if (patch.title !== undefined) {
+    sets.push("title = ?");
+    vals.push(patch.title);
+  }
+  if (patch.artistCredit !== undefined) {
+    sets.push("artist_credit = ?");
+    vals.push(patch.artistCredit);
+  }
+  await db
+    .prepare(`UPDATE song_recordings SET ${sets.join(", ")} WHERE id = ?`)
+    .bind(...vals, id)
+    .run();
 }
 
 export async function updateRecordingDetails(
@@ -213,6 +435,56 @@ export async function updateRecordingDetails(
       id,
     )
     .run();
+}
+
+/**
+ * What already depends on a reference recording: analyses computed from it, audio declared for
+ * it, values the band confirmed while it was the reference, and arrangement work.
+ */
+export async function referenceDependents(
+  db: D1Database,
+  song: { id: string; versionId: string },
+  recording: SongRecordingDto,
+): Promise<ReferenceDependents> {
+  const since = recording.referenceSince ?? recording.createdAt;
+  const [analyses, audio, confirmed, sections, materials] = await Promise.all([
+    db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM analysis_results WHERE song_id = ? AND recording_id = ? AND origin = 'audio_analysis'",
+      )
+      .bind(song.id, recording.id)
+      .first<{ n: number }>(),
+    db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM audio_assets WHERE song_id = ? AND recording_id = ? AND deleted_at IS NULL",
+      )
+      .bind(song.id, recording.id)
+      .first<{ n: number }>(),
+    db
+      .prepare(
+        `SELECT DISTINCT target FROM review_events
+         WHERE song_id = ? AND target IN ('band_bpm', 'band_key', 'band_meter') AND created_at >= ?`,
+      )
+      .bind(song.id, since)
+      .all<{ target: string }>(),
+    db
+      .prepare("SELECT COUNT(*) AS n FROM song_sections WHERE version_id = ?")
+      .bind(song.versionId)
+      .first<{ n: number }>(),
+    db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM song_materials WHERE song_id = ? AND deleted_at IS NULL AND status != 'pending'",
+      )
+      .bind(song.id)
+      .first<{ n: number }>(),
+  ]);
+  return {
+    analyses: analyses?.n ?? 0,
+    audioAssets: audio?.n ?? 0,
+    confirmedValues: confirmed.results.map((r) => r.target),
+    sections: sections?.n ?? 0,
+    readyMaterials: materials?.n ?? 0,
+  };
 }
 
 /* ------------------------------------------------------------------ */

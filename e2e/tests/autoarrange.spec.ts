@@ -1,4 +1,4 @@
-import { devices, expect, test } from "@playwright/test";
+import { devices, expect, type Page, test } from "@playwright/test";
 import {
   contextFor,
   createBand,
@@ -6,153 +6,228 @@ import {
   inviteCode,
   join,
   registerUser,
+  type User,
 } from "./helpers";
 
-const PEROLA = "0dea3c9a-ef6b-4707-90d8-685b2f4a2cd8";
-const UM_BANDA_UM = "8379142a-fe4e-4da2-8edf-fb493665a54f";
-const DOCES_BARBAROS = "d72d41dd-fb12-4775-8188-d95c1fdabfe3";
+/**
+ * The band's main reference recording is chosen by pasting a link. External services are the
+ * local stub replaying real captured answers (e2e/stubs/music-services.ts).
+ */
+const YT_ID = "JZqFoTIAJj8";
+const YT = `https://www.youtube.com/watch?v=${YT_ID}`;
+const YT_TITLE =
+  "Natiruts - Pérola Negra (Natiruts Acústico Ao Vivo no Rio de Janeiro) ft. Luiz Melodia";
+const SPOTIFY_ID = "4cOdK2wGLETKBW3PvgPWqT";
+const SPOTIFY = `https://open.spotify.com/track/${SPOTIFY_ID}`;
 const SEGUNDO_SOL_GIL = "790c0007-1df2-4d2e-bd34-8a772894e800";
 
-test("AutoArrange: find the exact recording, prepare, review and rehearse", async ({ browser }) => {
+async function identify(
+  page: Page,
+  link: string,
+  labels = { link: "Recording link", go: "Identify" },
+) {
+  await page.getByLabel(labels.link).fill(link);
+  await page.getByRole("button", { name: labels.go }).click();
+}
+
+/** Prepares a song through the API (the same call the wizard makes) and waits for the job. */
+async function prepareViaApi(user: User, bandId: string, body: Record<string, unknown>) {
+  const res = await user.api.post(`/api/bands/${bandId}/autoarrange/prepare`, { data: body });
+  expect(res.status(), await res.text()).toBe(201);
+  const out = await res.json();
+  await expect
+    .poll(
+      async () =>
+        (await (await user.api.get(`/api/bands/${bandId}/autoarrange/jobs/${out.job.id}`)).json())
+          .job.status,
+      { timeout: 20_000 },
+    )
+    .toBe("awaiting_review");
+  return out.song.id as string;
+}
+
+test("add a song by pasting a link; every member finds the same reference, also in the live room", async ({
+  browser,
+}) => {
   const ana = await registerUser("Ana Drums", "drums");
   const bruno = await registerUser("Bruno Bass", "bass");
-  const bandId = await createBand(ana, `Arrange Band ${Date.now()}`);
+  const bandId = await createBand(ana, `Reference Band ${Date.now()}`);
   await join(bruno, await inviteCode(ana, bandId, "bass"));
+  // Bruno plays but does not manage the repertoire.
+  await ana.api.patch(`/api/bands/${bandId}/members/${bruno.id}`, {
+    data: { permissions: { canEditRepertoire: false } },
+  });
   await createRepertoire(ana, bandId, "Thursday", []);
 
   const { page, context } = await contextFor(browser, ana);
   await page.goto(`/bands/${bandId}/songs`);
   await page.getByRole("link", { name: "Add song" }).first().click();
   await expect(page.getByRole("heading", { name: "Add song", level: 1 })).toBeVisible();
-  // The source registry says what may be done with each site.
-  await expect(page.getByText("Sources and how BandSync may use them")).toBeVisible();
-  await expect(page.getByText("Link only").first()).toBeVisible();
+  // The entry point is one field, not a catalogue of sources.
+  await expect(page.getByText("Accepts YouTube, YouTube Music and Spotify links.")).toBeVisible();
+  await expect(page.getByText(/MusicBrainz|Cifra Club|Songsterr|Discogs/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Enter manually" })).toBeVisible();
 
-  // 1. One composition, many recordings: each version is its own result.
-  await page.getByLabel("Song title").fill("Esotérico");
-  await page.getByLabel("Artist (optional)").fill("Gilberto Gil");
-  await page.getByRole("button", { name: "Search" }).click();
-  const results = page.getByTestId("recording-results");
-  await expect(results.locator("li")).toHaveCount(22);
-  await expect(results.locator(`[data-mbid="${UM_BANDA_UM}"]`)).toContainText("Um Banda Um");
-  await expect(results.locator(`[data-mbid="${UM_BANDA_UM}"]`)).toContainText("4:22");
-  await expect(results.locator(`[data-mbid="${DOCES_BARBAROS}"]`)).toContainText("4:11");
-  await expect(results.locator(`[data-mbid="${DOCES_BARBAROS}"]`)).toContainText("Maria Bethânia");
-  await page.screenshot({ path: "test-results/aa-01-versions.png", fullPage: true });
+  // 1. Links that are refused, each with its own state.
+  const problem = page.getByTestId("link-problem");
+  await identify(page, "javascript:alert(1)");
+  await expect(problem).toHaveAttribute("data-state", "invalid_url");
+  await identify(page, "https://vimeo.com/76979871");
+  await expect(problem).toHaveAttribute("data-state", "unsupported_platform");
+  await expect(problem).toContainText("Unsupported platform");
+  await identify(page, "https://www.youtube.com/playlist?list=PLabc123");
+  await expect(problem).toHaveAttribute("data-state", "unsupported_link");
+  await identify(page, "https://www.youtube.com/watch?v=AAAAAAAAAAA");
+  await expect(problem).toHaveAttribute("data-state", "reference_not_found");
+  await expect(problem).toContainText("Reference not found");
+  await expect(page.getByTestId("reference-preview")).toHaveCount(0);
+  await page.screenshot({ path: "test-results/ref-01-not-found.png", fullPage: true });
 
-  // The source does not say who wrote this recording: the app says so instead of guessing.
-  await results
-    .locator(`[data-mbid="${UM_BANDA_UM}"]`)
-    .getByRole("button", { name: "Select" })
-    .click();
-  await expect(page.getByTestId("recording-preview")).toContainText(
-    "The source does not say who wrote this recording",
-  );
-  await page.getByRole("button", { name: "Change recording" }).click();
-
-  // 2. The reference recording of Pérola Negra, with composer, ISRC and release.
+  // 2. A valid YouTube link is identified through the platform.
+  await identify(page, `https://youtu.be/${YT_ID}?si=share-tracking&t=42`);
+  const preview = page.getByTestId("reference-preview");
+  await expect(preview).toHaveAttribute("data-platform", "youtube");
+  await expect(preview).toHaveAttribute("data-metadata", "complete");
+  await expect(preview).toContainText(YT_TITLE);
+  await expect(preview).toContainText("Channel: NatirutsVEVO");
+  await expect(preview).toContainText("Reference identified");
+  await expect(preview.getByRole("link", { name: YT })).toHaveAttribute("href", YT);
+  await expect(problem).toHaveCount(0);
+  // The video's name is offered, not assumed: the member corrects title and artist.
+  await expect(page.getByLabel("Song title")).toHaveValue(YT_TITLE);
+  await expect(page.getByText("a video's name is not always the song's name")).toBeVisible();
+  await expect(page.getByLabel("Artist")).toHaveValue(""); // a channel is not presented as the artist
   await page.getByLabel("Song title").fill("Pérola Negra");
-  await page.getByLabel("Artist (optional)").fill("Natiruts");
-  await page.getByRole("button", { name: "Search" }).click();
-  await expect(results.locator("li")).toHaveCount(2);
-  await results.locator(`[data-mbid="${PEROLA}"]`).getByRole("button", { name: "Select" }).click();
-  const preview = page.getByTestId("recording-preview");
-  await expect(preview).toContainText("Natiruts Part. Especial Luiz Melodia");
-  await expect(preview).toContainText("Mirante Dona Marta");
-  await expect(preview).toContainText("Luiz Melodia");
-  await expect(preview).toContainText("BR4W41200009");
-  await expect(preview).toContainText("3:30");
-  await expect(page.getByLabel("Release")).toContainText("Acústico no Rio de Janeiro (2012-09-17)");
-
-  // 3. YouTube reference: validated, played only through the official player.
-  await page.getByLabel("YouTube link").fill("https://www.youtube.com/watch?v=AAAAAAAAAAA");
-  await page.getByRole("button", { name: "Check" }).click();
-  await expect(page.getByText("This link is not an available YouTube video.")).toBeVisible();
-  await page.getByLabel("YouTube link").fill("https://youtu.be/JZqFoTIAJj8");
-  await page.getByRole("button", { name: "Check" }).click();
-  const yt = page.getByTestId("youtube-preview");
-  await expect(yt).toContainText("Channel: NatirutsVEVO");
-  await expect(yt.locator("iframe")).toHaveAttribute(
+  await page.getByLabel("Artist").fill("Natiruts feat. Luiz Melodia");
+  await preview.getByRole("button", { name: "Listen to check" }).click();
+  await expect(preview.getByTestId("reference-player").locator("iframe")).toHaveAttribute(
     "src",
-    "https://www.youtube-nocookie.com/embed/JZqFoTIAJj8",
+    `https://www.youtube-nocookie.com/embed/${YT_ID}`,
   );
-  await expect(yt).toContainText("does not download or extract audio");
+  await page.screenshot({ path: "test-results/ref-02-identified.png", fullPage: true });
 
-  // 4. Prepare.
-  await page.getByLabel("Title in the band").fill("Pérola Negra");
-  await page.screenshot({ path: "test-results/aa-02-selected.png", fullPage: true });
-  await page.getByRole("button", { name: "Prepare song" }).click();
-  const progress = page.getByTestId("job-progress");
-  await expect(progress).toHaveAttribute("data-status", "awaiting_review", { timeout: 20_000 });
-  await expect(progress.locator('[data-step="searching_references"]')).toHaveAttribute(
-    "data-outcome",
-    "done",
+  // 3. Confirm and prepare: a known link is not audio, and nothing is analysed.
+  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+  const states = page.getByTestId("preparation-state");
+  await expect(states.locator('[data-item="arrangement"]')).toHaveAttribute(
+    "data-state",
+    "ready_for_review",
+    { timeout: 20_000 },
   );
-  await expect(progress.locator('[data-step="analyzing_audio"]')).toContainText(
-    "No authorised audio file was provided.",
+  await expect(states.locator('[data-item="reference"]')).toHaveAttribute(
+    "data-state",
+    "identified",
   );
-  await expect(progress.locator('[data-step="detecting_structure"]')).toHaveAttribute(
-    "data-outcome",
-    "skipped",
+  await expect(states.locator('[data-item="audio"]')).toHaveAttribute("data-state", "none");
+  await expect(states.locator('[data-item="audio"]')).toContainText(
+    "Audio not available for analysis",
   );
-  await expect(progress.locator('[data-step="preparing_materials"]')).toContainText(
-    "5 workspaces opened",
+  await expect(states.locator('[data-item="analysis"]')).toHaveAttribute(
+    "data-state",
+    "not_possible",
   );
+  await expect(states).toContainText("Arrangement ready for review");
+  await expect(page.getByRole("spinbutton", { name: "Band BPM" })).toHaveValue(""); // nothing invented
 
-  // 5. What was found, with origin and review state; nothing analysed is claimed.
-  await expect(page.locator('[data-kind="duration"]')).toContainText("3:30");
-  await expect(page.locator('[data-kind="duration"]')).toContainText("MusicBrainz");
-  await expect(page.locator('[data-kind="duration"]')).toContainText("Not reviewed");
-  await expect(page.locator('[data-kind="composer"]')).toContainText("Luiz Melodia");
-  await expect(page.locator('[data-kind="bpm"]')).toHaveCount(0);
-  await expect(page.getByText("were not analysed")).toBeVisible();
-
-  // 6. Human review: the band confirms its own tempo and meter.
+  // 4. The band's own values, the repertoire, and the end of the review.
   await page.getByRole("spinbutton", { name: "Band BPM" }).fill("72");
   await page.getByRole("button", { name: "Confirm Band BPM" }).click();
   await expect(page.getByText(/Confirmed by Ana Drums on/).first()).toBeVisible();
   await page.getByRole("button", { name: "Confirm Band time signature" }).click();
   await expect(page.getByText(/Confirmed by Ana Drums on/)).toHaveCount(2);
-
-  // 7. Into the repertoire, then finish the review.
   await page.getByLabel("Repertoire").selectOption({ label: "Thursday" });
   await page.getByRole("button", { name: "Add", exact: true }).click();
   await expect(page.getByText("Added to “Thursday”")).toBeVisible();
-  await page.screenshot({ path: "test-results/aa-03-review.png", fullPage: true });
   await page.getByRole("button", { name: "Finish review" }).click();
-  await expect(progress).toHaveAttribute("data-status", "completed");
+  await expect(states.locator('[data-item="arrangement"]')).toHaveAttribute(
+    "data-state",
+    "reviewed",
+  );
+  await page.screenshot({ path: "test-results/ref-03-prepared.png", fullPage: true });
 
-  // 8. The song sheet shows verified data, the reference recording and the player.
+  // 5. The song sheet: reference recording first, band arrangement second, sources tucked away.
   await page.getByRole("link", { name: "Open song sheet" }).click();
   await expect(page.getByRole("heading", { name: "Pérola Negra", level: 1 })).toBeVisible();
-  await expect(page.getByText("Acústico no Rio de Janeiro (2012)")).toBeVisible();
-  const panel = page.getByTestId("autoarrange-panel");
-  await expect(panel).toContainText("Reference recording");
-  await expect(panel).toContainText("Natiruts Part. Especial Luiz Melodia");
-  await panel.getByRole("button", { name: "Listen to the reference" }).click();
-  await expect(panel.locator("iframe")).toHaveAttribute(
-    "src",
-    /youtube-nocookie\.com\/embed\/JZqFoTIAJj8/,
+  const block = page.getByTestId("reference-block");
+  await expect(block).toHaveAttribute("data-state", "identified");
+  await expect(block).toContainText("Pérola Negra");
+  await expect(block).toContainText("Natiruts feat. Luiz Melodia");
+  await expect(block.locator('[data-platform="youtube"]')).toHaveText("YouTube");
+  await expect(block.getByRole("link", { name: "Open original recording" })).toHaveAttribute(
+    "href",
+    YT,
   );
-  await expect(page.getByText("Bass tab · Bass").first()).toBeVisible();
-  await page.screenshot({ path: "test-results/aa-04-song-sheet.png", fullPage: true });
+  await expect(block.getByRole("button", { name: "Change reference" })).toBeVisible();
+  await block.getByRole("button", { name: "Listen here" }).click();
+  await expect(block.getByTestId("reference-player").locator("iframe")).toHaveAttribute(
+    "src",
+    `https://www.youtube-nocookie.com/embed/${YT_ID}`,
+  );
+  const arrangement = page.getByTestId("band-arrangement");
+  await expect(arrangement.getByRole("heading", { name: "Band arrangement" })).toBeVisible();
+  await expect(arrangement.getByTestId("materials-overview")).toContainText(
+    "Bass tab · Bass · Pending",
+  );
+  const technical = page.getByTestId("technical-details");
+  await expect(technical).not.toHaveAttribute("open", "");
+  await expect(page.getByText("Title on the platform")).toBeHidden();
+  await technical.locator("summary").first().click();
+  await expect(technical).toContainText("Identified by");
+  await expect(technical).toContainText(YT_TITLE);
+  await expect(technical).toContainText("NatirutsVEVO");
+  await page.screenshot({ path: "test-results/ref-04-song-sheet.png", fullPage: true });
+  // The link persists.
+  await page.reload();
+  await expect(page.getByTestId("reference-block")).toHaveAttribute("data-state", "identified");
+  const songUrl = page.url();
 
-  // 9. Live rehearsal uses the confirmed tempo and meter as the band's values.
+  // 6. Another member, on a phone, sees the same reference and cannot change it.
+  const member = await contextFor(browser, bruno, { ...devices["iPhone 13"] });
+  await member.page.goto(songUrl);
+  const theirs = member.page.getByTestId("reference-block");
+  await expect(theirs).toContainText("Pérola Negra");
+  await expect(theirs).toContainText("Natiruts feat. Luiz Melodia");
+  await expect(theirs.getByRole("link", { name: "Open original recording" })).toHaveAttribute(
+    "href",
+    YT,
+  );
+  await expect(theirs.getByRole("button", { name: "Change reference" })).toHaveCount(0);
+  await expect(member.page.getByTestId("band-values")).toContainText("72");
+  const overflow = await member.page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+  await member.page.screenshot({ path: "test-results/ref-05-member-mobile.png", fullPage: true });
+  // In the repertoire, the reference is one tap away.
+  await member.page.goto(`/bands/${bandId}/repertoires`);
+  await member.page.getByRole("link", { name: /Thursday/ }).click();
+  await expect(member.page.getByTestId("reference-open")).toHaveAttribute("href", YT);
+
+  // 7. Live rehearsal: tempo and devices are synchronised; the reference is opened locally.
   await page.goto(`/bands/${bandId}/rehearsal`);
   await page.getByLabel("Repertoire for this session").selectOption({ index: 1 });
   await page.getByRole("button", { name: "Start session" }).click();
   await expect(page).toHaveURL(/\/rehearsal\/[0-9a-f-]+$/);
   const room = page.url();
   await page.getByRole("button", { name: "Enable sound" }).click();
-  const member = await contextFor(browser, bruno, { ...devices["iPhone 13"] });
   await member.page.goto(room);
   await member.page.getByRole("button", { name: "Enable sound" }).click();
   await page.getByRole("button", { name: "Choose song" }).click();
   await page.getByRole("button", { name: /Pérola Negra/ }).click();
   await expect(member.page.getByText("Pérola Negra").first()).toBeVisible();
   await expect(member.page.getByText("72", { exact: true }).first()).toBeVisible();
-  await expect(member.page.getByTestId("tempo-source")).toHaveCount(0); // confirmed: no warning
+  await expect(member.page.getByTestId("tempo-source")).toHaveCount(0); // confirmed by the band
   await expect(member.page.getByText("Bass tab · Bass").first()).toBeVisible();
+  await member.page.getByTestId("room-reference").click();
+  const panel = member.page.getByTestId("room-reference-panel");
+  await expect(panel).toContainText("Natiruts feat. Luiz Melodia");
+  await expect(panel.getByRole("link", { name: "Open original recording" })).toHaveAttribute(
+    "href",
+    YT,
+  );
+  await expect(panel).toContainText("Plays on this device only");
+  await member.page.screenshot({ path: "test-results/ref-06-room-mobile.png" });
+  await member.page.getByRole("button", { name: "Close" }).click();
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(member.page.getByText("Playing").first()).toBeVisible({ timeout: 15_000 });
   await page.getByRole("button", { name: "Stop" }).click();
@@ -160,11 +235,128 @@ test("AutoArrange: find the exact recording, prepare, review and rehearse", asyn
   await context.close();
 });
 
-test("AutoArrange on an existing song keeps the band's data, in Portuguese and on a phone", async ({
+test("changing the reference asks before replacing; a new link for the same recording keeps everything", async ({
+  browser,
+}) => {
+  const ana = await registerUser("Ana Drums", "drums");
+  const bandId = await createBand(ana, `Change Band ${Date.now()}`);
+  const songId = await prepareViaApi(ana, bandId, {
+    newSong: { title: "Never Gonna Give You Up" },
+    recording: { source: "link", title: "Never Gonna Give You Up", artistCredit: "A live video" },
+    referenceUrl: YT,
+  });
+  await ana.api.post(`/api/bands/${bandId}/autoarrange/songs/${songId}/review`, {
+    data: { target: "band_bpm", bpm: 113 },
+  });
+
+  const { page, context } = await contextFor(browser, ana);
+  await page.goto(`/bands/${bandId}/songs/${songId}`);
+  const block = page.getByTestId("reference-block");
+  await expect(block.locator('[data-platform="youtube"]')).toBeVisible();
+
+  // 1. Authorised audio is a separate thing from the link, and still not an analysis.
+  const states = page.getByTestId("preparation-state");
+  await states.getByRole("button", { name: "Upload authorised audio" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.locator('input[type="file"]').setInputFiles({
+    name: "our-take.mp3",
+    mimeType: "audio/mpeg",
+    buffer: Buffer.from([0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00]),
+  });
+  await expect(dialog.getByRole("button", { name: "Upload" })).toBeDisabled(); // no declaration yet
+  await dialog.getByRole("checkbox").check();
+  await dialog.getByRole("button", { name: "Upload" }).click();
+  await expect(states.locator('[data-item="audio"]')).toHaveAttribute("data-state", "available");
+  await expect(states.locator('[data-item="audio"]')).toContainText("our-take.mp3");
+  await expect(states.locator('[data-item="analysis"]')).toHaveAttribute("data-state", "pending");
+  await expect(states).toContainText("Analysis pending");
+  await expect(page.locator('[data-kind="bpm"]')).toHaveCount(0);
+
+  // 2. A Spotify link for another recording.
+  await block.getByRole("button", { name: "Change reference" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Change the reference recording", level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByTestId("current-reference")).toContainText("A live video");
+  await identify(page, `https://open.spotify.com/intl-pt/track/${SPOTIFY_ID}?si=abc`);
+  const preview = page.getByTestId("reference-preview");
+  await expect(preview).toHaveAttribute("data-platform", "spotify");
+  await expect(preview).toHaveAttribute("data-metadata", "partial");
+  await expect(preview).toContainText("Never Gonna Give You Up");
+  await expect(preview.getByRole("link", { name: SPOTIFY })).toHaveAttribute("href", SPOTIFY);
+  await expect(page.getByText("Spotify does not name the artist")).toBeVisible();
+  await page.getByLabel("Artist").fill("Rick Astley");
+  await expect(page.getByRole("radio", { name: /Another recording/ })).toBeChecked();
+  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+
+  // 3. Confirmed tempo and audio depend on the current recording: the app asks first.
+  const warning = page.getByTestId("replace-warning");
+  await expect(warning).toContainText("Band BPM confirmed");
+  await expect(warning).toContainText("1 audio file");
+  await expect(warning).toContainText("None of it is deleted or changed");
+  await page.screenshot({ path: "test-results/ref-07-replace-warning.png" });
+  await page.getByRole("button", { name: "Cancel" }).click();
+  // Cancelled: nothing changed.
+  const before = (await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json()).song;
+  expect(before.reference.url).toBe(YT);
+  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+  await page.getByRole("button", { name: "Replace reference" }).click();
+  await expect(
+    page.getByTestId("preparation-state").locator('[data-item="arrangement"]'),
+  ).toHaveAttribute("data-state", "ready_for_review", { timeout: 20_000 });
+  // The tempo the band confirmed is kept, and flagged as older than the reference.
+  await expect(page.getByRole("spinbutton", { name: "Band BPM" })).toHaveValue("113");
+  await expect(page.locator('[data-stale="true"]')).toContainText("check again");
+
+  await page.getByRole("link", { name: "Open song sheet" }).click();
+  await expect(block.locator('[data-platform="spotify"]')).toHaveText("Spotify");
+  await expect(block).toContainText("Rick Astley");
+  await block.getByRole("button", { name: "Listen here" }).click();
+  await expect(block.getByTestId("reference-player").locator("iframe")).toHaveAttribute(
+    "src",
+    `https://open.spotify.com/embed/track/${SPOTIFY_ID}`,
+  );
+  const technical = page.getByTestId("technical-details");
+  await technical.locator("summary").first().click();
+  await expect(technical.getByTestId("previous-references")).toContainText("A live video");
+  await expect(technical.getByTestId("previous-references")).toContainText("YouTube");
+  await expect(technical.getByTestId("history").locator('[data-target="reference"]')).toHaveCount(
+    2,
+  );
+  await page.screenshot({ path: "test-results/ref-08-after-replace.png", fullPage: true });
+  const after = (await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json()).song;
+  expect(after.version.bpm).toBe(113);
+  expect(after.reference).toMatchObject({ platform: "spotify", url: SPOTIFY });
+
+  // 4. A recording identified without a link: adding the link keeps the recording and its data.
+  const pendingId = await prepareViaApi(ana, bandId, {
+    newSong: { title: "O Segundo Sol" },
+    recording: { source: "musicbrainz", mbid: SEGUNDO_SOL_GIL },
+  });
+  await page.goto(`/bands/${bandId}/songs/${pendingId}`);
+  await expect(block).toHaveAttribute("data-state", "link_pending");
+  await expect(block).toContainText("Link pending");
+  await expect(block).toContainText("No other recording is chosen automatically");
+  await expect(block).toContainText("Cássia Reggae, Vol. 1");
+  await expect(
+    page.getByTestId("preparation-state").locator('[data-item="reference"]'),
+  ).toHaveAttribute("data-state", "link_pending");
+  await block.getByRole("button", { name: "Add link" }).click();
+  await identify(page, YT);
+  await expect(page.getByRole("radio", { name: /The same reference recording/ })).toBeChecked();
+  await page.getByRole("button", { name: "Save link" }).click();
+  await expect(page).toHaveURL(new RegExp(`/songs/${pendingId}$`));
+  await expect(block).toHaveAttribute("data-state", "identified");
+  await expect(block).toContainText("O segundo sol");
+  await expect(block).toContainText("4:18"); // the catalogue's duration is still attached
+  await context.close();
+});
+
+test("an existing song gets its reference in Portuguese on a phone, and the catalogue search still works", async ({
   browser,
 }) => {
   const ana = await registerUser("Ana Drums", "drums", "pt-BR");
-  const bandId = await createBand(ana, `Arrange PT ${Date.now()}`);
+  const bandId = await createBand(ana, `Referência PT ${Date.now()}`);
   const created = await ana.api.post(`/api/bands/${bandId}/songs`, {
     data: {
       title: "O Segundo Sol",
@@ -174,54 +366,81 @@ test("AutoArrange on an existing song keeps the band's data, in Portuguese and o
     },
   });
   const songId = (await created.json()).song.id as string;
+  const pt = { link: "Link da gravação", go: "Identificar" };
 
   const { page, context } = await contextFor(browser, ana, { ...devices["iPhone 13"] });
   await page.goto(`/bands/${bandId}/songs/${songId}`);
-  const panel = page.getByTestId("autoarrange-panel");
-  await expect(panel).toContainText("Nenhuma gravação identificada ainda.");
-  await panel.getByRole("link", { name: "Identificar gravação" }).click();
-  await expect(page.getByRole("heading", { name: "Identificar gravação", level: 1 })).toBeVisible();
-  // Title and artist come from the song.
-  await expect(page.getByLabel("Título da música")).toHaveValue("O Segundo Sol");
-  await expect(page.getByLabel("Artista (opcional)")).toHaveValue("Gilberto Gil");
-  await page.getByRole("button", { name: "Buscar" }).click();
-  const results = page.getByTestId("recording-results");
-  await expect(results.locator("li")).toHaveCount(2);
-  await expect(results.locator(`[data-mbid="${SEGUNDO_SOL_GIL}"]`)).toContainText(
-    "Cássia Reggae, Vol. 1",
-  );
-  // Phone layout: nothing overflows sideways.
+  const block = page.getByTestId("reference-block");
+  await expect(block).toHaveAttribute("data-state", "none");
+  await expect(block).toContainText("Nenhuma gravação de referência definida.");
+  await expect(page.getByTestId("preparation-state")).toContainText("Referência não definida");
+  await block.getByRole("button", { name: "Definir referência" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Definir gravação de referência", level: 1 }),
+  ).toBeVisible();
+
+  // States in Portuguese.
+  const problem = page.getByTestId("link-problem");
+  await identify(page, "https://soundcloud.com/artista/faixa", pt);
+  await expect(problem).toContainText("Plataforma não suportada");
+  await identify(page, "https://open.spotify.com/track/0000000000000000000000", pt);
+  await expect(problem).toContainText("Referência não encontrada");
+  // A video whose owner does not allow embedding: the link is kept, the limits are stated.
+  await identify(page, "https://www.youtube.com/watch?v=RESTRICTED1", pt);
+  const preview = page.getByTestId("reference-preview");
+  await expect(preview).toHaveAttribute("data-metadata", "missing");
+  await expect(preview).toContainText("Metadados ausentes");
+  await expect(preview).toContainText("Player indisponível");
+  await expect(preview.getByTestId("reference-player")).toHaveCount(0);
+  await page.screenshot({ path: "test-results/ref-09-mobile-pt-restricted.png", fullPage: true });
+
+  await identify(page, `spotify:track:${SPOTIFY_ID}`, pt);
+  await expect(preview).toHaveAttribute("data-platform", "spotify");
+  await expect(preview).toContainText("Referência identificada");
+  // The song keeps its own title; only the artist of the recording is asked.
+  await expect(page.getByLabel("Título da música")).toHaveCount(0);
+  await expect(page.getByLabel("Artista")).toHaveValue("Gilberto Gil");
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
-  await page.screenshot({ path: "test-results/aa-05-mobile-pt.png", fullPage: true });
-
-  await results
-    .locator(`[data-mbid="${SEGUNDO_SOL_GIL}"]`)
-    .getByRole("button", { name: "Selecionar" })
-    .click();
-  await expect(page.getByTestId("recording-preview")).toContainText(
-    "A fonte não informa quem compôs esta gravação",
-  );
-  await page.getByRole("button", { name: "Preparar música" }).click();
-  const progress = page.getByTestId("job-progress");
-  await expect(progress).toHaveAttribute("data-status", "awaiting_review", { timeout: 20_000 });
-  await expect(progress).toContainText("Aguardando revisão");
-  await expect(progress.locator('[data-step="analyzing_audio"]')).toContainText(
-    "Nenhum arquivo de áudio autorizado foi fornecido.",
-  );
-  await expect(page.getByText("Nenhum valor é inventado")).toBeVisible();
-  await expect(page.locator('[data-kind="duration"]')).toContainText("4:18");
-  await expect(page.locator('[data-kind="composer"]')).toHaveCount(0);
+  await page.screenshot({ path: "test-results/ref-10-mobile-pt.png", fullPage: true });
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  const states = page.getByTestId("preparation-state");
+  await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
+  await expect(states).toContainText("Referência identificada");
+  await expect(states).toContainText("Áudio não disponível para análise");
+  await expect(states).toContainText("Análise não realizada");
 
   // The band's own values and the composer it had typed are untouched.
   const after = (await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json()).song;
   expect(after.composer).toBe("Nando Reis");
   expect(after.version.bpm).toBe(90);
   expect(after.version.key).toBe("A");
-  expect(after.referenceRecording).toBe("Cássia Reggae, Vol. 1");
-  expect(after.referenceYear).toBe(2022);
-  expect(after.durationSeconds).toBe(258);
+  expect(after.reference).toMatchObject({ platform: "spotify", artist: "Gilberto Gil" });
+
+  // Without a link at hand, the open catalogue still tells versions apart.
+  await page.goto(`/bands/${bandId}/songs/add`);
+  await page.getByRole("button", { name: "Buscar por título e artista" }).click();
+  await page.getByLabel("Título da música").fill("Esotérico");
+  await page.getByLabel("Artista (opcional)").fill("Gilberto Gil");
+  await page.getByRole("button", { name: "Buscar" }).click();
+  const results = page.getByTestId("recording-results");
+  await expect(results.locator("li")).toHaveCount(22);
+  const umBandaUm = results.locator('[data-mbid="8379142a-fe4e-4da2-8edf-fb493665a54f"]');
+  await expect(umBandaUm).toContainText("Um Banda Um");
+  await umBandaUm.getByRole("button", { name: "Selecionar" }).click();
+  await expect(page.getByTestId("recording-preview")).toContainText(
+    "A fonte não informa quem compôs esta gravação",
+  );
+  await page.getByRole("button", { name: "Preparar música" }).click();
+  await expect(page.getByTestId("preparation-state")).toContainText("Link da referência pendente", {
+    timeout: 20_000,
+  });
+  await page.getByRole("link", { name: "Abrir ficha da música" }).click();
+  const sheet = page.getByTestId("reference-block");
+  await expect(sheet).toHaveAttribute("data-state", "link_pending");
+  await expect(sheet).toContainText("Um Banda Um");
+  await expect(sheet).toContainText("4:22");
   await context.close();
 });

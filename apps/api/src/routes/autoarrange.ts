@@ -1,31 +1,43 @@
 import {
   BAND_DAILY_JOB_LIMIT,
   createAudioAssetSchema,
+  editReferenceSchema,
+  hasReferenceDependents,
+  identifyReferenceSchema,
   isActiveJob,
   JOB_MAX_ATTEMPTS,
   type JobStepRecord,
   jobDedupeKey,
   PIPELINE_VERSION,
+  type PreparationState,
+  parseReferenceLink,
   pickDefaultRelease,
   prepareSongSchema,
   type RecordingDetails,
+  type ReferenceLinkInfo,
+  type ReferencePlatform,
   recordingPageUrl,
   reviewSchema,
+  type SongRecordingDto,
   searchRecordingsSchema,
+  setReferenceLinkSchema,
   workAuthors,
-  type YouTubeVideoInfo,
   youtubeLookupSchema,
 } from "@bandsync/shared";
 import { type Context, Hono } from "hono";
-import { musicBrainz, youtubeVideoInfo } from "../autoarrange/clients";
+import { identifyReferenceLink, musicBrainz, youtubeVideoInfo } from "../autoarrange/clients";
 import { CONNECTORS } from "../autoarrange/connectors";
 import { audit } from "../db/audit";
 import {
   countRecentJobs,
   createAudioAsset,
+  editRecordingMetadata,
   findActiveJob,
+  findRecordingMatch,
   getAudioAsset,
   getJobForBand,
+  getRecording,
+  getReferenceRecording,
   getResult,
   insertJob,
   insertReviewEvent,
@@ -34,8 +46,11 @@ import {
   listRecordings,
   listResults,
   listReviewEvents,
+  referenceDependents,
+  setRecordingLink,
   setResultReview,
   toJobDto,
+  toReferenceSummary,
   updateJob,
   upsertReferenceRecording,
 } from "../db/autoarrange";
@@ -115,31 +130,68 @@ autoArrangeRoutes.post("/youtube", requireRepertoireEditor, async (c) => {
   return c.json({ video });
 });
 
+/* ---------------- reference link ---------------- */
+
+const PLATFORM_NAMES: Record<ReferencePlatform, string> = {
+  youtube: "YouTube",
+  youtube_music: "YouTube Music",
+  spotify: "Spotify",
+};
+
+/**
+ * Reads a pasted link through its platform's connector. The errors are the states the interface
+ * shows: not a link to one recording, a site without a connector, or a recording the platform
+ * does not know.
+ */
+async function resolveReferenceLink(c: Context<AppEnv>, raw: string): Promise<ReferenceLinkInfo> {
+  const parsed = parseReferenceLink(raw);
+  if (!parsed.ok) {
+    if (parsed.reason === "unsupported_platform")
+      throw new ApiError("unsupported_platform", "no connector for this site", {
+        reason: parsed.reason,
+      });
+    throw new ApiError("validation_error", "not a link to one recording", {
+      reason: parsed.reason,
+    });
+  }
+  const info = await identifyReferenceLink(c.env, parsed.link);
+  if (!info)
+    throw new ApiError("not_found", "the platform does not know this recording", {
+      reason: "reference_not_found",
+    });
+  return info;
+}
+
+autoArrangeRoutes.post("/reference/identify", requireRepertoireEditor, async (c) => {
+  await limitExternal(c, "ref-identify", 30);
+  const { url } = await parseBody(c, identifyReferenceSchema);
+  return c.json({ reference: await resolveReferenceLink(c, url) });
+});
+
 /* ---------------- prepare ---------------- */
 
 autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
   const bandId = p(c, "bandId");
   const user = c.get("user");
+  const db = c.env.DB;
   const input = await parseBody(c, prepareSongSchema);
   await limitExternal(c, "prepare", 20);
   if (
-    (await countRecentJobs(c.env.DB, bandId, new Date(Date.now() - DAY_MS).toISOString())) >=
+    (await countRecentJobs(db, bandId, new Date(Date.now() - DAY_MS).toISOString())) >=
     BAND_DAILY_JOB_LIMIT
   ) {
     throw new ApiError("rate_limited", "daily preparation limit reached for this band");
   }
 
-  // 1. Resolve the chosen recording from the source itself (never from client-supplied metadata).
+  // 1. Resolve the chosen recording from the sources themselves (never from client-supplied
+  //    platform metadata). The title and artist a member typed are theirs to decide.
   let details: RecordingDetails | null = null;
   if (input.recording.source === "musicbrainz") {
     details = await musicBrainz(c.env).lookup(input.recording.mbid);
     if (!details) throw notFound("recording");
   }
-  let video: YouTubeVideoInfo | null = null;
-  if (input.youtubeUrl) {
-    video = await youtubeVideoInfo(c.env, input.youtubeUrl);
-    if (!video) throw new ApiError("validation_error", "not an available YouTube video");
-  }
+  const rawLink = input.referenceUrl ?? input.youtubeUrl ?? null;
+  const link = rawLink ? await resolveReferenceLink(c, rawLink) : null;
   const release = details
     ? ((input.recording.source === "musicbrainz" && input.recording.releaseMbid
         ? details.releases.find(
@@ -147,55 +199,88 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
           )
         : null) ?? pickDefaultRelease(details.releases))
     : null;
+  const manual = input.recording.source === "manual" ? input.recording : null;
+  const byLink = input.recording.source === "link" ? input.recording : null;
+  const typedArtist = (manual ?? byLink)?.artistCredit?.trim() || null;
 
-  // 2. The song: an existing one, or a new one created from verified data only.
+  // 2. An existing song: replacing its reference must not happen silently.
   let songId = input.songId ?? null;
   let created = false;
+  let previous: SongRecordingDto | null = null;
+  let replacing = false;
   if (songId) {
-    if (!(await getSong(c.env.DB, bandId, songId))) throw notFound("song");
+    const song = await getSong(db, bandId, songId);
+    if (!song) throw notFound("song");
+    previous = await getReferenceRecording(db, songId);
+    const target = await findRecordingMatch(db, songId, { mbid: details?.mbid ?? null, link });
+    replacing = !!previous && previous.id !== target?.id;
+    if (replacing && previous) {
+      const dependents = await referenceDependents(
+        db,
+        { id: song.id, versionId: song.version.id },
+        previous,
+      );
+      if (hasReferenceDependents(dependents) && !input.confirmReplace)
+        throw new ApiError("confirmation_required", "replacing the reference needs confirmation", {
+          dependents,
+          current: toReferenceSummary(previous),
+        });
+    }
   } else {
+    // …or a new one, created from verified data and from what the member confirmed.
     const authors = details ? workAuthors(details.works) : [];
     const sourceUrl = details ? recordingPageUrl(details.mbid) : null;
     const note = "MusicBrainz";
-    const manual = input.recording.source === "manual" ? input.recording : null;
     const year = (release?.date ?? details?.firstReleaseDate ?? manual?.releaseDate ?? "").slice(
       0,
       4,
     );
-    songId = await createSong(c.env.DB, bandId, user.id, {
+    songId = await createSong(db, bandId, user.id, {
       title: input.newSong!.title,
-      artist: details?.artistCredit || manual?.artistCredit || null,
+      artist: details?.artistCredit || typedArtist || link?.artistGuess || null,
       composer: authors.length > 0 ? authors.join(", ") : null,
       referenceRecording: release?.title ?? manual?.releaseTitle ?? null,
       referenceYear: /^\d{4}$/.test(year) ? Number(year) : null,
       durationSeconds: details?.durationMs ? Math.round(details.durationMs / 1000) : null,
       originalBpmStatus: "unknown",
       originalKeyStatus: "unknown",
-      metadataSources: details
-        ? [
-            { field: "recording", value: details.artistCredit, url: sourceUrl, note },
-            ...(authors.length > 0
-              ? [
-                  {
-                    field: "composer" as const,
-                    value: authors.join(", "),
-                    url: details.works[0]?.url ?? sourceUrl,
-                    note,
-                  },
-                ]
-              : []),
-            ...(details.durationMs
-              ? [
-                  {
-                    field: "duration" as const,
-                    value: `${Math.round(details.durationMs / 1000)} s`,
-                    url: sourceUrl,
-                    note,
-                  },
-                ]
-              : []),
-          ]
-        : [],
+      metadataSources: [
+        ...(details
+          ? [
+              { field: "recording" as const, value: details.artistCredit, url: sourceUrl, note },
+              ...(authors.length > 0
+                ? [
+                    {
+                      field: "composer" as const,
+                      value: authors.join(", "),
+                      url: details.works[0]?.url ?? sourceUrl,
+                      note,
+                    },
+                  ]
+                : []),
+              ...(details.durationMs
+                ? [
+                    {
+                      field: "duration" as const,
+                      value: `${Math.round(details.durationMs / 1000)} s`,
+                      url: sourceUrl,
+                      note,
+                    },
+                  ]
+                : []),
+            ]
+          : []),
+        ...(link
+          ? [
+              {
+                field: "recording" as const,
+                value: link.title ?? link.url,
+                url: link.url,
+                note: PLATFORM_NAMES[link.platform],
+              },
+            ]
+          : []),
+      ],
       // Tempo, key and meter are never guessed: the band version starts unset / unconfirmed.
       version: {
         bpm: null,
@@ -203,13 +288,13 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
         beatsPerBar: 4,
         beatUnit: 4,
         meterConfirmed: false,
-        referenceUrl: video?.url ?? null,
+        referenceUrl: link?.url ?? null,
       },
     });
     if (details?.works[0])
-      await updateSong(c.env.DB, bandId, songId, { workMbid: details.works[0].mbid });
+      await updateSong(db, bandId, songId, { workMbid: details.works[0].mbid });
     created = true;
-    await audit(c.env.DB, {
+    await audit(db, {
       bandId,
       actorUserId: user.id,
       action: "song.created",
@@ -218,10 +303,12 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
       metadata: { via: "autoarrange" },
     });
   }
+  const song = (await getSong(db, bandId, songId))!;
 
-  // 3. The reference recording of that song.
+  // 3. The reference recording of that song. The previous one, if any, is retired, not deleted.
+  const typedTitle = (manual ?? byLink)?.title?.trim() || null;
   const recording = await upsertReferenceRecording(
-    c.env.DB,
+    db,
     songId,
     user.id,
     details
@@ -238,21 +325,51 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
           isrcs: details.isrcs,
           works: details.works,
           links: details.links,
-          youtube: video ?? undefined,
+          link: link ?? undefined,
           sourceUrl: recordingPageUrl(details.mbid),
           fetched: true,
         }
       : {
           source: "manual",
-          title: (input.recording as { title: string }).title,
-          artistCredit: (input.recording as { artistCredit?: string | null }).artistCredit ?? null,
-          releaseTitle: (input.recording as { releaseTitle?: string | null }).releaseTitle ?? null,
-          releaseDate: (input.recording as { releaseDate?: string | null }).releaseDate ?? null,
-          youtube: video ?? undefined,
+          // A video title is not necessarily the song title: what the member confirmed wins.
+          title: typedTitle ?? song.title,
+          artistCredit: typedArtist ?? link?.artistGuess ?? null,
+          releaseTitle: manual?.releaseTitle ?? null,
+          releaseDate: manual?.releaseDate ?? null,
+          link: link ?? undefined,
+          metadataEdited:
+            !!link &&
+            ((typedTitle !== null && typedTitle !== link.title) ||
+              (typedArtist !== null && typedArtist !== link.artistGuess)),
         },
   );
+  if (link) {
+    await updateSong(db, bandId, songId, {
+      version: { ...versionOf(song), referenceUrl: recording.link?.url ?? null },
+    });
+  }
+  if (replacing || !previous) {
+    await insertReviewEvent(db, {
+      bandId,
+      songId,
+      target: "reference",
+      action: replacing ? "edit" : "confirm",
+      before: previous ? { change: "replaced", ...toReferenceSummary(previous) } : null,
+      after: toReferenceSummary(recording),
+      resultId: null,
+      userId: user.id,
+    });
+    await audit(db, {
+      bandId,
+      actorUserId: user.id,
+      action: replacing ? "reference.replaced" : "reference.set",
+      targetType: "song",
+      targetId: songId,
+      metadata: { recordingId: recording.id, previousRecordingId: previous?.id ?? null },
+    });
+  }
 
-  if (input.audioAssetId && !(await getAudioAsset(c.env.DB, songId, input.audioAssetId)))
+  if (input.audioAssetId && !(await getAudioAsset(db, songId, input.audioAssetId)))
     throw notFound("audio asset");
 
   // 4. One active job per song + recording + audio file: pressing "Prepare" twice reuses it.
@@ -263,16 +380,16 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
     pipelineVersion: PIPELINE_VERSION,
   });
   let reused = false;
-  let jobRow = await findActiveJob(c.env.DB, dedupeKey);
+  let jobRow = await findActiveJob(db, dedupeKey);
   if (jobRow && jobRow.status === "awaiting_review") {
     // A finished run waiting for review does not block a new run; it is closed first.
-    await updateJob(c.env.DB, jobRow.id, { status: "completed", finishedAt: nowIso() });
+    await updateJob(db, jobRow.id, { status: "completed", finishedAt: nowIso() });
     jobRow = null;
   }
   if (jobRow) {
     reused = true;
   } else {
-    const jobId = await insertJob(c.env.DB, {
+    const jobId = await insertJob(db, {
       bandId,
       songId,
       recordingId: recording.id,
@@ -284,16 +401,17 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
       userId: user.id,
     });
     await startJob(c, jobId);
-    jobRow = (await getJobForBand(c.env.DB, bandId, jobId))!;
+    jobRow = (await getJobForBand(db, bandId, jobId))!;
   }
 
   return c.json(
     {
-      song: await getSong(c.env.DB, bandId, songId),
+      song: await getSong(db, bandId, songId),
       recording,
       job: toJobDto(jobRow),
       songCreated: created,
       reused,
+      replaced: replacing,
     },
     reused ? 200 : 201,
   );
@@ -362,13 +480,16 @@ autoArrangeRoutes.post("/jobs/:jobId/complete", requireRepertoireEditor, async (
 
 async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
   const db = c.env.DB;
-  const [recordings, jobs, results, reviews, audioAssets] = await Promise.all([
+  const [song, recordings, jobs, results, reviews, audioAssets] = await Promise.all([
+    getSong(db, bandId, songId),
     listRecordings(db, songId),
     listJobs(db, songId),
     listResults(db, songId),
     listReviewEvents(db, songId),
     listAudioAssets(db, songId),
   ]);
+  const reference = recordings.find((r) => r.isReference) ?? null;
+  const since = reference?.referenceSince ?? null;
   const latest = (target: string) => {
     const e = reviews.find((r) => r.target === target);
     return e
@@ -378,16 +499,47 @@ async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
           userName: e.userName,
           at: e.createdAt,
           action: e.action,
+          // Confirmed while another recording (or none) was the reference: worth a second look.
+          beforeReferenceChange: !!since && e.createdAt < since,
         }
       : null;
   };
+  // Three separate facts: a known reference, audio the band may process, and an analysis done.
+  const audioForReference = audioAssets.filter(
+    (a) => !reference || a.recordingId === null || a.recordingId === reference.id,
+  );
+  const analysed = results.some(
+    (r) => r.origin === "audio_analysis" && (!reference || r.recordingId === reference.id),
+  );
+  const latestJob = jobs[0] ?? null;
+  const preparation: PreparationState = {
+    reference: !reference ? "none" : reference.link ? "identified" : "link_pending",
+    player: !reference?.link
+      ? "none"
+      : reference.link.embeddable === false
+        ? "unavailable"
+        : "available",
+    audio: audioForReference.length > 0 ? "available" : "none",
+    analysis: analysed ? "done" : audioForReference.length > 0 ? "pending" : "not_possible",
+    arrangement:
+      latestJob?.status === "completed"
+        ? "reviewed"
+        : latestJob?.status === "awaiting_review"
+          ? "ready_for_review"
+          : "not_started",
+  };
   return {
-    song: await getSong(db, bandId, songId),
+    song,
     recordings,
     jobs,
     results,
     reviews,
     audioAssets,
+    preparation,
+    dependents:
+      reference && song
+        ? await referenceDependents(db, { id: song.id, versionId: song.version.id }, reference)
+        : null,
     confirmations: {
       band_bpm: latest("band_bpm"),
       band_key: latest("band_key"),
@@ -401,6 +553,64 @@ autoArrangeRoutes.get("/songs/:songId", async (c) => {
   const bandId = p(c, "bandId");
   const song = await getSong(c.env.DB, bandId, p(c, "songId"));
   if (!song) throw notFound("song");
+  return c.json(await overview(c, bandId, song.id));
+});
+
+/**
+ * Gives the current reference recording a link, or another link to the same recording (the same
+ * track on another platform, a better upload). The recording, its analyses and the band's
+ * confirmed values stay as they are; choosing a different recording goes through `/prepare`.
+ */
+autoArrangeRoutes.put("/songs/:songId/reference/link", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const user = c.get("user");
+  const song = await getSong(c.env.DB, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const current = await getReferenceRecording(c.env.DB, song.id);
+  if (!current) throw notFound("reference");
+  await limitExternal(c, "ref-identify", 30);
+  const { url } = await parseBody(c, setReferenceLinkSchema);
+  const link = await resolveReferenceLink(c, url);
+  await setRecordingLink(c.env.DB, current.id, link);
+  await updateSong(c.env.DB, bandId, song.id, {
+    version: { ...versionOf(song), referenceUrl: link.url },
+  });
+  await insertReviewEvent(c.env.DB, {
+    bandId,
+    songId: song.id,
+    target: "reference",
+    action: "edit",
+    before: { change: "link", url: current.link?.url ?? null },
+    after: { url: link.url, platform: link.platform },
+    resultId: null,
+    userId: user.id,
+  });
+  return c.json(await overview(c, bandId, song.id));
+});
+
+/** A member corrects the title or artist of the reference recording. */
+autoArrangeRoutes.patch("/songs/:songId/reference", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const user = c.get("user");
+  const song = await getSong(c.env.DB, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const current = await getReferenceRecording(c.env.DB, song.id);
+  if (!current) throw notFound("reference");
+  const patch = await parseBody(c, editReferenceSchema);
+  await editRecordingMetadata(c.env.DB, current.id, user.id, patch);
+  await insertReviewEvent(c.env.DB, {
+    bandId,
+    songId: song.id,
+    target: "reference",
+    action: "edit",
+    before: { change: "metadata", title: current.title, artist: current.artistCredit },
+    after: {
+      title: patch.title ?? current.title,
+      artist: patch.artistCredit === undefined ? current.artistCredit : patch.artistCredit,
+    },
+    resultId: null,
+    userId: user.id,
+  });
   return c.json(await overview(c, bandId, song.id));
 });
 
@@ -485,10 +695,15 @@ autoArrangeRoutes.post("/songs/:songId/audio-assets", requireRepertoireEditor, a
   if (!file) throw notFound("file");
   if (!file.content_type.startsWith("audio/"))
     throw new ApiError("unsupported_media", "the file is not audio");
+  // The file is tied to one recording: the one given, or the current reference.
+  const recordingOfFile = input.recordingId
+    ? await getRecording(c.env.DB, song.id, input.recordingId)
+    : await getReferenceRecording(c.env.DB, song.id);
+  if (input.recordingId && !recordingOfFile) throw notFound("recording");
   const id = await createAudioAsset(c.env.DB, {
     bandId,
     songId: song.id,
-    recordingId: input.recordingId ?? null,
+    recordingId: recordingOfFile?.id ?? null,
     fileId: file.id,
     rightsBasis: input.rightsBasis,
     rightsNote: input.rightsNote ?? null,

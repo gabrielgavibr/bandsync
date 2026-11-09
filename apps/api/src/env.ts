@@ -18,6 +18,7 @@ export interface Env {
   /** Contact shown in the User-Agent sent to MusicBrainz, as their API rules require. */
   MUSICBRAINZ_CONTACT?: string;
   YOUTUBE_OEMBED_BASE?: string;
+  SPOTIFY_OEMBED_BASE?: string;
   /** "on" (default) or "off". Only turn off for local development. */
   RATE_LIMITS?: string;
   MAIL_PROVIDER?: string;

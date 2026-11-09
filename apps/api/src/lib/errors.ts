@@ -17,6 +17,8 @@ const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   payload_too_large: 413,
   unsupported_media: 415,
   upstream_unavailable: 503,
+  unsupported_platform: 422,
+  confirmation_required: 409,
   internal_error: 500,
 };
 

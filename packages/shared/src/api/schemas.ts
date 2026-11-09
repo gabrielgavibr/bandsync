@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { SongReferenceSummary } from "../autoarrange/reference";
 import {
   BAND_ROLES,
   INSTRUMENTS,
@@ -30,6 +31,8 @@ export const API_ERROR_CODES = [
   "payload_too_large",
   "unsupported_media",
   "upstream_unavailable",
+  "unsupported_platform",
+  "confirmation_required",
   "internal_error",
 ] as const;
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
@@ -422,6 +425,8 @@ export interface SongDto {
     count: number;
   }[];
   references: SongReferenceDto[];
+  /** The band's main reference recording for this version, when one was chosen. */
+  reference: SongReferenceSummary | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -447,7 +452,10 @@ export interface RepertoireItemDto {
   songId: string;
   position: number;
   notes: string | null;
-  song: Pick<SongDto, "id" | "title" | "artist"> & { bpm: number | null; key: string | null };
+  song: Pick<SongDto, "id" | "title" | "artist" | "reference"> & {
+    bpm: number | null;
+    key: string | null;
+  };
 }
 
 export interface RepertoireDto {

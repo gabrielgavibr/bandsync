@@ -6,10 +6,12 @@ import type {
   SongDto,
   SongMaterialDto,
   SongReferenceDto,
+  SongReferenceSummary,
   SongSectionDto,
 } from "@bandsync/shared";
 import { newId } from "../lib/ids";
 import { nowIso } from "../lib/time";
+import { getReferenceRecording, listReferenceSummaries, toReferenceSummary } from "./autoarrange";
 
 interface SongRow {
   id: string;
@@ -61,6 +63,7 @@ function toSongDto(
   sections: SongSectionDto[],
   summary: SongDto["materialSummary"],
   references: SongReferenceDto[] = [],
+  reference: SongReferenceSummary | null = null,
 ): SongDto {
   return {
     id: r.id,
@@ -93,6 +96,7 @@ function toSongDto(
     sections,
     materialSummary: summary,
     references,
+    reference,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -126,7 +130,8 @@ export async function listSongs(db: D1Database, bandId: string): Promise<SongDto
     arr.push({ type: s.type, instrument: s.instrument, status: s.status, count: s.count });
     byId.set(s.song_id, arr);
   }
-  return results.map((r) => toSongDto(r, [], byId.get(r.id) ?? []));
+  const refs = await listReferenceSummaries(db, bandId);
+  return results.map((r) => toSongDto(r, [], byId.get(r.id) ?? [], [], refs.get(r.id) ?? null));
 }
 
 export async function getSong(
@@ -139,12 +144,19 @@ export async function getSong(
     .bind(bandId, songId)
     .first<SongRow>();
   if (!row) return null;
-  const [sections, summary, references] = await Promise.all([
+  const [sections, summary, references, reference] = await Promise.all([
     listSections(db, row.version_id),
     materialSummary(db, songId),
     listReferences(db, songId),
+    getReferenceRecording(db, songId),
   ]);
-  return toSongDto(row, sections, summary, references);
+  return toSongDto(
+    row,
+    sections,
+    summary,
+    references,
+    reference ? toReferenceSummary(reference) : null,
+  );
 }
 
 /** Minimal song info for the live session (loaded by the Durable Object). */

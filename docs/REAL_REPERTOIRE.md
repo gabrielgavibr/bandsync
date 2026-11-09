@@ -3,11 +3,16 @@
 Three real songs replace the fictional demo for the first rehearsal test, in a repertoire named
 **Repertório Real — Primeiro Ensaio**, in this order:
 
-| #   | Song          | Composer     | Reference recording                                                                                                                   |
-| --- | ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Pérola Negra  | Luiz Melodia | Natiruts feat. Luiz Melodia, _Natiruts Acústico no Rio de Janeiro_ (2012), official video https://www.youtube.com/watch?v=JZqFoTIAJj8 |
-| 2   | Esotérico     | Gilberto Gil | **To be chosen.** Candidates: Doces Bárbaros (1976, live) and _Um Banda Um_ (1982)                                                    |
-| 3   | O Segundo Sol | Nando Reis   | Gilberto Gil in _Cássia Reggae — Vibrações de Paz e Amor para Cássia Eller_ (2022, Universal Music); not Cássia Eller's original      |
+| #   | Song          | Composer     | Reference recording                                                                                                                                |
+| --- | ------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Pérola Negra  | Luiz Melodia | Natiruts feat. Luiz Melodia, _Natiruts Acústico no Rio de Janeiro_ (2012), official video https://www.youtube.com/watch?v=JZqFoTIAJj8              |
+| 2   | Esotérico     | Gilberto Gil | Gilberto Gil, _Um Banda Um_ (1982), chosen by the band. **Link pending**: no exact link was confirmed                                              |
+| 3   | O Segundo Sol | Nando Reis   | Gilberto Gil in _Cássia Reggae — Vibrações de Paz e Amor para Cássia Eller_ (2022, Universal Music); not Cássia Eller's original. **Link pending** |
+
+The **main reference recording** of each song (what every member sees first on the song page, in the
+repertoire and in the live room) is set by `scripts/prepare-real-repertoire.mjs`; see
+`REFERENCE_RECORDING.md` §9. Only Pérola Negra has a confirmed link; the other two keep the reference
+"link pending" until someone pastes the exact link.
 
 Source of truth: `apps/api/seed/real-repertoire.json`. Apply with the create-only importer:
 
@@ -22,7 +27,9 @@ type and instrument, the repertoire by name). It never edits existing data, so t
 
 ## How facts are recorded
 
-- **Reference recording vs band version.** The song sheet shows both columns. Reference values carry a
+- **Reference recording vs band version.** The song page shows the reference recording and the band
+  arrangement as its two main blocks; the side-by-side table of reference and band values is now under
+  "Technical details". Reference values carry a
   status: _Not known_, _Estimate, to confirm_ or _Confirmed_. Band values show _Not set by the band_
   until the band enters them.
 - **Nothing is invented.** No BPM or key could be read on an authoritative page for any of the three

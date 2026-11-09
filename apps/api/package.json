@@ -19,7 +19,7 @@
     "staging:update": "bash scripts/update-staging.sh",
     "import:real-repertoire": "node scripts/import-real-repertoire.mjs",
     "prepare:real-repertoire": "node scripts/prepare-real-repertoire.mjs",
-    "dev:e2e": "wrangler dev --port 8787 --var MUSICBRAINZ_BASE_URL:http://localhost:8790 --var YOUTUBE_OEMBED_BASE:http://localhost:8790 --var MUSICBRAINZ_MIN_INTERVAL_MS:0"
+    "dev:e2e": "wrangler dev --port 8787 --var MUSICBRAINZ_BASE_URL:http://localhost:8790 --var YOUTUBE_OEMBED_BASE:http://localhost:8790 --var SPOTIFY_OEMBED_BASE:http://localhost:8790 --var MUSICBRAINZ_MIN_INTERVAL_MS:0"
   },
   "dependencies": {
     "@bandsync/shared": "workspace:*",

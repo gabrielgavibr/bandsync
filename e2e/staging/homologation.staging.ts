@@ -90,10 +90,11 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await expect(rows.nth(2)).toContainText("O Segundo Sol");
   await ana.page.screenshot({ path: `${SHOTS}/04-desktop-repertorio-real.png` });
   await ana.page.getByRole("link", { name: /Pérola Negra/ }).click();
-  await expect(ana.page.getByRole("heading", { name: "Ficha da música" })).toBeVisible();
-  await expect(ana.page.getByText("Luiz Melodia").first()).toBeVisible();
-  await expect(ana.page.getByText("Não definido pela banda").first()).toBeVisible();
-  await expect(ana.page.getByText("Links de referência")).toBeVisible();
+  // Two blocks: the reference recording and the band's arrangement. Sources are tucked away.
+  await expect(ana.page.getByRole("heading", { name: "Gravação de referência" })).toBeVisible();
+  await expect(ana.page.getByRole("heading", { name: "Arranjo da banda" })).toBeVisible();
+  await expect(ana.page.getByTestId("reference-block")).toContainText("Luiz Melodia");
+  await expect(ana.page.getByText("Links de referência")).toBeHidden();
   await ana.page.screenshot({ path: `${SHOTS}/04b-desktop-ficha-perola.png`, fullPage: true });
 
   // Start (or rejoin) a live session.
@@ -139,6 +140,15 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await expect(bruno.page.getByText("Este material ainda não foi adicionado.")).toBeVisible();
   await expect(ana.page.getByText("Mapa de arranjo · Bateria").first()).toBeVisible();
   await expect(bruno.page.getByTestId("tempo-source")).toBeVisible();
+  // The reference is one tap away in the room, opened on each device through the platform.
+  await bruno.page.getByTestId("room-reference").click();
+  await expect(
+    bruno.page
+      .getByTestId("room-reference-panel")
+      .getByRole("link", { name: "Abrir gravação original" }),
+  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=JZqFoTIAJj8");
+  await bruno.page.screenshot({ path: `${SHOTS}/06a-mobile-room-referencia.png` });
+  await bruno.page.getByRole("button", { name: "Fechar" }).click();
 
   // The conductor sets a tempo and runs the click.
   await ana.page.getByRole("spinbutton", { name: "BPM" }).fill("70");
@@ -176,75 +186,106 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
 });
 
 /**
- * AutoArrange against the real services. Read-only for the band: it checks what the preparation
- * of Pérola Negra stored, and searches the versions of Esotérico without choosing one (that
- * choice belongs to the band).
+ * Reference recordings against the real platforms. Read-only for the band: it checks what each
+ * real song shows and identifies links in the add-song flow without confirming anything.
  */
-test("homologation: AutoArrange with real sources", async ({ browser }) => {
+test("homologation: reference recordings with real platforms", async ({ browser }) => {
   const c = credentials();
+  const YT = "https://www.youtube.com/watch?v=JZqFoTIAJj8";
   const ana = await enter(browser, c.key, { viewport: { width: 1280, height: 900 } });
   await login(ana.page, "ana@bandsync.demo", c.ana);
   await ana.page.getByRole("link", { name: /Sala 3/ }).click();
-  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
+  const openSong = async (title: RegExp) => {
+    await ana.page.getByRole("link", { name: "Músicas" }).first().click();
+    await ana.page.getByRole("link", { name: title }).first().click();
+  };
+  const block = ana.page.getByTestId("reference-block");
+  const states = ana.page.getByTestId("preparation-state");
 
-  // 1. The song sheet of Pérola Negra shows the identified recording and sourced data.
-  await ana.page
-    .getByRole("link", { name: /Pérola Negra/ })
-    .first()
-    .click();
-  const panel = ana.page.getByTestId("autoarrange-panel");
-  await expect(panel).toContainText("Gravação de referência");
-  await expect(panel).toContainText("Natiruts Part. Especial Luiz Melodia");
-  await expect(panel).toContainText("Acústico no Rio de Janeiro");
-  await expect(panel.locator('[data-kind="duration"]')).toContainText("3:30");
-  await expect(panel.locator('[data-kind="duration"]')).toContainText("MusicBrainz");
-  await expect(panel.locator('[data-kind="composer"]')).toContainText("Luiz Melodia");
-  // Nothing analysed is claimed.
-  await expect(panel.locator('[data-kind="bpm"]')).toHaveCount(0);
-  await expect(panel.locator('[data-kind="key"]')).toHaveCount(0);
-  await expect(panel.getByText("não foram analisados")).toBeVisible();
-  const lastJob = panel.locator("details", { hasText: "Última preparação" });
-  if ((await lastJob.getAttribute("open")) === null) await lastJob.locator("summary").click();
-  await expect(panel.locator('[data-step="analyzing_audio"]')).toContainText(
-    "Nenhum arquivo de áudio autorizado foi fornecido.",
+  // 1. Pérola Negra: the confirmed link is the band's main reference.
+  await openSong(/Pérola Negra/);
+  await expect(block).toHaveAttribute("data-state", "identified");
+  await expect(block).toContainText("Natiruts Part. Especial Luiz Melodia");
+  await expect(block).toContainText("Acústico no Rio de Janeiro");
+  await expect(block.locator('[data-platform="youtube"]')).toHaveText("YouTube");
+  await expect(block.getByRole("link", { name: "Abrir gravação original" })).toHaveAttribute(
+    "href",
+    YT,
   );
-  await ana.page.screenshot({ path: `${SHOTS}/11-autoarrange-ficha-perola.png`, fullPage: true });
-
-  // 2. The wizard tells the recordings of Esotérico apart (live MusicBrainz).
-  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
-  await ana.page.getByRole("link", { name: "Adicionar música" }).first().click();
-  await expect(ana.page.getByRole("heading", { name: "Adicionar música", level: 1 })).toBeVisible();
-  await expect(ana.page.getByText("Fontes e como o BandSync pode usá-las")).toBeVisible();
-  await ana.page.getByLabel("Título da música").fill("Esotérico");
-  await ana.page.getByLabel("Artista (opcional)").fill("Gilberto Gil");
-  await ana.page.getByRole("button", { name: "Buscar" }).click();
-  const results = ana.page.getByTestId("recording-results");
-  const umBandaUm = results.locator('[data-mbid="8379142a-fe4e-4da2-8edf-fb493665a54f"]');
-  const docesBarbaros = results.locator('[data-mbid="d72d41dd-fb12-4775-8188-d95c1fdabfe3"]');
-  await expect(umBandaUm).toContainText("Um Banda Um", { timeout: 30_000 });
-  await expect(docesBarbaros).toBeVisible();
-  expect(await results.locator("li").count()).toBeGreaterThan(2);
-  await ana.page.screenshot({
-    path: `${SHOTS}/12-autoarrange-versoes-esoterico.png`,
-    fullPage: true,
-  });
-
-  // 3. Selecting one shows what the source says and admits what it does not say.
-  await umBandaUm.getByRole("button", { name: "Selecionar" }).click();
-  const preview = ana.page.getByTestId("recording-preview");
-  await expect(preview).toContainText("Um Banda Um", { timeout: 30_000 });
-  await expect(preview).toContainText("A fonte não informa quem compôs esta gravação");
-
-  // 4. A YouTube link is validated and offered only through the official player.
-  await ana.page.getByLabel("Link do YouTube").fill("https://youtu.be/JZqFoTIAJj8");
-  await ana.page.getByRole("button", { name: "Verificar" }).click();
-  const yt = ana.page.getByTestId("youtube-preview");
-  await expect(yt).toContainText("Canal:", { timeout: 30_000 });
-  await expect(yt.locator("iframe")).toHaveAttribute(
+  await block.getByRole("button", { name: "Ouvir aqui" }).click();
+  await expect(block.getByTestId("reference-player").locator("iframe")).toHaveAttribute(
     "src",
     "https://www.youtube-nocookie.com/embed/JZqFoTIAJj8",
   );
-  await ana.page.screenshot({ path: `${SHOTS}/13-autoarrange-selecao.png`, fullPage: true });
-  // Leave without preparing: the band chooses the version of Esotérico itself.
+  await block.getByRole("button", { name: "Fechar player" }).click();
+  // A known link is not audio and not an analysis.
+  await expect(states.locator('[data-item="reference"]')).toHaveAttribute(
+    "data-state",
+    "identified",
+  );
+  await expect(states.locator('[data-item="audio"]')).toHaveAttribute("data-state", "none");
+  await expect(states.locator('[data-item="analysis"]')).toHaveAttribute(
+    "data-state",
+    "not_possible",
+  );
+  // Sources, catalogue data and links are kept under "Detalhes técnicos", closed by default.
+  const technical = ana.page.getByTestId("technical-details");
+  await expect(ana.page.getByText("Links de referência")).toBeHidden();
+  await ana.page.screenshot({ path: `${SHOTS}/11-referencia-perola.png`, fullPage: true });
+  await technical.locator("summary").first().click();
+  await expect(technical.locator('[data-kind="duration"]')).toContainText("3:30");
+  await expect(technical.locator('[data-kind="composer"]')).toContainText("Luiz Melodia");
+  await expect(technical.locator('[data-kind="bpm"]')).toHaveCount(0);
+  await expect(technical.locator('[data-kind="key"]')).toHaveCount(0);
+  await expect(technical).toContainText("NatirutsVEVO");
+  await expect(technical.getByText("Links de referência")).toBeVisible();
+  await ana.page.screenshot({ path: `${SHOTS}/11b-detalhes-tecnicos-perola.png`, fullPage: true });
+
+  // 2. No confirmed link: the recording is known, the link stays pending, nothing is guessed.
+  await openSong(/Esotérico/);
+  await expect(block).toHaveAttribute("data-state", "link_pending");
+  await expect(block).toContainText("Um Banda Um");
+  await expect(block).toContainText("Link pendente");
+  await expect(block.getByTestId("reference-player")).toHaveCount(0);
+  await ana.page.screenshot({ path: `${SHOTS}/12-referencia-esoterico.png`, fullPage: true });
+  await openSong(/O Segundo Sol/);
+  await expect(block).toHaveAttribute("data-state", "link_pending");
+  await expect(block).toContainText("Cássia Reggae, Vol. 1");
+
+  // 3. The add-song flow identifies real links (and refuses the rest) without saving anything.
+  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
+  await ana.page.getByRole("link", { name: "Adicionar música" }).first().click();
+  await expect(ana.page.getByRole("heading", { name: "Adicionar música", level: 1 })).toBeVisible();
+  await expect(ana.page.getByText(/MusicBrainz|Cifra Club|Songsterr|Discogs/)).toHaveCount(0);
+  const identify = async (link: string) => {
+    await ana.page.getByLabel("Link da gravação").fill(link);
+    await ana.page.getByRole("button", { name: "Identificar" }).click();
+  };
+  const problem = ana.page.getByTestId("link-problem");
+  await identify("https://vimeo.com/76979871");
+  await expect(problem).toContainText("Plataforma não suportada");
+  await identify("https://www.youtube.com/watch?v=AAAAAAAAAAA");
+  await expect(problem).toContainText("Referência não encontrada", { timeout: 30_000 });
+  const preview = ana.page.getByTestId("reference-preview");
+  await identify("https://youtu.be/JZqFoTIAJj8?si=compartilhado");
+  await expect(preview).toHaveAttribute("data-platform", "youtube", { timeout: 30_000 });
+  await expect(preview).toContainText("Canal: NatirutsVEVO");
+  await expect(preview.getByRole("link", { name: YT })).toHaveAttribute("href", YT);
+  await ana.page.screenshot({ path: `${SHOTS}/13-adicionar-por-link-youtube.png`, fullPage: true });
+  await identify("https://music.youtube.com/watch?v=JZqFoTIAJj8");
+  await expect(preview).toHaveAttribute("data-platform", "youtube_music", { timeout: 30_000 });
+  // A real Spotify track: the public endpoint gives title and cover, not the artist.
+  await identify("https://open.spotify.com/intl-pt/track/4cOdK2wGLETKBW3PvgPWqT?si=abc");
+  await expect(preview).toHaveAttribute("data-platform", "spotify", { timeout: 30_000 });
+  await expect(preview).toHaveAttribute("data-metadata", "partial");
+  await expect(preview).toContainText("Never Gonna Give You Up");
+  await expect(ana.page.getByText("O Spotify não informa o artista")).toBeVisible();
+  await preview.getByRole("button", { name: "Ouvir para conferir" }).click();
+  await expect(preview.getByTestId("reference-player").locator("iframe")).toHaveAttribute(
+    "src",
+    "https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT",
+  );
+  await ana.page.screenshot({ path: `${SHOTS}/14-adicionar-por-link-spotify.png`, fullPage: true });
+  // Left without confirming: no song is created by this check.
   await ana.context.close();
 });

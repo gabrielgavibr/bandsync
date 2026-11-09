@@ -63,7 +63,10 @@
       "manual": "Andamento ajustado pelo regente",
       "none": "Nenhum andamento registrado para esta música; ajuste manualmente"
     },
-    "meterUnconfirmed": "Compasso ainda não confirmado pela banda"
+    "meterUnconfirmed": "Compasso ainda não confirmado pela banda",
+    "reference": "Gravação de referência",
+    "referenceNoLink": "A banda ainda não informou o link desta gravação.",
+    "referenceLocal": "Toca só neste aparelho, pela própria plataforma. O ensaio sincroniza andamento e compasso, não o áudio."
   },
   "controls": {
     "title": "Controles do regente",

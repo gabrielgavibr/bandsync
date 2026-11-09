@@ -8,43 +8,15 @@ import {
   LIMITS,
   type ReviewStatus,
   type SongDto,
-  youtubeEmbedUrl,
 } from "@bandsync/shared";
 import { Check, CircleDashed, ExternalLink, Loader2, MinusCircle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Badge, Button, Card, useToast } from "../../components/ui";
+import { Badge, Button, useToast } from "../../components/ui";
 import { errorCode } from "../../lib/api";
 import { cn } from "../../lib/cn";
 import { formatDateTime, formatDuration } from "../../lib/format";
-import {
-  type Confirmation,
-  type SongAnalysisOverview,
-  useConnectors,
-  useJobAction,
-  useReview,
-} from "./queries";
-
-/** YouTube's own embedded player. The audio never leaves YouTube. */
-export function YouTubePlayer({ videoId, title }: { videoId: string; title: string }) {
-  const { t } = useTranslation("autoarrange");
-  return (
-    <div>
-      <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
-        <iframe
-          src={youtubeEmbedUrl(videoId)}
-          title={`${t("youtube.player")}: ${title}`}
-          className="size-full"
-          loading="lazy"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
-      <p className="mt-1.5 text-xs text-muted">{t("youtube.notice")}</p>
-    </div>
-  );
-}
+import { type Confirmation, type SongAnalysisOverview, useJobAction, useReview } from "./queries";
 
 /* ------------------------------------------------------------------ */
 
@@ -111,8 +83,6 @@ export function JobProgress({ bandId, job }: { bandId: string; job: AnalysisJobD
           const Icon = STEP_ICON[view];
           const detail = record?.detail ?? {};
           const facts: string[] = [];
-          if (typeof detail.referencesAdded === "number" && detail.referencesAdded > 0)
-            facts.push(t("autoarrange:job.linksAdded", { count: detail.referencesAdded }));
           if (typeof detail.fieldsFilled === "number" && detail.fieldsFilled > 0)
             facts.push(t("autoarrange:job.fieldsFilled", { count: detail.fieldsFilled }));
           if (typeof detail.slotsCreated === "number" && detail.slotsCreated > 0)
@@ -289,13 +259,21 @@ export function ResultsList({ results }: { results: AnalysisResultDto[] }) {
 function ConfirmationLine({ c }: { c: Confirmation | null }) {
   const { t, i18n } = useTranslation("autoarrange");
   return (
-    <p className={cn("text-xs", c ? "text-ok-500" : "text-muted")}>
+    <p
+      className={cn(
+        "text-xs",
+        !c ? "text-muted" : c.beforeReferenceChange ? "text-warn-500" : "text-ok-500",
+      )}
+      data-stale={c?.beforeReferenceChange ? "true" : undefined}
+    >
       {c
         ? t("review.confirmedBy", {
             name: c.userName ?? "—",
             date: formatDateTime(c.at, i18n.language),
           })
         : t("review.notConfirmed")}
+      {/* Nothing was changed by the new reference; the band is only told to listen again. */}
+      {c?.beforeReferenceChange ? ` · ${t("review.beforeReferenceChange")}` : ""}
     </p>
   );
 }
@@ -413,40 +391,5 @@ export function ReviewForm({
         </div>
       </div>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-
-/** What each source is and what BandSync is allowed to do with it. */
-export function SourcesCard({ bandId }: { bandId: string }) {
-  const { t } = useTranslation("autoarrange");
-  const connectors = useConnectors(bandId);
-  if (!connectors.data) return null;
-  return (
-    <Card>
-      <h2 className="mb-3 font-semibold">{t("sources.heading")}</h2>
-      <ul className="flex flex-col gap-2 text-sm">
-        {connectors.data.connectors.map((c) => (
-          <li key={c.id} className="rounded-xl bg-sunken px-3 py-2">
-            <p className="flex flex-wrap items-center gap-2">
-              <span className="font-medium">{c.name}</span>
-              <Badge tone={c.access === "link_only" ? "neutral" : "accent"}>
-                {t(`sources.access.${c.access}`)}
-              </Badge>
-              <a
-                href={c.termsUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="ml-auto text-xs text-accent-600 underline dark:text-accent-300"
-              >
-                {t("sources.terms")}
-              </a>
-            </p>
-            <p className="mt-0.5 text-xs text-muted">{t(`sources.policy.${c.policyKey}`)}</p>
-          </li>
-        ))}
-      </ul>
-    </Card>
   );
 }

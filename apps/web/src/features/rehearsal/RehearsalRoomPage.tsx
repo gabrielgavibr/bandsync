@@ -1,6 +1,15 @@
 import { deriveStatus, type Notation, type SongMaterialDto } from "@bandsync/shared";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, LogOut, Users, Volume2, VolumeX, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Activity,
+  Headphones,
+  LogOut,
+  Users,
+  Volume2,
+  VolumeX,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
@@ -12,6 +21,7 @@ import { audioEngine } from "../../lib/audio/AudioEngine";
 import { cn } from "../../lib/cn";
 import { resolvePreferredMaterial } from "../../lib/materials";
 import { useAuth } from "../auth/AuthProvider";
+import { ReferenceListen, ReferenceSummaryView } from "../autoarrange/reference";
 import { useBand } from "../bands/queries";
 import { MaterialViewer } from "../repertoire/MaterialViewer";
 import { useRepertoires, useSong, useSongs } from "../repertoire/queries";
@@ -47,6 +57,7 @@ export function RehearsalRoomPage() {
   const [targetKey, setTargetKey] = useState<string | null>(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [showSync, setShowSync] = useState(false);
+  const [showReference, setShowReference] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [localVolume, setLocalVolume] = useState(preferences?.clickVolume ?? 0.8);
@@ -153,6 +164,12 @@ export function RehearsalRoomPage() {
   const canClaim = !!me?.canControl && !isConductor && (!conductor || conductorOffline);
   const repertoireTotal = state.repertoireSongIds.length;
   const repertoireIndex = state.currentSong?.repertoireIndex;
+  // The reference is read from the song, like on every other screen. Each device opens or plays
+  // it through the platform itself: the session synchronises tempo and devices, never the audio.
+  const reference =
+    state.currentSong && songQ.data?.song.id === state.currentSong.songId
+      ? songQ.data.song.reference
+      : null;
 
   return (
     <div className="flex h-dvh flex-col bg-surface">
@@ -186,6 +203,17 @@ export function RehearsalRoomPage() {
           </p>
         </div>
         <Badge tone={m.running ? "accent" : "neutral"}>{t(`rehearsal:status.${liveStatus}`)}</Badge>
+        {reference ? (
+          <button
+            type="button"
+            onClick={() => setShowReference(true)}
+            aria-label={t("rehearsal:room.reference")}
+            data-testid="room-reference"
+            className="rounded-lg p-1.5 hover:bg-elev"
+          >
+            <Headphones className="size-5 text-accent-500" />
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setShowSync(true)}
@@ -494,6 +522,24 @@ export function RehearsalRoomPage() {
             </li>
           ))}
         </ul>
+      </Dialog>
+
+      <Dialog
+        open={showReference && !!reference}
+        onClose={() => setShowReference(false)}
+        title={t("rehearsal:room.reference")}
+      >
+        {reference ? (
+          <div className="flex flex-col gap-3" data-testid="room-reference-panel">
+            <ReferenceSummaryView reference={reference} size="sm" />
+            {reference.url ? (
+              <ReferenceListen reference={reference} />
+            ) : (
+              <p className="text-sm text-warn-500">{t("rehearsal:room.referenceNoLink")}</p>
+            )}
+            <p className="text-xs text-muted">{t("rehearsal:room.referenceLocal")}</p>
+          </div>
+        ) : null}
       </Dialog>
 
       <Dialog open={showSync} onClose={() => setShowSync(false)} title={t("rehearsal:sync.title")}>

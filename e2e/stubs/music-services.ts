@@ -1,5 +1,5 @@
 /**
- * Local stand-in for MusicBrainz and YouTube oEmbed, used only by the local end-to-end tests.
+ * Local stand-in for MusicBrainz and the YouTube / Spotify oEmbed endpoints, used only by the local end-to-end tests.
  * It replays the real responses captured in packages/shared/test/fixtures/musicbrainz through the
  * same fake the API integration tests use, so the browser flow can run without internet access.
  *
@@ -12,7 +12,12 @@ const PORT = Number(process.env.MUSIC_STUB_PORT ?? 8790);
 
 createServer(async (req, res) => {
   const path = req.url ?? "/";
-  const host = path.startsWith("/oembed") ? "www.youtube.com" : "musicbrainz.org";
+  // Both platforms use /oembed; the recording they are asked about tells them apart.
+  const host = !path.startsWith("/oembed")
+    ? "musicbrainz.org"
+    : decodeURIComponent(path).includes("open.spotify.com")
+      ? "open.spotify.com"
+      : "www.youtube.com";
   const headers = new Headers();
   for (const [k, v] of Object.entries(req.headers)) if (typeof v === "string") headers.set(k, v);
   const out = await outboundService(new Request(`https://${host}${path}`, { headers }));

@@ -72,20 +72,23 @@ STAGING_URL=https://bandsync-staging.<subdomain>.workers.dev pnpm test:staging
 The check passes the gate, refuses a wrong key, confirms the public demo password is blocked, logs in as
 two accounts (desktop and iPhone-sized viewports), switches the language, opens band pages, runs a live
 rehearsal across both devices and saves screenshots to `test-results/staging/`.
-A second scenario checks AutoArrange against the real MusicBrainz and YouTube services: the recording
-identified for Pérola Negra and its sourced data, the versions of Esotérico in the wizard and the
-validation of a YouTube link. It does not prepare or change any song.
+A second scenario checks reference recordings against the real platforms: the confirmed YouTube
+reference of Pérola Negra and its player, the pending links of Esotérico and O Segundo Sol, and the
+identification of real YouTube, YouTube Music and Spotify links in the add-song flow. It confirms
+nothing and creates no song.
 
-## AutoArrange on staging
+## Reference recordings on staging
 
-After a deploy that includes migration `0003`, the preparation of the two songs whose recording the
-band chose is applied through the API (idempotent, never changes the band's own values):
+After a deploy that includes migration `0004`, the references the band decided are applied through
+the API (idempotent, never changes the band's own values, never picks a link the band did not
+confirm):
 
 ```bash
 BANDSYNC_URL=https://bandsync-staging.<subdomain>.workers.dev BANDSYNC_CREDENTIALS=.staging/credentials.txt pnpm --filter @bandsync/api prepare:real-repertoire
 ```
 
-Esotérico is left for the band to choose its recording in the "Adicionar música" wizard.
+Pérola Negra uses its confirmed YouTube link. Esotérico (_Um Banda Um_) and O Segundo Sol
+(_Cássia Reggae, Vol. 1_) stay "link pending" until someone pastes the exact link in the app.
 
 ## Cost
 

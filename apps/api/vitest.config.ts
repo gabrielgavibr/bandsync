@@ -27,6 +27,10 @@ export default defineConfig(async () => {
       include: ["test/**/*.test.ts"],
       setupFiles: ["./test/apply-migrations.ts"],
       testTimeout: 20_000,
+      // The fake external services (test/outbound.ts) live in this Node process and are shared by
+      // every test file, including the "fail the next N requests" switch. Files run one at a time
+      // so an outage simulated by one file cannot leak into another.
+      fileParallelism: false,
     },
   };
 });

@@ -2,16 +2,17 @@ import {
   type AnalysisJobDto,
   type AnalysisResultDto,
   type AudioAssetDto,
-  type ConnectorInfo,
   isRunningJob,
+  type PreparationState,
   type RecordingCandidate,
   type RecordingDetails,
   type RecordingRelease,
+  type ReferenceDependents,
+  type ReferenceLinkInfo,
   type ReviewEventDto,
   type ReviewInput,
   type SongDto,
   type SongRecordingDto,
-  type YouTubeVideoInfo,
 } from "@bandsync/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../lib/api";
@@ -34,6 +35,8 @@ export interface Confirmation {
   userName: string | null;
   at: string;
   action: string;
+  /** Confirmed while another recording (or none) was the reference. */
+  beforeReferenceChange: boolean;
 }
 
 export interface SongAnalysisOverview {
@@ -43,6 +46,8 @@ export interface SongAnalysisOverview {
   results: AnalysisResultDto[];
   reviews: ReviewEventDto[];
   audioAssets: AudioAssetDto[];
+  preparation: PreparationState;
+  dependents: ReferenceDependents | null;
   confirmations: Record<"band_bpm" | "band_key" | "band_meter", Confirmation | null>;
   engines: { audioAnalysis: string };
 }
@@ -81,12 +86,13 @@ export function useRecordingDetails(bandId: string, mbid: string | null) {
   });
 }
 
-export function useYouTubeLookup(bandId: string) {
+/** Asks the platform of a pasted link what it says about that recording. */
+export function useIdentifyReference(bandId: string) {
   return useMutation({
     mutationFn: (url: string) =>
       http
-        .post<{ video: YouTubeVideoInfo }>(`${base(bandId)}/youtube`, { url })
-        .then((r) => r.video),
+        .post<{ reference: ReferenceLinkInfo }>(`${base(bandId)}/reference/identify`, { url })
+        .then((r) => r.reference),
   });
 }
 
@@ -96,6 +102,7 @@ export interface PrepareResponse {
   job: AnalysisJobDto;
   songCreated: boolean;
   reused: boolean;
+  replaced: boolean;
 }
 
 export function usePrepare(bandId: string) {
@@ -162,13 +169,45 @@ export function useReview(bandId: string, songId: string) {
   });
 }
 
-export function useConnectors(bandId: string) {
-  return useQuery({
-    queryKey: aaKeys.connectors(bandId),
-    staleTime: 60 * 60_000,
-    queryFn: () =>
-      http.get<{ connectors: ConnectorInfo[]; engines: { audioAnalysis: string } }>(
-        `${base(bandId)}/connectors`,
-      ),
+function useOverviewMutation<T>(
+  bandId: string,
+  songId: string,
+  mutationFn: (input: T) => Promise<SongAnalysisOverview>,
+) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn,
+    onSuccess: (data) => {
+      qc.setQueryData(aaKeys.overview(bandId, songId), data);
+      void qc.invalidateQueries({ queryKey: repKeys.song(bandId, songId) });
+      void qc.invalidateQueries({ queryKey: repKeys.songs(bandId) });
+      void qc.invalidateQueries({ queryKey: repKeys.repertoires(bandId) });
+    },
+  });
+}
+
+/** Same recording, another (or a first) link. */
+export function useSetReferenceLink(bandId: string, songId: string) {
+  return useOverviewMutation(bandId, songId, (url: string) =>
+    http.put<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/reference/link`, { url }),
+  );
+}
+
+export function useEditReference(bandId: string, songId: string) {
+  return useOverviewMutation(
+    bandId,
+    songId,
+    (input: { title?: string; artistCredit?: string | null }) =>
+      http.patch<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/reference`, input),
+  );
+}
+
+/** Registers an uploaded file as audio the band declares it may process, for the reference. */
+export function useDeclareAudio(bandId: string, songId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { fileId: string; rightsBasis: string; rightsNote: string | null }) =>
+      http.post(`${base(bandId)}/songs/${songId}/audio-assets`, { ...input, declaration: true }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: aaKeys.overview(bandId, songId) }),
   });
 }

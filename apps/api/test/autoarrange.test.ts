@@ -1,6 +1,11 @@
 import { runDurableObjectAlarm, runInDurableObject, SELF } from "cloudflare:test";
 import { env } from "cloudflare:workers";
-import type { AnalysisJobDto, ServerMessage, SessionState } from "@bandsync/shared";
+import {
+  type AnalysisJobDto,
+  REFERENCE_PLATFORMS,
+  type ServerMessage,
+  type SessionState,
+} from "@bandsync/shared";
 import { describe, expect, it } from "vitest";
 import {
   api,
@@ -204,8 +209,8 @@ describe("preparing a song", () => {
       referenceUrl: YT,
     });
     expect(
-      body.song.metadataSources.every((m: { url: string }) =>
-        m.url.startsWith("https://musicbrainz.org/"),
+      body.song.metadataSources.every(
+        (m: { url: string }) => m.url.startsWith("https://musicbrainz.org/") || m.url === YT,
       ),
     ).toBe(true);
     expect(body.recording).toMatchObject({
@@ -213,7 +218,24 @@ describe("preparing a song", () => {
       isReference: true,
       isrcs: ["BR4W41200009"],
     });
-    expect(body.recording.youtube.channelName).toBe("NatirutsVEVO");
+    expect(body.recording.identifiedBy).toBe("musicbrainz");
+    expect(body.recording.link).toMatchObject({
+      platform: "youtube",
+      externalId: "JZqFoTIAJj8",
+      url: YT,
+      author: "NatirutsVEVO",
+      embeddable: true,
+    });
+    // Every member finds the same reference on the song itself.
+    expect(body.song.reference).toMatchObject({
+      recordingId: body.recording.id,
+      title: "Pérola negra",
+      artist: "Natiruts Part. Especial Luiz Melodia",
+      releaseTitle: "Acústico no Rio de Janeiro",
+      year: "2012",
+      platform: "youtube",
+      url: YT,
+    });
     expect(["pending", "searching_references"]).toContain(body.job.status);
 
     const job = await waitForJob(ana, bandId, body.job.id, ["awaiting_review"]);
@@ -246,16 +268,16 @@ describe("preparing a song", () => {
     });
     expect(o.song.workMbid).toBe("39fe8e07-adc0-4d8d-8e46-7ec134ae6ec1");
 
-    const refs = o.song.references as { kind: string; url: string; note: string | null }[];
-    expect(refs.some((r) => r.url === `https://musicbrainz.org/recording/${PEROLA}`)).toBe(true);
-    expect(
-      refs.some((r) => r.kind === "video" && r.url === YT && r.note?.includes("NatirutsVEVO")),
-    ).toBe(true);
-    for (const host of ["www.cifraclub.com.br", "www.cifras.com.br", "www.songsterr.com"]) {
-      expect(refs.filter((r) => new URL(r.url).hostname === host)).toHaveLength(1);
-    }
-    // Notes are written in the requester's language (pt-BR here).
-    expect(refs.find((r) => r.url.includes("cifraclub"))!.note).toContain("Link de busca");
+    // No list of source links is attached to the song: provenance stays on the recording.
+    expect(o.song.references).toEqual([]);
+    expect(o.recordings[0].sourceUrl).toBe(`https://musicbrainz.org/recording/${PEROLA}`);
+    expect(o.preparation).toEqual({
+      reference: "identified",
+      player: "available",
+      audio: "none",
+      analysis: "not_possible",
+      arrangement: "ready_for_review",
+    });
 
     const { materials } = await json(
       await api("GET", `/api/bands/${bandId}/songs/${body.song.id}`, undefined, ana.cookie),
@@ -300,7 +322,7 @@ describe("preparing a song", () => {
     const second = await json(rerun);
     expect(second.job.id).not.toBe(first.job.id);
     const job2 = await waitForJob(ana, bandId, second.job.id, ["awaiting_review"]);
-    expect(job2.steps[0]!.detail).toMatchObject({ referencesAdded: 0, resultsAdded: 0 });
+    expect(job2.steps[0]!.detail).toMatchObject({ resultsAdded: 0 });
     expect(job2.steps[3]!.detail).toMatchObject({ slotsCreated: 0, fieldsFilled: 0 });
     const o = await json(
       await api("GET", `${aa(bandId)}/songs/${first.song.id}`, undefined, ana.cookie),
@@ -430,6 +452,20 @@ describe("preparing a song", () => {
           youtubeUrl: "https://www.youtube.com/watch?v=AAAAAAAAAAA",
         })
       ).status,
+    ).toBe(404);
+    expect(
+      (
+        await prepare(ana, bandId, {
+          newSong: { title: "X" },
+          recording: { source: "link", title: "X" },
+          referenceUrl: "https://vimeo.com/1",
+        })
+      ).status,
+    ).toBe(422);
+    // Identified "by link" without a link is not a request the API accepts.
+    expect(
+      (await prepare(ana, bandId, { newSong: { title: "X" }, recording: { source: "link" } }))
+        .status,
     ).toBe(400);
     expect(
       (await prepare(ana, bandId, { recording: { source: "musicbrainz", mbid: PEROLA } })).status,
@@ -835,6 +871,35 @@ describe("authorised audio", () => {
     const o = await json(await api("GET", `${aa(bandId)}/songs/${songId}`, undefined, ana.cookie));
     expect(o.audioAssets).toHaveLength(1);
     expect(o.results).toEqual([]); // nothing was analysed, so nothing is reported
+    // Audio the band may process exists, but that is not an analysis.
+    expect(o.preparation).toMatchObject({ audio: "available", analysis: "pending" });
+
+    // A file declared after the reference exists is tied to that recording.
+    const laterId = await upload("take2.mp3", "audio/mpeg");
+    const later = await json(
+      await api(
+        "POST",
+        base,
+        { fileId: laterId, rightsBasis: "own_recording", declaration: true },
+        ana.cookie,
+      ),
+    );
+    expect(later.audioAsset.recordingId).toBe(body.recording.id);
+    expect(
+      (
+        await api(
+          "POST",
+          base,
+          {
+            fileId: laterId,
+            recordingId: "00000000-0000-4000-8000-000000000000",
+            rightsBasis: "own_recording",
+            declaration: true,
+          },
+          ana.cookie,
+        )
+      ).status,
+    ).toBe(404);
   });
 });
 
@@ -897,5 +962,12 @@ describe("source registry", () => {
     for (const id of ["cifraclub", "cifras", "songsterr"])
       expect(by[id]).toMatchObject({ access: "link_only", mayStoreContent: false });
     expect(engines.audioAnalysis).toBe("not_configured");
+    // Reference links come only from platforms with a connector, all through official players.
+    const linkable = connectors.filter((c: { referenceLinks: boolean }) => c.referenceLinks);
+    expect(linkable.map((c: { id: string }) => c.id).sort()).toEqual(
+      [...REFERENCE_PLATFORMS].sort(),
+    );
+    for (const c of linkable)
+      expect(c).toMatchObject({ access: "official_embed", mayStoreContent: false });
   });
 });

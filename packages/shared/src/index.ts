@@ -1,6 +1,7 @@
 export * from "./api/schemas";
 export * from "./autoarrange/jobs";
 export * from "./autoarrange/musicbrainz";
+export * from "./autoarrange/reference";
 export * from "./autoarrange/types";
 export * from "./autoarrange/youtube";
 export * from "./constants";

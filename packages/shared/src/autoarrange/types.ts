@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { httpUrlSchema, idSchema } from "../api/schemas";
+import type { ReferencePlatform } from "./reference";
 
 /* ------------------------------------------------------------------ */
 /* Recordings: a specific performance of a composition                 */
@@ -71,6 +72,8 @@ export interface SongRecordingDto {
   id: string;
   songId: string;
   source: "musicbrainz" | "manual";
+  /** How the band pointed at this recording: catalogue entry, pasted link, or typed by hand. */
+  identifiedBy: "musicbrainz" | "link" | "manual";
   mbid: string | null;
   title: string;
   artistCredit: string | null;
@@ -82,11 +85,31 @@ export interface SongRecordingDto {
   isrcs: string[];
   works: RecordingWork[];
   links: RecordingLink[];
-  youtube: YouTubeVideoInfo | null;
+  /** The link the band gave for this recording, with what the platform says about it. */
+  link: RecordingReferenceLink | null;
   isReference: boolean;
+  /** When this recording became the reference, and when it stopped being it. */
+  referenceSince: string | null;
+  retiredAt: string | null;
+  /** Set when a member corrected the title or artist by hand. */
+  metadataEditedBy: string | null;
+  metadataEditedAt: string | null;
   sourceUrl: string | null;
   fetchedAt: string | null;
   createdAt: string;
+}
+
+/** A recording's link on a supported platform. URLs are rebuilt from platform and id. */
+export interface RecordingReferenceLink {
+  platform: ReferencePlatform;
+  externalId: string;
+  url: string;
+  /** Title and channel exactly as the platform gave them (kept even after manual corrections). */
+  title: string | null;
+  author: string | null;
+  thumbnailUrl: string | null;
+  embeddable: boolean | null;
+  checkedAt: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -285,7 +308,9 @@ export interface ConnectorInfo {
   id: string;
   name: string;
   /** What the connector helps to find. */
-  provides: ("metadata" | "video" | "chords" | "tabs" | "lyrics")[];
+  provides: ("metadata" | "video" | "audio" | "chords" | "tabs" | "lyrics")[];
+  /** True for the platforms whose links can be a song's reference recording. */
+  referenceLinks: boolean;
   /** How BandSync is allowed to use the source. */
   access: "api" | "official_embed" | "link_only";
   /** Whether BandSync may store the source's content (not just a link to it). */
@@ -310,6 +335,21 @@ const mbidSchema = z
 
 export const youtubeLookupSchema = z.object({ url: httpUrlSchema });
 
+/** A pasted reference link. Deliberately loose here: the connector decides what is acceptable. */
+const referenceUrlSchema = z.string().trim().min(1).max(2000);
+export const identifyReferenceSchema = z.object({ url: referenceUrlSchema });
+/** Attach or change the link of the current reference recording (same recording, other link). */
+export const setReferenceLinkSchema = z.object({ url: referenceUrlSchema });
+/** Manual correction of what identifies the reference recording. */
+export const editReferenceSchema = z
+  .object({
+    title: z.string().trim().min(1).max(160).optional(),
+    artistCredit: z.string().trim().max(200).nullable().optional(),
+  })
+  .refine((v) => v.title !== undefined || v.artistCredit !== undefined, {
+    message: "nothing to change",
+  });
+
 const recordingChoiceSchema = z.discriminatedUnion("source", [
   z.object({
     source: z.literal("musicbrainz"),
@@ -324,6 +364,12 @@ const recordingChoiceSchema = z.discriminatedUnion("source", [
     releaseTitle: z.string().trim().max(200).optional().nullable(),
     releaseDate: z.string().trim().max(10).optional().nullable(),
   }),
+  /** Identified by the pasted link alone; title and artist may be corrected by the member. */
+  z.object({
+    source: z.literal("link"),
+    title: z.string().trim().min(1).max(160).optional(),
+    artistCredit: z.string().trim().max(200).optional().nullable(),
+  }),
 ]);
 
 export const prepareSongSchema = z
@@ -333,12 +379,23 @@ export const prepareSongSchema = z
     /** …or create a new one from the chosen recording. */
     newSong: z.object({ title: z.string().trim().min(1).max(160) }).optional(),
     recording: recordingChoiceSchema,
+    /** Link to the recording on a supported platform (YouTube, YouTube Music, Spotify). */
+    referenceUrl: referenceUrlSchema.optional().nullable(),
+    /** Older name of `referenceUrl`, still accepted. */
     youtubeUrl: httpUrlSchema.optional().nullable(),
+    /**
+     * Required to replace a reference recording that confirmed values, analyses or arrangement
+     * work already depend on. Without it the server answers `confirmation_required`.
+     */
+    confirmReplace: z.boolean().optional(),
     audioAssetId: idSchema.optional().nullable(),
     /** Language for the text the preparation writes into pending slots. */
     locale: z.enum(["pt-BR", "en"]).optional(),
   })
-  .refine((v) => !!v.songId !== !!v.newSong, { message: "provide either songId or newSong" });
+  .refine((v) => !!v.songId !== !!v.newSong, { message: "provide either songId or newSong" })
+  .refine((v) => v.recording.source !== "link" || !!(v.referenceUrl ?? v.youtubeUrl), {
+    message: "a link is required",
+  });
 export type PrepareSongInput = z.infer<typeof prepareSongSchema>;
 
 export const reviewSchema = z.discriminatedUnion("target", [
@@ -373,3 +430,37 @@ export const createAudioAssetSchema = z.object({
   /** The member must tick the declaration; without it nothing is registered. */
   declaration: z.literal(true),
 });
+
+/* ------------------------------------------------------------------ */
+/* Preparation state                                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Three different things that must never be confused:
+ *  - reference: the app knows which recording the band means (and maybe its link);
+ *  - audio:     the band gave a file it may process (a link is never that);
+ *  - analysis:  values were actually computed from that audio.
+ */
+export interface PreparationState {
+  reference: "none" | "link_pending" | "identified";
+  player: "none" | "available" | "unavailable";
+  audio: "none" | "available";
+  /** not_possible: no authorised audio. pending: audio exists but nothing analysed it yet. */
+  analysis: "not_possible" | "pending" | "done";
+  arrangement: "not_started" | "ready_for_review" | "reviewed";
+}
+
+/** What already depends on the current reference recording; replacing it needs confirmation. */
+export interface ReferenceDependents {
+  analyses: number;
+  audioAssets: number;
+  confirmedValues: string[];
+  sections: number;
+  readyMaterials: number;
+}
+
+export function hasReferenceDependents(d: ReferenceDependents): boolean {
+  return (
+    d.analyses + d.audioAssets + d.sections + d.readyMaterials > 0 || d.confirmedValues.length > 0
+  );
+}

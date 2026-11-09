@@ -18,13 +18,13 @@ import { errorCode } from "../../lib/api";
 import { cn } from "../../lib/cn";
 import { resolvePreferredMaterial } from "../../lib/materials";
 import { useAuth } from "../auth/AuthProvider";
-import { AutoArrangePanel } from "../autoarrange/AutoArrangePanel";
+import { BandArrangementCard, TechnicalDetails } from "../autoarrange/arrangement";
+import { ReferenceBlock } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useMembers } from "../bands/queries";
 import { MaterialEditor } from "./MaterialEditor";
 import { MaterialViewer } from "./MaterialViewer";
 import { useDeleteMaterial, useDeleteSong, useSong } from "./queries";
-import { MaterialsOverview, ReferencesCard, SongSheet } from "./SongSheet";
 
 export function SongDetailPage() {
   const { songId = "" } = useParams();
@@ -80,39 +80,15 @@ export function SongDetailPage() {
           ) : null
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
-        <div className="flex flex-col gap-4">
-          <SongSheet song={song} />
-          <AutoArrangePanel bandId={band.id} songId={song.id} canEdit={canEdit} />
-          <MaterialsOverview materials={materials} />
-          <ReferencesCard bandId={band.id} song={song} canEdit={canEdit} />
-          {song.version.notes ? (
-            <Card>
-              <h2 className="mb-2 font-semibold">{t("repertoire:song.fields.notes")}</h2>
-              <p className="whitespace-pre-wrap text-sm text-muted">{song.version.notes}</p>
-            </Card>
-          ) : null}
-          <Card>
-            <h2 className="mb-3 font-semibold">{t("repertoire:sections.title")}</h2>
-            {song.sections.length === 0 ? (
-              <p className="text-sm text-muted">{t("repertoire:sections.empty")}</p>
-            ) : (
-              <ol className="flex flex-col gap-1.5">
-                {song.sections.map((s) => (
-                  <li
-                    key={s.id}
-                    className="flex items-baseline justify-between gap-3 rounded-lg bg-sunken px-3 py-2 text-sm"
-                  >
-                    <span className="font-medium">{s.name}</span>
-                    <span className="text-muted">{t("common:music.bars", { count: s.bars })}</span>
-                    {s.notes ? (
-                      <span className="basis-full text-xs text-muted">{s.notes}</span>
-                    ) : null}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </Card>
+      <div className="grid gap-6 lg:grid-cols-[26rem_1fr]">
+        <div className="flex min-w-0 flex-col gap-4">
+          <ReferenceBlock bandId={band.id} song={song} canEdit={canEdit} />
+          <BandArrangementCard
+            bandId={band.id}
+            song={song}
+            materials={materials}
+            canEdit={canEdit}
+          />
         </div>
         <Card className="flex min-h-[50vh] flex-col p-0">
           <div className="flex flex-wrap items-center gap-2 border-b border-line p-3">
@@ -200,6 +176,7 @@ export function SongDetailPage() {
           )}
         </Card>
       </div>
+      <TechnicalDetails bandId={band.id} song={song} canEdit={canEdit} />
 
       <Dialog
         open={editing !== null}

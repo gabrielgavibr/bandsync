@@ -95,7 +95,6 @@ export function SongFormPage() {
           beatsPerBar: bpb,
           beatUnit: bu,
           notes: str(fd.get("notes")),
-          referenceUrl: str(fd.get("referenceUrl")),
           meterConfirmed,
         },
         sections: sections
@@ -269,12 +268,6 @@ export function SongFormPage() {
               label={t("repertoire:song.fields.meterConfirmed")}
               checked={meterConfirmed}
               onChange={setMeterConfirmed}
-            />
-            <Input
-              name="referenceUrl"
-              type="url"
-              label={t("repertoire:song.fields.referenceUrl")}
-              defaultValue={song?.version.referenceUrl ?? ""}
             />
             <Textarea
               name="notes"

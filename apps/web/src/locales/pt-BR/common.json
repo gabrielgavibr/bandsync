@@ -76,7 +76,9 @@
     "unsupported_media": "Este tipo de arquivo não é aceito.",
     "internal_error": "Erro inesperado no servidor. Tente novamente.",
     "network": "Não foi possível falar com o servidor. Verifique sua conexão.",
-    "upstream_unavailable": "Um serviço de dados musicais não respondeu. Tente de novo em instantes."
+    "upstream_unavailable": "Um serviço de dados musicais não respondeu. Tente de novo em instantes.",
+    "unsupported_platform": "Plataforma não suportada.",
+    "confirmation_required": "Esta alteração precisa ser confirmada."
   },
   "instrument": {
     "vocals": "Voz",

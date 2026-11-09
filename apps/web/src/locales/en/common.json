@@ -76,7 +76,9 @@
     "unsupported_media": "This file type is not supported.",
     "internal_error": "Unexpected server error. Please try again.",
     "network": "Could not reach the server. Check your connection.",
-    "upstream_unavailable": "A music data service did not respond. Please try again in a moment."
+    "upstream_unavailable": "A music data service did not respond. Please try again in a moment.",
+    "unsupported_platform": "Unsupported platform.",
+    "confirmation_required": "This change needs to be confirmed."
   },
   "instrument": {
     "vocals": "Vocals",

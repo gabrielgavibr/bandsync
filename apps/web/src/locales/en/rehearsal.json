@@ -63,7 +63,10 @@
       "manual": "Tempo set by the conductor",
       "none": "No tempo recorded for this song; set it manually"
     },
-    "meterUnconfirmed": "Time signature not yet confirmed by the band"
+    "meterUnconfirmed": "Time signature not yet confirmed by the band",
+    "reference": "Reference recording",
+    "referenceNoLink": "The band has not given this recording's link yet.",
+    "referenceLocal": "Plays on this device only, through the platform itself. The rehearsal synchronises tempo and meter, not the audio."
   },
   "controls": {
     "title": "Conductor controls",

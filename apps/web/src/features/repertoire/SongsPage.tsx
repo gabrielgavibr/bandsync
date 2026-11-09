@@ -11,6 +11,7 @@ import {
   LoadingBlock,
   PageHeader,
 } from "../../components/ui";
+import { ReferenceThumb } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useSongs } from "./queries";
 
@@ -82,6 +83,10 @@ export function SongsPage() {
                   <li key={s.id}>
                     <Link to={`/bands/${band.id}/songs/${s.id}`}>
                       <Card className="flex items-center gap-4 py-3 transition-colors hover:border-accent-500/60">
+                        <ReferenceThumb
+                          url={s.reference?.thumbnailUrl ?? null}
+                          className="size-11"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium">{s.title}</p>
                           <p className="truncate text-sm text-muted">{s.artist ?? "—"}</p>

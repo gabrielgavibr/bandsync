@@ -6,6 +6,11 @@ recording, the right references and a slot for their own material". It is built 
 but **not implemented**: no tempo, key, chord or structure is produced by the system today, and
 the interface says so instead of showing invented values.
 
+> **Read first:** songs are now added by pasting a link to the recording, and the song page is
+> built around one main reference recording. That flow, its platforms and its rules are described
+> in [`REFERENCE_RECORDING.md`](REFERENCE_RECORDING.md). This document covers the rest: the
+> catalogue search, the preparation jobs, the review trail and the analysis roadmap.
+
 ## 1. Principles
 
 1. **Nothing is invented.** A value exists only if a named source gave it or a band member typed
@@ -65,7 +70,7 @@ the interface says so instead of showing invented values.
 - **No queue product needed.** Alarms are available on the free plan, so stage A adds no paid
   service.
 
-## 3. Data model (migration `0003_autoarrange.sql`, additive)
+## 3. Data model (migrations `0003_autoarrange.sql` and `0004_reference_link.sql`, additive)
 
 | Concept            | Table                                                                                                                              | Notes                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -85,17 +90,19 @@ nothing writes automatic content to them yet.
 
 Checked on 2026-11-09. Each source is an independent connector.
 
-| Source            | What BandSync does                                                                                                                                                                                                   | What it does **not** do                                                                                                                                                 |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **MusicBrainz**   | Official JSON web service: search recordings, read one recording with releases, ISRCs, works and their writers, URL relations. Core data is CC0 and may be stored. One request per second, identifying `User-Agent`. | No scraping of pages.                                                                                                                                                   |
-| **YouTube**       | Validates a link through oEmbed (title, channel, thumbnail) and plays it in the official privacy-enhanced embedded player.                                                                                           | **No download, no audio extraction, no storage of the audio.** Embedding can be disabled by the video owner; then only the link is shown.                               |
-| **Cifra Club**    | Builds a search link a person opens.                                                                                                                                                                                 | No request is made by the server (the site refuses automated requests with HTTP 403 and its legal notice forbids extraction and framing). No content is read or stored. |
-| **Cifras.com.br** | Search link only.                                                                                                                                                                                                    | `robots.txt` disallows `/busca` and `/api/`; content is for personal use. Nothing is fetched.                                                                           |
-| **Songsterr**     | Search link only.                                                                                                                                                                                                    | `robots.txt` disallows `/api/`; tab licences do not cover showing them elsewhere. Nothing is fetched.                                                                   |
+| Source                     | What BandSync does                                                                                                                                                                                                   | What it does **not** do                                                                                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **MusicBrainz**            | Official JSON web service: search recordings, read one recording with releases, ISRCs, works and their writers, URL relations. Core data is CC0 and may be stored. One request per second, identifying `User-Agent`. | No scraping of pages.                                                                                                                                                   |
+| **YouTube, YouTube Music** | Identifies a pasted link through oEmbed (title, channel, thumbnail) and plays it in the official privacy-enhanced embedded player.                                                                                   | **No download, no audio extraction, no storage of the audio.** Embedding can be disabled by the video owner; then only the link is shown.                               |
+| **Spotify**                | Identifies a pasted track link through oEmbed (title and cover only) and plays it in the official embedded player.                                                                                                   | **No download, no audio extraction.** No artist or duration from the public endpoint; the Web API is not configured.                                                    |
+| **Cifra Club**             | Listed in the source registry as link-only. The preparation no longer creates search links to it.                                                                                                                    | No request is made by the server (the site refuses automated requests with HTTP 403 and its legal notice forbids extraction and framing). No content is read or stored. |
+| **Cifras.com.br**          | Link-only, as above.                                                                                                                                                                                                 | `robots.txt` disallows `/busca` and `/api/`; content is for personal use. Nothing is fetched.                                                                           |
+| **Songsterr**              | Link-only, as above.                                                                                                                                                                                                 | `robots.txt` disallows `/api/`; tab licences do not cover showing them elsewhere. Nothing is fetched.                                                                   |
 
 Consequences that the interface states plainly:
 
-- BandSync cannot know whether a chart exists on a link-only site until a person opens the link.
+- Chord and tab sites allow links only. They are not shown in the add-song flow or on the song
+  page any more; links stored earlier stay under "Technical details".
 - MusicBrainz is community data. A recording may have no linked work, so the composer may be
   absent (true today for the catalogued recordings of _Esotérico_ and for Gilberto Gil's
   _O Segundo Sol_). The app then says "the source does not say who wrote this recording".
@@ -107,12 +114,12 @@ Consequences that the interface states plainly:
 `POST /prepare` resolves the recording **from the source itself** (client-supplied metadata is
 never trusted), creates the song if needed, stores the reference recording and starts a job.
 
-| Step                   | Today                                                                                                                                                                                                                                                                                  | Result    |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| `searching_references` | **Implemented.** Reads the recording from MusicBrainz; stores duration and composer as results with origin and source URL; adds references (recording page, work page, URL relations, the validated video, one search link per link-only site that the song does not already link to). | `done`    |
-| `analyzing_audio`      | **Not implemented.** Skipped with `no_authorized_audio` when the band gave no file, or `engine_not_configured` when it did.                                                                                                                                                            | `skipped` |
-| `detecting_structure`  | **Not implemented.** Same reasons.                                                                                                                                                                                                                                                     | `skipped` |
-| `preparing_materials`  | **Implemented.** Fills only _empty_ song fields from sourced data and opens one pending workspace per instrument in the band (drums: arrangement map, bass: tab, guitar and keys: chords, vocals: lyrics). The workspaces are empty on purpose: the band fills them.                   | `done`    |
+| Step                   | Today                                                                                                                                                                                                                                                                              | Result    |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `searching_references` | **Implemented.** When the recording has a catalogue id, reads it from MusicBrainz and stores duration and composer as results with origin and source URL. A recording identified only by its link has nothing to read (`no_recording_identifier`). No links are added to the song. | `done`    |
+| `analyzing_audio`      | **Not implemented.** Skipped with `no_authorized_audio` when the band gave no file, or `engine_not_configured` when it did.                                                                                                                                                        | `skipped` |
+| `detecting_structure`  | **Not implemented.** Same reasons.                                                                                                                                                                                                                                                 | `skipped` |
+| `preparing_materials`  | **Implemented.** Fills only _empty_ song fields from sourced data and opens one pending workspace per instrument in the band (drums: arrangement map, bass: tab, guitar and keys: chords, vocals: lyrics). The workspaces are empty on purpose: the band fills them.               | `done`    |
 
 Job states: `pending` → `searching_references` → `analyzing_audio` → `detecting_structure` →
 `preparing_materials` → `awaiting_review` → `completed`, plus `failed` and `cancelled`.
@@ -224,18 +231,19 @@ No paid service was started for AutoArrange.
 All under `/api/bands/:bandId/autoarrange`, authenticated members only; writes need permission to
 edit the repertoire.
 
-| Method and path                                     | Purpose                                                                          |
-| --------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `GET /connectors`                                   | Source registry and engine state.                                                |
-| `GET /search?title=&artist=`                        | Recording candidates (one per recording, not per song).                          |
-| `GET /recordings/:mbid`                             | One recording: releases, ISRCs, works, writers, default release.                 |
-| `POST /youtube`                                     | Validate a YouTube link.                                                         |
-| `POST /prepare`                                     | Identify, store the reference recording, start a job (or return the active one). |
-| `GET /jobs/:jobId`                                  | Job progress.                                                                    |
-| `POST /jobs/:jobId/cancel` · `/retry` · `/complete` | Cancel, retry a failed job, finish the review.                                   |
-| `GET /songs/:songId`                                | Recordings, jobs, results, reviews, authorised audio, confirmations.             |
-| `POST /songs/:songId/review`                        | Confirm, edit or reject a result or a band value.                                |
-| `POST /songs/:songId/audio-assets`                  | Register an uploaded file as authorised audio (requires the rights declaration). |
+| Method and path                                                        | Purpose                                                                                                   |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `GET /connectors`                                                      | Source registry and engine state.                                                                         |
+| `GET /search?title=&artist=`                                           | Recording candidates (one per recording, not per song).                                                   |
+| `GET /recordings/:mbid`                                                | One recording: releases, ISRCs, works, writers, default release.                                          |
+| `POST /reference/identify`                                             | Identify a pasted link (YouTube, YouTube Music, Spotify). `POST /youtube` is the older YouTube-only form. |
+| `PUT /songs/:songId/reference/link` · `PATCH /songs/:songId/reference` | Change the link of the reference recording; correct its title or artist.                                  |
+| `POST /prepare`                                                        | Identify, store the reference recording, start a job (or return the active one).                          |
+| `GET /jobs/:jobId`                                                     | Job progress.                                                                                             |
+| `POST /jobs/:jobId/cancel` · `/retry` · `/complete`                    | Cancel, retry a failed job, finish the review.                                                            |
+| `GET /songs/:songId`                                                   | Recordings, jobs, results, reviews, authorised audio, confirmations.                                      |
+| `POST /songs/:songId/review`                                           | Confirm, edit or reject a result or a band value.                                                         |
+| `POST /songs/:songId/audio-assets`                                     | Register an uploaded file as authorised audio (requires the rights declaration).                          |
 
 Errors use the stable codes of the rest of the API; `upstream_unavailable` (503) means a source
 did not answer and the person may try again.
@@ -243,8 +251,8 @@ did not answer and the person may try again.
 ## 13. Known limitations
 
 - No audio analysis. BPM, key, meter, sections and chords are whatever the band types.
-- The authorised-audio endpoint exists, but there is no upload screen for it yet and no engine
-  reads the file.
+- Authorised audio can be uploaded from the song page (with a rights declaration) and is tied to
+  the reference recording, but no engine reads the file: the page reports "analysis pending".
 - MusicBrainz may throttle shared cloud addresses; the gateway retries and, if it still fails,
   the app says the source is unavailable.
 - Search finds what MusicBrainz catalogues. A recording missing there can be entered by hand
@@ -260,15 +268,16 @@ did not answer and the person may try again.
 - `apps/api/test/autoarrange.test.ts` — routes, gateway spacing/retry/cache, job runner
   (retry, failure, cancel, budget, dedupe), review trail, permissions, with a fake outbound
   service replaying the same captures.
-- `e2e/tests/autoarrange.spec.ts` — the wizard end to end (two recordings of the same song told
-  apart, prepare, review, repertoire, song sheet, live rehearsal on two devices) and an existing
-  song in Portuguese on a phone, against a local stub of the external services.
+- `e2e/tests/autoarrange.spec.ts` — adding by link, reference shown to every member, live
+  rehearsal on two devices, replacement, and the catalogue search in Portuguese on a phone,
+  against a local stub of the external services. Reference-link tests are listed in
+  `REFERENCE_RECORDING.md` §11.
 - `e2e/staging/homologation.staging.ts` — the same flow against the real services on staging.
 
 ## 15. Applying it to the real repertoire
 
-`apps/api/scripts/prepare-real-repertoire.mjs` runs the preparation through the API for the
-songs whose recording the band has chosen: _Pérola Negra_ (Natiruts with Luiz Melodia, _Acústico
-no Rio de Janeiro_) and _O Segundo Sol_ (Gilberto Gil, _Cássia Reggae, Vol. 1_). _Esotérico_ is
-left for a person to choose between its recordings in the wizard. The script is idempotent and
-never changes the band's own values.
+See [`REFERENCE_RECORDING.md`](REFERENCE_RECORDING.md) §9. `apps/api/scripts/prepare-real-repertoire.mjs`
+sets the reference of the three real songs through the API: _Pérola Negra_ with its confirmed
+YouTube link; _Esotérico_ (_Um Banda Um_) and _O Segundo Sol_ (_Cássia Reggae, Vol. 1_) with the
+link pending, because no exact link was confirmed. It is idempotent and never changes the band's
+own values.

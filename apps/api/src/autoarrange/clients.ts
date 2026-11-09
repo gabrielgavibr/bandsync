@@ -1,12 +1,16 @@
 import {
   MUSICBRAINZ_BASE_URL,
+  normalizeOEmbed,
   normalizeRecordingLookup,
   normalizeSearchResponse,
+  type ParsedReferenceLink,
   parseYouTubeUrl,
   type RecordingCandidate,
   type RecordingDetails,
+  type ReferenceLinkInfo,
   recordingLookupUrl,
   recordingSearchUrl,
+  referenceOEmbedUrl,
   type YouTubeVideoInfo,
   youtubeOEmbedUrl,
   youtubeWatchUrl,
@@ -89,4 +93,46 @@ export async function youtubeVideoInfo(env: Env, url: string): Promise<YouTubeVi
     channelUrl: http(j?.author_url),
     thumbnailUrl: http(j?.thumbnail_url),
   };
+}
+
+/**
+ * Asks the platform of a parsed link what it publicly says about that recording, through its
+ * official oEmbed endpoint (no key, no scraping, nothing downloaded).
+ *
+ * Returns null when the platform does not know the recording. A recording the platform knows but
+ * will not describe or embed (private video, embedding disabled) comes back with no metadata and
+ * `embeddable: false`, so the band can still keep the link and type the details.
+ */
+export async function identifyReferenceLink(
+  env: Env,
+  link: ParsedReferenceLink,
+): Promise<ReferenceLinkInfo | null> {
+  const endpoint = referenceOEmbedUrl(link.platform, link.externalId, {
+    youtube: env.YOUTUBE_OEMBED_BASE || "https://www.youtube.com",
+    spotify: env.SPOTIFY_OEMBED_BASE || "https://open.spotify.com",
+  });
+  const name = link.platform === "spotify" ? "Spotify" : "YouTube";
+  let res: Response;
+  try {
+    res = await fetch(endpoint, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    throw new ApiError("upstream_unavailable", `${name} did not answer`);
+  }
+  if (res.status === 404 || res.status === 400) return null;
+  if (res.status === 401 || res.status === 403) {
+    return {
+      ...link,
+      title: null,
+      author: null,
+      artistGuess: null,
+      thumbnailUrl: null,
+      embeddable: false,
+      metadata: "missing",
+    };
+  }
+  if (!res.ok) throw new ApiError("upstream_unavailable", `${name} answered ${res.status}`);
+  return normalizeOEmbed(link, await res.json().catch(() => null));
 }

@@ -1,8 +1,8 @@
 {
   "title": "Add song",
-  "subtitle": "Find the exact recording, check what was found and let BandSync prepare the song for the band.",
-  "existingTitle": "Identify recording",
-  "existingSubtitle": "Choose the reference recording of “{{title}}”. What the band already filled in is not changed.",
+  "subtitle": "Paste the link of the recording the band wants to play. BandSync identifies that version and prepares the song.",
+  "existingTitle": "Set the reference recording",
+  "existingSubtitle": "Reference recording of “{{title}}”. What the band already filled in is not changed.",
   "manual": "Enter manually",
   "stepLabel": "Step {{n}}",
   "search": {
@@ -23,7 +23,9 @@
     "moreReleases_one": "+{{count}} release",
     "moreReleases_other": "+{{count}} releases",
     "withoutIdentifier": "Continue without an identifier",
-    "versionsHint": "Each row is a different recording. Live, studio and other performers' versions do not share tempo or arrangement."
+    "versionsHint": "Each row is a different recording. Live, studio and other performers' versions do not share tempo or arrangement.",
+    "haveLink": "Have the recording's link?",
+    "pasteInstead": "Paste link"
   },
   "recording": {
     "heading": "Reference recording",
@@ -32,30 +34,16 @@
     "composerUnknown": "The source does not say who wrote this recording. The field stays empty for the band to fill in.",
     "release": "Release",
     "duration": "Duration",
-    "isrc": "ISRC",
-    "openSource": "Open on MusicBrainz",
-    "linked": "Preparation and analysis are tied to this recording, not to other versions of the song.",
     "manualHeading": "Recording without an identifier",
     "manualArtist": "Performer",
     "manualRelease": "Album or project",
     "manualYear": "Year"
   },
-  "youtube": {
-    "heading": "Reference video (optional)",
-    "label": "YouTube link",
-    "check": "Check",
-    "invalid": "This link is not an available YouTube video.",
-    "channel": "Channel: {{name}}",
-    "notice": "The video is for listening through the official player. BandSync does not download or extract audio from YouTube.",
-    "remove": "Remove video",
-    "player": "Official YouTube player"
-  },
   "prepare": {
     "heading": "Prepare song",
     "songTitle": "Title in the band",
     "submit": "Prepare song",
-    "explain": "Preparation checks the recording at the source, gathers reference links and opens a workspace for each instrument. Tempo, key and structure are only analysed from authorised audio.",
-    "running": "Preparing…"
+    "explain": "Preparing stores this recording as the band's reference and opens a workspace for each instrument. Tempo, key and structure are analysed only from authorised audio; a link is not that."
   },
   "steps": {
     "searching_references": "Searching references",
@@ -99,8 +87,6 @@
       "budget_exceeded": "Preparation reached its external-request limit.",
       "step_failed": "A step failed."
     },
-    "linksAdded_one": "{{count}} link added",
-    "linksAdded_other": "{{count}} links added",
     "slotsCreated_one": "{{count}} workspace opened",
     "slotsCreated_other": "{{count}} workspaces opened",
     "fieldsFilled_one": "{{count}} field filled",
@@ -150,7 +136,8 @@
     "confirm": "Confirm",
     "confirmedBy": "Confirmed by {{name}} on {{date}}",
     "notConfirmed": "Not confirmed yet",
-    "saved": "Confirmation recorded"
+    "saved": "Confirmation recorded",
+    "beforeReferenceChange": "confirmed before the reference changed; check again"
   },
   "repertoire": {
     "heading": "Add to a repertoire",
@@ -163,29 +150,149 @@
     "openSong": "Open song sheet",
     "another": "Add another song"
   },
-  "sources": {
-    "heading": "Sources and how BandSync may use them",
-    "access": {
-      "api": "Official API",
-      "official_embed": "Official player",
-      "link_only": "Link only"
-    },
-    "policy": {
-      "musicbrainz": "Open data (CC0). BandSync queries the official API and may store the metadata.",
-      "youtube": "The video plays in the official player. No download or audio extraction.",
-      "linkOnly": "The site's terms do not allow copying or showing its content elsewhere. BandSync only keeps the link for you to open."
-    },
-    "terms": "Terms"
-  },
   "panel": {
-    "heading": "AutoArrange",
-    "noRecording": "No recording identified yet.",
-    "identify": "Identify recording",
-    "prepareAgain": "Prepare again",
-    "listen": "Listen to the reference",
-    "hidePlayer": "Close player",
     "lastJob": "Latest preparation",
-    "history": "Confirmation history",
-    "changed": "{{name}} · {{date}}"
+    "history": "Confirmation history"
+  },
+  "changeTitle": "Change the reference recording",
+  "link": {
+    "heading": "Paste the recording's link",
+    "label": "Recording link",
+    "identify": "Identify",
+    "accepted": "Accepts YouTube, YouTube Music and Spotify links.",
+    "noLink": "No link at hand?",
+    "searchInstead": "Search by title and artist",
+    "problem": {
+      "invalid_url": "This does not look like a valid link. Copy the full address, starting with https://.",
+      "unsupported_platform": "Unsupported platform. Use a YouTube, YouTube Music or Spotify link.",
+      "unsupported_link": "This link does not point to one recording (it is a playlist, album, channel or short link). Open the track or video and copy its link.",
+      "reference_not_found": "Reference not found: the platform does not recognise this link. Check that the video or track still exists."
+    },
+    "confirmHeading": "Confirm the recording",
+    "channel": "Channel: {{name}}",
+    "noMetadataTitle": "The platform gave no title",
+    "metadataMissing": "Metadata missing",
+    "listenToCheck": "Listen to check",
+    "songTitle": "Song title",
+    "titleHint": "Check it: a video's name is not always the song's name.",
+    "artistHint": "The video's channel is not always the artist. Fill it in if you know.",
+    "artistHintSpotify": "Spotify does not name the artist through this endpoint. Fill it in if you know.",
+    "whichRecording": "Which recording is this link?",
+    "same": "The same reference recording",
+    "sameHint": "Only stores the link. Analyses and confirmed values stay valid.",
+    "other": "Another recording",
+    "otherHint": "Replaces the band's reference. The previous one stays in the history.",
+    "saveLink": "Save link",
+    "confirmAndPrepare": "Confirm and prepare song",
+    "saved": "Link saved",
+    "optionalHeading": "Recording link (optional)"
+  },
+  "reference": {
+    "heading": "Reference recording",
+    "current": "Current reference",
+    "none": "No reference recording set.",
+    "set": "Set reference",
+    "change": "Change reference",
+    "addLink": "Add link",
+    "fix": "Fix details",
+    "fixHint": "The title and artist below are what the band sees. What the platform said is kept.",
+    "recordingTitle": "Recording title",
+    "artist": "Artist",
+    "artistUnknown": "Artist not stated",
+    "linkPending": "Link pending",
+    "linkPendingBody": "The band knows which recording it means but has not given its link yet. No other recording is chosen automatically.",
+    "listen": "Listen here",
+    "hidePlayer": "Close player",
+    "openOriginal": "Open original recording",
+    "openOn": "Open on {{platform}}",
+    "player": "Official {{platform}} player",
+    "playerUnavailable": "Player unavailable: the platform does not allow this recording to play here. Use “Open original recording”.",
+    "shared": "Every member sees this same reference. Each one listens through the platform itself: BandSync does not download or relay the audio.",
+    "legacyLink": "Link given earlier (not identified yet)"
+  },
+  "state": {
+    "reference": {
+      "identified": "Reference identified",
+      "link_pending": "Reference link pending",
+      "none": "Reference not set"
+    },
+    "player": {
+      "unavailable": "Player unavailable"
+    },
+    "audio": {
+      "none": "Audio not available for analysis",
+      "available": "Authorised audio available",
+      "noneHint": "A link does not allow downloading or processing the audio. To analyse, upload a file the band may use."
+    },
+    "analysis": {
+      "not_possible": "Analysis not done",
+      "pending": "Analysis pending",
+      "done": "Analysis done",
+      "pendingHint": "There is authorised audio, but the analysis engine is not configured yet. No value is estimated.",
+      "noneHint": "BPM, key, meter and structure are whatever the band enters."
+    },
+    "arrangement": {
+      "not_started": "Preparation not started",
+      "ready_for_review": "Arrangement ready for review",
+      "reviewed": "Arrangement reviewed",
+      "reviewHint": "Check BPM, key and meter, then finish the review."
+    }
+  },
+  "arrangement": {
+    "heading": "Band arrangement",
+    "preparation": "Preparation status",
+    "materials": "Materials by instrument"
+  },
+  "audio": {
+    "add": "Upload authorised audio",
+    "explain": "Upload a file the band has the right to process (own recording, licensed or permitted). It is tied to the reference recording. Audio from YouTube or Spotify is not downloaded.",
+    "file": "Audio file",
+    "rightsLabel": "Basis of the right to use it",
+    "rights": {
+      "own_recording": "The band's own recording",
+      "licensed": "Licensed file",
+      "permission_from_owner": "Permission from the owner"
+    },
+    "note": "Note (optional)",
+    "declaration": "I declare the band has the right to process this file.",
+    "submit": "Upload",
+    "saved": "Audio registered"
+  },
+  "replace": {
+    "title": "Replace the reference recording?",
+    "body": "Work was already done listening to “{{title}}” ({{artist}}):",
+    "confirmed": "{{what}} confirmed",
+    "sections_one": "{{count}} section in the map",
+    "sections_other": "{{count}} sections in the map",
+    "materials_one": "{{count}} ready material",
+    "materials_other": "{{count}} ready materials",
+    "audio_one": "{{count}} audio file",
+    "audio_other": "{{count}} audio files",
+    "analyses_one": "{{count}} analysis result",
+    "analyses_other": "{{count}} analysis results",
+    "kept": "None of it is deleted or changed, but it was set with the previous recording. Worth checking again after the change.",
+    "confirm": "Replace reference"
+  },
+  "technical": {
+    "heading": "Technical details",
+    "hint": "sources, identification and history",
+    "identification": "Recording identification",
+    "identifiedBy": "Identified by",
+    "by": {
+      "musicbrainz": "Catalogue (MusicBrainz)",
+      "link": "Link",
+      "manual": "Manual entry"
+    },
+    "platform": "Platform",
+    "platformTitle": "Title on the platform",
+    "platformAuthor": "Channel on the platform",
+    "link": "Link",
+    "checkedAt": "Checked on",
+    "catalogue": "Catalogue",
+    "note": "Note",
+    "since": "Reference since",
+    "previous": "Previous references",
+    "until": "until {{date}}",
+    "noHistory": "No change recorded."
   }
 }

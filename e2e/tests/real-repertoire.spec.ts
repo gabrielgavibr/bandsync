@@ -74,17 +74,33 @@ test("real repertoire: idempotent import, song sheet, pending material per instr
   await expect(rows.nth(2)).toContainText("O Segundo Sol");
 
   await page.getByRole("link", { name: /Pérola Negra/ }).click();
-  await expect(page.getByRole("heading", { name: "Song sheet" })).toBeVisible();
-  await expect(page.getByText("Luiz Melodia").first()).toBeVisible();
-  await expect(page.getByText("Natiruts feat. Luiz Melodia").first()).toBeVisible();
-  await expect(page.getByText("Natiruts Acústico no Rio de Janeiro (2012)")).toBeVisible();
-  await expect(page.getByText("Not set by the band").first()).toBeVisible();
-  await expect(page.getByText("To confirm").first()).toBeVisible();
-  await expect(page.getByText(/Sources \(\d+\)/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pérola Negra", level: 1 })).toBeVisible();
+  // Imported with a link the band typed, not yet identified: no recording is assumed.
+  const block = page.getByTestId("reference-block");
+  await expect(block).toHaveAttribute("data-state", "none");
+  await expect(block).toContainText("No reference recording set.");
+  await expect(block.getByRole("link", { name: /Link given earlier/ })).toHaveAttribute(
+    "href",
+    "https://www.youtube.com/watch?v=JZqFoTIAJj8",
+  );
+  const arrangement = page.getByTestId("band-arrangement");
+  await expect(arrangement.getByRole("heading", { name: "Band arrangement" })).toBeVisible();
+  await expect(arrangement.getByTestId("materials-overview")).toContainText(
+    "Arrangement map · Drums · Pending",
+  );
+  await expect(arrangement.getByTestId("preparation-state")).toContainText("Reference not set");
+  // Sources and links are kept, out of the way.
+  const technical = page.getByTestId("technical-details");
+  await expect(page.getByRole("heading", { name: "Song sheet" })).toBeHidden();
+  await technical.locator("summary").first().click();
+  await expect(technical.getByRole("heading", { name: "Song sheet" })).toBeVisible();
+  await expect(technical.getByText("Luiz Melodia").first()).toBeVisible();
+  await expect(technical.getByText("Natiruts Acústico no Rio de Janeiro (2012)")).toBeVisible();
+  await expect(technical.getByText("To confirm").first()).toBeVisible();
+  await expect(technical.getByText(/Sources \(\d+\)/)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Pérola Negra \(feat\. Luiz Melodia\)/ }),
+    technical.getByRole("link", { name: /Pérola Negra \(feat\. Luiz Melodia\)/ }),
   ).toHaveAttribute("href", "https://www.youtube.com/watch?v=JZqFoTIAJj8");
-  await expect(page.getByText("Nothing available yet.")).toBeVisible();
   await expect(page.getByText("Arrangement map · Drums").first()).toBeVisible();
   await page.screenshot({ path: "test-results/real-song-sheet-en.png", fullPage: true });
 
@@ -92,8 +108,11 @@ test("real repertoire: idempotent import, song sheet, pending material per instr
   await page.getByRole("link", { name: "Profile" }).first().click();
   await page.getByRole("radio", { name: "Português (Brasil)" }).click();
   await page.goBack();
-  await expect(page.getByRole("heading", { name: "Ficha da música" })).toBeVisible();
-  await expect(page.getByText("Não definido pela banda").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Gravação de referência" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Arranjo da banda" })).toBeVisible();
+  await expect(page.getByTestId("reference-block")).toContainText(
+    "Nenhuma gravação de referência definida.",
+  );
   await expect(page.getByRole("heading", { name: "Pérola Negra" })).toBeVisible();
   await page.getByRole("link", { name: "Perfil" }).first().click();
   await page.getByRole("radio", { name: "English" }).click();

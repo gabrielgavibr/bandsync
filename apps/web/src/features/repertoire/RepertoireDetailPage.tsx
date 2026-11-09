@@ -14,6 +14,7 @@ import {
   useToast,
 } from "../../components/ui";
 import { errorCode } from "../../lib/api";
+import { ReferenceOpenLink } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useRepertoire, useRepertoireMutations, useSongs } from "./queries";
 
@@ -102,6 +103,7 @@ export function RepertoireDetailPage() {
                   {it.song.key ? <Badge>{it.song.key}</Badge> : null}
                   {it.song.bpm ? <Badge>{it.song.bpm} BPM</Badge> : null}
                 </span>
+                <ReferenceOpenLink reference={it.song.reference} />
                 {canEdit ? (
                   <span className="flex items-center">
                     <Button

@@ -1,6 +1,7 @@
 import type { RepertoireDto, RepertoireItemDto } from "@bandsync/shared";
 import { newId } from "../lib/ids";
 import { nowIso } from "../lib/time";
+import { listReferenceSummariesOfRepertoire } from "./autoarrange";
 
 interface RepRow {
   id: string;
@@ -73,12 +74,20 @@ export async function listItems(
       bpm: number | null;
       key: string | null;
     }>();
+  const refs = await listReferenceSummariesOfRepertoire(db, repertoireId);
   return results.map((r) => ({
     id: r.id,
     songId: r.song_id,
     position: r.position,
     notes: r.notes,
-    song: { id: r.song_id, title: r.title, artist: r.artist, bpm: r.bpm, key: r.key },
+    song: {
+      id: r.song_id,
+      title: r.title,
+      artist: r.artist,
+      bpm: r.bpm,
+      key: r.key,
+      reference: refs.get(r.song_id) ?? null,
+    },
   }));
 }
 

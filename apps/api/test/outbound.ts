@@ -3,7 +3,7 @@ import path from "node:path";
 
 /**
  * Stand-in for the external services during tests (runs in Node, outside the Worker).
- * It serves real MusicBrainz and YouTube oEmbed responses captured from the live services
+ * It serves real MusicBrainz, YouTube and Spotify oEmbed responses captured from the live services
  * (packages/shared/test/fixtures/musicbrainz) and can be told to fail, so the gateway's retry
  * logic and the job's failure handling are exercised without any network access.
  *
@@ -29,6 +29,11 @@ const LOOKUPS: Record<string, string> = {
   "d72d41dd-fb12-4775-8188-d95c1fdabfe3": "lookup-esoterico-doces-barbaros.json",
   "790c0007-1df2-4d2e-bd34-8a772894e800": "lookup-o-segundo-sol-gil.json",
 };
+
+/** A made-up id standing for "exists, but the owner does not allow embedding". */
+export const RESTRICTED_VIDEO_ID = "RESTRICTED1";
+/** The track of the captured Spotify oEmbed answer (spotify-oembed-track.json). */
+export const SPOTIFY_TRACK_ID = "4cOdK2wGLETKBW3PvgPWqT";
 
 let failNext = 0;
 let calls = 0;
@@ -73,7 +78,15 @@ export async function outboundService(request: Request): Promise<Response> {
   if (url.hostname === "www.youtube.com" && url.pathname === "/oembed") {
     const target = url.searchParams.get("url") ?? "";
     if (target.includes("JZqFoTIAJj8")) return json(read("youtube-oembed-perola-negra.json"));
+    // YouTube answers 401 for a video that exists but is private or not embeddable.
+    if (target.includes(RESTRICTED_VIDEO_ID)) return new Response("Unauthorized", { status: 401 });
     return new Response("Not Found", { status: 404 });
+  }
+
+  if (url.hostname === "open.spotify.com" && url.pathname === "/oembed") {
+    const target = url.searchParams.get("url") ?? "";
+    if (target.includes(SPOTIFY_TRACK_ID)) return json(read("spotify-oembed-track.json"));
+    return new Response("", { status: 404 });
   }
 
   return new Response(`outbound request to ${url.hostname} is not allowed in tests`, {

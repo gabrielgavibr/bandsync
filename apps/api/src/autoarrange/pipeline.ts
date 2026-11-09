@@ -14,10 +14,9 @@ import {
   type JobRow,
   updateRecordingDetails,
 } from "../db/autoarrange";
-import { addReference, createMaterial, getSong, listMaterials, updateSong } from "../db/songs";
+import { createMaterial, getSong, listMaterials, updateSong } from "../db/songs";
 import type { Env } from "../env";
 import type { MusicBrainzClient } from "./clients";
-import { buildSearchLinks } from "./connectors";
 
 export interface StepResult {
   outcome: StepOutcome;
@@ -46,12 +45,6 @@ export class PermanentStepError extends Error {
 
 const TEXTS = {
   "pt-BR": {
-    mbRecording: "MusicBrainz – gravação",
-    mbWork: "MusicBrainz – obra",
-    mbLink: "Link listado no MusicBrainz",
-    searchNote:
-      "Link de busca: abre o site para você procurar. O BandSync não lê nem copia o conteúdo.",
-    youtubeNote: (channel: string) => `Canal: ${channel}. Ouça pelo player oficial do YouTube.`,
     sourceNote:
       "Dado do MusicBrainz (base aberta mantida pela comunidade). Confira antes de confirmar.",
     slots: {
@@ -78,13 +71,6 @@ const TEXTS = {
     },
   },
   en: {
-    mbRecording: "MusicBrainz – recording",
-    mbWork: "MusicBrainz – work",
-    mbLink: "Link listed on MusicBrainz",
-    searchNote:
-      "Search link: opens the site for you to look. BandSync does not read or copy its content.",
-    youtubeNote: (channel: string) =>
-      `Channel: ${channel}. Listen through the official YouTube player.`,
     sourceNote:
       "Data from MusicBrainz (open, community-maintained database). Check it before confirming.",
     slots: {
@@ -132,27 +118,13 @@ async function load(ctx: StepContext) {
   return { song, recording };
 }
 
-function linkKind(type: string, url: string): string {
-  if (/youtube\.com|youtu\.be/.test(url)) return "video";
-  if (/streaming/.test(type)) return "official_audio";
-  if (/lyrics/.test(type)) return "lyrics";
-  return "other";
-}
-
 /* ------------------------------------------------------------------ */
-/* Step 1: identify the recording and collect reference links          */
+/* Step 1: confirm the recording at its source                         */
 /* ------------------------------------------------------------------ */
 async function searchingReferences(ctx: StepContext): Promise<StepResult> {
   const { song, recording } = await load(ctx);
-  const t = texts(ctx.job.locale);
-  const userId = ctx.job.requested_by;
-  let references = 0;
   let results = 0;
   let identified = false;
-  const add = async (kind: string, title: string, url: string, note: string | null) => {
-    const { created } = await addReference(ctx.db, song.id, userId, { kind, title, url, note });
-    if (created) references += 1;
-  };
 
   if (recording?.mbid) {
     ctx.spend();
@@ -195,46 +167,15 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
         });
         if (r.created) results += 1;
       }
-      await add("metadata", t.mbRecording, sourceUrl, null);
-      if (work) await add("metadata", t.mbWork, work.url, null);
-      for (const link of details.links.slice(0, 8)) {
-        await add(linkKind(link.type, link.url), `${t.mbLink} (${link.type})`, link.url, null);
-      }
     }
   }
 
-  if (recording?.youtube) {
-    await add(
-      "video",
-      `YouTube – ${recording.youtube.title}`.slice(0, 160),
-      recording.youtube.url,
-      t.youtubeNote(recording.youtube.channelName),
-    );
-  }
-
-  // Search links for the link-only sites, skipped when the song already has a link to that site.
-  const after = await getSong(ctx.db, ctx.job.band_id, song.id);
-  const hosts = new Set(
-    (after?.references ?? []).map((r) => {
-      try {
-        return new URL(r.url).hostname;
-      } catch {
-        return "";
-      }
-    }),
-  );
-  for (const link of buildSearchLinks({
-    title: song.title,
-    artist: recording?.artistCredit ?? song.artist,
-  })) {
-    if (hosts.has(link.host)) continue;
-    await add(link.kind, link.title, link.url, t.searchNote);
-  }
-
+  // Nothing is added to the song's visible links: what identifies the recording (catalogue page,
+  // work, platform link) stays on the recording row, for provenance and audit.
   return {
     outcome: "done",
     reason: recording?.mbid ? null : "no_recording_identifier",
-    detail: { identified, referencesAdded: references, resultsAdded: results },
+    detail: { identified, resultsAdded: results },
   };
 }
 

@@ -86,7 +86,8 @@ Planned:
 Detailed in `AUTOARRANGE.md`.
 
 - **A — Identification and sources — Done.** Add-song wizard (search by title/artist, one result per recording, release choice, YouTube link validated and played in the official player), source registry with what each site allows, preparation jobs on a Durable Object (states, retry, cancel, dedupe, cost budget), results stored with origin/method/review state, human confirmation of the band's tempo, key and meter with who and when, song-sheet panel, live session using the confirmed values.
-- **B — Authorised audio analysis — Not implemented.** Storage for authorised audio with a rights declaration and the pipeline steps exist; there is no analysis engine and no upload screen. Tempo, key, structure and chords are not produced.
+- **Reference recording by link — Done.** Songs are added by pasting a YouTube, YouTube Music or Spotify link; one main reference per song, shown on the song page, song list, repertoire and live room; replacement asks first and keeps history; the song page has two blocks (reference recording, band arrangement) with sources under "Technical details"; authorised audio can be uploaded and tied to the reference. See `REFERENCE_RECORDING.md`.
+- **B — Authorised audio analysis — Not implemented.** Authorised audio can be uploaded with a rights declaration and the pipeline steps exist; there is no analysis engine. Tempo, key, structure and chords are not produced.
 - **C — Arrangement-map editor — Not implemented.** Section timing and cue columns exist.
 - **D — Per-instrument materials — Not implemented.** Harmony table exists; pending workspaces per instrument are created today.
 - **E — Live integration and homologation — Partial.** The live room uses the band's confirmed tempo and meter; it does not follow an arrangement map yet.
