@@ -128,6 +128,10 @@ test("add a song by pasting a link; every member finds the same reference, also 
   );
   await expect(states).toContainText("Arrangement ready for review");
   await expect(page.getByRole("spinbutton", { name: "Band BPM" })).toHaveValue(""); // nothing invented
+  // The next step is offered right away: let BandSync hear the recording.
+  await expect(page.getByTestId("listen-next")).toContainText(
+    "Now let BandSync hear the recording",
+  );
 
   // 4. The band's own values, the repertoire, and the end of the review.
   await page.getByRole("spinbutton", { name: "Band BPM" }).fill("72");

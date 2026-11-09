@@ -81,5 +81,10 @@ export async function connect() {
   if (!band.myPermissions.canEditRepertoire)
     throw new Error(`${email} cannot edit the repertoire of "${bandName}"`);
 
-  return { base, email, bandName, band, call, bandPath: `/api/bands/${band.id}` };
+  /** Plain GET with the session (for non-JSON resources such as the web app's files). */
+  async function raw(path) {
+    return fetch(`${base}${path}`, { redirect: "manual", headers: { cookie: cookie() } });
+  }
+
+  return { base, email, bandName, band, call, raw, bandPath: `/api/bands/${band.id}` };
 }

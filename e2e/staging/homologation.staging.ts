@@ -231,7 +231,7 @@ test("homologation: reference recordings with real platforms", async ({ browser 
   const states = ana.page.getByTestId("preparation-state");
 
   // 1. Pérola Negra: the confirmed link is the band's main reference.
-  await openSong(/Pérola Negra/);
+  await openSong(/^Pérola Negra/);
   await expect(block).toHaveAttribute("data-state", "identified");
   await expect(block).toContainText("Natiruts Part. Especial Luiz Melodia");
   await expect(block).toContainText("Acústico no Rio de Janeiro");
@@ -252,10 +252,21 @@ test("homologation: reference recordings with real platforms", async ({ browser 
     "identified",
   );
   await expect(states.locator('[data-item="audio"]')).toHaveAttribute("data-state", "none");
+  // Nothing analysed yet, unless the band has already listened to it.
   await expect(states.locator('[data-item="analysis"]')).toHaveAttribute(
     "data-state",
-    "not_possible",
+    /not_possible|done/,
   );
+  // The reference can be heard through the microphone. Opened and closed only: listening here
+  // would store estimates on the real song, and that is for the band to do with the real audio.
+  await states.getByRole("button", { name: /Ouvir pelo microfone|Ouvir de novo/ }).click();
+  const listen = ana.page.getByTestId("listen-dialog");
+  await expect(listen).toContainText("Nada é gravado nem enviado");
+  await expect(listen.getByRole("button", { name: "Começar a ouvir" })).toBeVisible();
+  await ana.page.screenshot({ path: `${SHOTS}/11c-ouvir-pelo-microfone.png` });
+  await ana.page.getByRole("dialog").getByRole("button", { name: "Fechar" }).first().click();
+  await expect(listen).toBeHidden();
+
   // Sources, catalogue data and links are kept under "Detalhes técnicos", closed by default.
   const technical = ana.page.getByTestId("technical-details");
   await expect(ana.page.getByText("Links de referência")).toBeHidden();
@@ -270,18 +281,18 @@ test("homologation: reference recordings with real platforms", async ({ browser 
   await ana.page.screenshot({ path: `${SHOTS}/11b-detalhes-tecnicos-perola.png`, fullPage: true });
 
   // 2. No confirmed link: the recording is known, the link stays pending, nothing is guessed.
-  await openSong(/Esotérico/);
+  await openSong(/^Esotérico/);
   await expect(block).toHaveAttribute("data-state", "link_pending");
   await expect(block).toContainText("Um Banda Um");
   await expect(block).toContainText("Link pendente");
   await expect(block.getByTestId("reference-player")).toHaveCount(0);
   await ana.page.screenshot({ path: `${SHOTS}/12-referencia-esoterico.png`, fullPage: true });
-  await openSong(/O Segundo Sol/);
+  await openSong(/^O Segundo Sol/);
   await expect(block).toHaveAttribute("data-state", "link_pending");
   await expect(block).toContainText("Cássia Reggae, Vol. 1");
 
   // 2b. Replacing a reference asks first, in words, with three choices. Cancelled: nothing changes.
-  await openSong(/Esotérico/);
+  await openSong(/^Esotérico/);
   await block.getByRole("button", { name: "Informar link" }).click();
   await ana.page.getByLabel("Link da gravação").fill(YT);
   await ana.page.getByRole("button", { name: "Identificar" }).click();
@@ -299,7 +310,7 @@ test("homologation: reference recordings with real platforms", async ({ browser 
   await ana.page.screenshot({ path: `${SHOTS}/12b-confirmar-substituicao.png` });
   await warning.getByRole("button", { name: "Cancelar" }).click();
   await expect(warning).toHaveCount(0);
-  await openSong(/Esotérico/);
+  await openSong(/^Esotérico/);
   await expect(block).toHaveAttribute("data-state", "link_pending");
   await expect(block).toContainText("Um Banda Um");
 

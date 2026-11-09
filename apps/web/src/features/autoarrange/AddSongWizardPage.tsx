@@ -8,7 +8,7 @@ import {
   type SongReferenceSummary,
 } from "@bandsync/shared";
 import { useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, Headphones, Link2, Search } from "lucide-react";
+import { ExternalLink, Headphones, Link2, Mic, Search } from "lucide-react";
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -31,6 +31,7 @@ import { formatDuration } from "../../lib/format";
 import { useCurrentBand } from "../bands/BandLayout";
 import { repKeys, useRepertoires, useSong } from "../repertoire/queries";
 import { PreparationList } from "./arrangement";
+import { ListenDialog } from "./listen/ListenDialog";
 import { JobProgress, ResultsList, ReviewForm } from "./parts";
 import {
   type PrepareResponse,
@@ -987,6 +988,7 @@ function PreparedView({
 
   const data = overview.data;
   const reference = data?.song.reference ?? null;
+  const [listening, setListening] = useState(false);
   return (
     <div className="grid gap-6 lg:grid-cols-2" data-testid="prepared" data-running={running}>
       <div className="flex min-w-0 flex-col gap-6">
@@ -994,6 +996,25 @@ function PreparedView({
           <Card>
             <h2 className="mb-3 text-lg font-semibold">{t("autoarrange:reference.heading")}</h2>
             <ReferenceSummaryView reference={reference} />
+          </Card>
+        ) : null}
+        {!running && data && reference && data.preparation.analysis !== "done" ? (
+          // Right after adding: the next step is to let BandSync hear the recording.
+          <Card className="border-accent-500/60" data-testid="listen-next">
+            <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
+              <Mic className="size-5 text-accent-500" /> {t("autoarrange:listen.nextTitle")}
+            </h2>
+            <p className="mb-3 text-sm text-muted">{t("autoarrange:listen.nextBody")}</p>
+            <Button size="lg" icon={<Mic className="size-5" />} onClick={() => setListening(true)}>
+              {t("autoarrange:listen.button")}
+            </Button>
+            <ListenDialog
+              open={listening}
+              onClose={() => setListening(false)}
+              bandId={bandId}
+              songId={songId}
+              reference={reference}
+            />
           </Card>
         ) : null}
         <Card>
