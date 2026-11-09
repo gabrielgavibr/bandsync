@@ -160,10 +160,14 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await ana.page.getByRole("button", { name: "Próxima música" }).click();
   await expect(bruno.page.getByText("Esotérico").first()).toBeVisible();
   await expect(bruno.page.getByText("2 de 3")).toBeVisible();
+  await expect(bruno.page.getByText("Tablatura de baixo · Baixo").first()).toBeVisible();
+  await expect(bruno.page.getByText("Este material ainda não foi adicionado.")).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/09-mobile-room-esoterico.png` });
   await ana.page.getByRole("button", { name: "Próxima música" }).click();
   await expect(bruno.page.getByText("O Segundo Sol").first()).toBeVisible();
   await expect(bruno.page.getByText("3 de 3")).toBeVisible();
+  await expect(bruno.page.getByText("Tablatura de baixo · Baixo").first()).toBeVisible();
+  await expect(bruno.page.getByText("Este material ainda não foi adicionado.")).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/10-mobile-room-segundo-sol.png` });
 
   // Leave the session running so testers find it; just close the browsers.
