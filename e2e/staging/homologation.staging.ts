@@ -28,6 +28,32 @@ async function enter(
   return { context, page };
 }
 
+/**
+ * Turns the sound on in the live room. The staging session is long-lived and shared with human
+ * testers, so a musician's click may have been left off; returns whether it was, so the check
+ * can put it back the way it found it.
+ */
+async function enableSound(page: Page): Promise<boolean> {
+  // The musician's own click switch in the bottom bar (the sound prompt has a similar label).
+  const toggle = page.locator("footer button[aria-pressed]").first();
+  await expect(toggle).toBeVisible();
+  const wasOff = (await toggle.getAttribute("aria-pressed")) === "false";
+  if (wasOff) {
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  }
+  // The browser's audio still has to be unlocked by a tap, unless it already is.
+  const enable = page.getByRole("button", { name: "Ativar som" }).first();
+  if (await enable.isVisible()) await enable.click();
+  return wasOff;
+}
+
+async function restoreClickOff(page: Page) {
+  const toggle = page.locator("footer button[aria-pressed]").first();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+}
+
 async function login(page: Page, email: string, password: string) {
   await expect(page).toHaveURL(/\/login/);
   await page.locator("input[name=email]").fill(email);
@@ -112,7 +138,7 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   }
   await expect(ana.page).toHaveURL(/\/rehearsal\/[0-9a-f-]+$/);
   const roomUrl = new URL(ana.page.url()).pathname;
-  await ana.page.getByRole("button", { name: "Ativar som" }).click();
+  const anaClickWasOff = await enableSound(ana.page);
 
   // Bassist on a phone.
   const bruno = await enter(browser, c.key, { ...devices["iPhone 13"] });
@@ -124,7 +150,7 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await expect(bruno.page.getByText(REAL)).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/05b-mobile-repertorios.png` });
   await bruno.page.goto(roomUrl);
-  await bruno.page.getByRole("button", { name: "Ativar som" }).click();
+  const brunoClickWasOff = await enableSound(bruno.page);
   await expect(bruno.page.getByText("Regente: Ana Ribeiro")).toBeVisible();
 
   // Conductor switches the session to the real repertoire and picks Pérola Negra.
@@ -180,7 +206,9 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await expect(bruno.page.getByText("Este material ainda não foi adicionado.")).toBeVisible();
   await bruno.page.screenshot({ path: `${SHOTS}/10-mobile-room-segundo-sol.png` });
 
-  // Leave the session running so testers find it; just close the browsers.
+  // Leave the session running so testers find it, with each musician's click as it was found.
+  if (brunoClickWasOff) await restoreClickOff(bruno.page);
+  if (anaClickWasOff) await restoreClickOff(ana.page);
   await ana.context.close();
   await bruno.context.close();
 });
