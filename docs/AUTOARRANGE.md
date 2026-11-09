@@ -2,9 +2,10 @@
 
 AutoArrange helps a band go from "we want to play this song" to "everyone has the right
 recording, the right references and a slot for their own material". It is built in stages.
-**Stage A (identification and sources) is implemented.** Audio analysis (stage B) is designed
-but **not implemented**: no tempo, key, chord or structure is produced by the system today, and
-the interface says so instead of showing invented values.
+**Stage A (identification and sources) is implemented.** **Stage B is implemented in part:**
+BandSync's own engine estimates tempo, beats, meter and key on the member's device, from the
+microphone while the reference plays or from an authorised audio file (section 16). Chords and
+sections are not produced yet. Every estimate is shown as "review needed" until the band confirms it.
 
 > **Read first:** songs are now added by pasting a link to the recording, and the song page is
 > built around one main reference recording. That flow, its platforms and its rules are described
@@ -281,3 +282,45 @@ sets the reference of the three real songs through the API: _Pérola Negra_ with
 YouTube link; _Esotérico_ (_Um Banda Um_) and _O Segundo Sol_ (_Cássia Reggae, Vol. 1_) with the
 link pending, because no exact link was confirmed. It is idempotent and never changes the band's
 own values.
+
+## 16. Listening to the reference (stage B, first part)
+
+A link to YouTube or Spotify can never be downloaded or analysed (platform terms; Spotify also
+closed its audio-analysis API to new apps in 2024). BandSync listens in the two ways that are
+allowed, both free and on the member's device:
+
+| Input                                           | How                                                                                                                                                                               | Kept                                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Microphone** ("Ouvir pelo microfone")         | The member plays the reference (in the app's player, another device or a speaker). The device listens for 15–60 s with echo cancellation, noise suppression and gain control off. | Nothing: the audio is analysed and discarded; only the results are sent. |
+| **Authorised file** ("Enviar áudio autorizado") | A file the band declares it may process (own recording, licensed, permission from the owner). Analysed right after the upload, or later with "Analisar".                          | The file, as before, tied to the reference recording.                    |
+
+**Engine** (`packages/shared/src/analysis/analyze.ts`, `bandsync-browser` `listen-v1`, no
+dependencies, runs in a Web Worker): mono 11 025 Hz; spectral-flux onset envelope; tempo from its
+autocorrelation with a log-normal prior around 120 BPM; beats by dynamic programming (Ellis 2007)
+with sub-frame refinement and a line fit for the final tempo; meter from where the strongest
+low-frequency accents fall in groups of 2, 3 or 4 beats; key from the chroma profile against the
+Krumhansl–Kessler profiles; tempo stability from ~10 s windows. About 0.5 s for a 4-minute song.
+
+**What is stored** (`POST /songs/:songId/analysis`, migration `0005_analysis_input.sql`): one
+`analysis_results` row per kind (`bpm`, `tempo_ambiguity`, `tempo_stability`, `time_signature`,
+`key`, `beats`) with `origin = audio_analysis`, method `bandsync-browser.microphone` or
+`.audio_file`, the engine version, how many seconds were analysed, the file when there is one,
+who ran it, the reference recording, `confidence = null`, `confidence_calibrated = false` and
+review state **needs review**. The band's tempo, key and meter are never filled in by it.
+
+**Review**: under each band value the latest estimates appear as suggestions ("Estimativa: 96 BPM
+· ou 48 BPM · Revisão necessária"). Tapping one fills the field; nothing is saved until "Confirmar".
+The estimate is then marked confirmed (same value) or corrected (another value), with who and when;
+the original estimate is kept.
+
+**Measured** on synthetic grooves with a known answer (`packages/shared/test/analysis.test.ts`):
+tempo within 0.3 BPM from 72 to 140 BPM, also through room noise; 4/4 and 3/4; keys C, D, Am, Em,
+F#m, with the relative key among the candidates; tempo drift detected; silence and clips shorter
+than 8 s refused. In the browser, with Chromium's fake microphone playing a synthetic groove,
+the app finds 96 BPM, A minor and 4/4 (`e2e/tests/listen.spec.ts`).
+
+**Not yet known**: accuracy on real recordings. No real song was available to measure, so the
+confidence is not calibrated and every value needs review. Expected weak points: half/double tempo
+(both readings are always shown — the band chooses, which matters for reggae), relative
+major/minor, compound meters such as 6/8, songs without a steady pulse, quiet or noisy rooms.
+Chords and section boundaries are the next part of stage B.

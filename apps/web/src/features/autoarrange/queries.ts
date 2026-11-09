@@ -1,5 +1,6 @@
 import {
   type AnalysisJobDto,
+  type AnalysisReport,
   type AnalysisResultDto,
   type AudioAssetDto,
   isRunningJob,
@@ -208,12 +209,28 @@ export function useEditReference(bandId: string, songId: string) {
   );
 }
 
+/** Stores an analysis run on this device (microphone or authorised file). */
+export function useSubmitAnalysis(bandId: string, songId: string) {
+  return useOverviewMutation(
+    bandId,
+    songId,
+    (
+      input: AnalysisReport & { input: "microphone" | "audio_file"; audioAssetId?: string | null },
+    ) => http.post<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/analysis`, input),
+  );
+}
+
 /** Registers an uploaded file as audio the band declares it may process, for the reference. */
 export function useDeclareAudio(bandId: string, songId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: { fileId: string; rightsBasis: string; rightsNote: string | null }) =>
-      http.post(`${base(bandId)}/songs/${songId}/audio-assets`, { ...input, declaration: true }),
+      http
+        .post<{ audioAsset: AudioAssetDto }>(`${base(bandId)}/songs/${songId}/audio-assets`, {
+          ...input,
+          declaration: true,
+        })
+        .then((r) => r.audioAsset),
     onSuccess: () => qc.invalidateQueries({ queryKey: aaKeys.overview(bandId, songId) }),
   });
 }

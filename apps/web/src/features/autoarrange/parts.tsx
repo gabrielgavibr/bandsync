@@ -13,7 +13,6 @@ import { Check, CircleDashed, ExternalLink, Loader2, MinusCircle, XCircle } from
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge, Button, useToast } from "../../components/ui";
-// removed "../../lib/api";
 import { cn } from "../../lib/cn";
 import { errorText } from "../../lib/errors";
 import { formatDateTime, formatDuration } from "../../lib/format";
@@ -189,6 +188,12 @@ function formatValue(r: AnalysisResultDto): string {
       return Array.isArray(v.names) ? (v.names as string[]).join(", ") : "—";
     case "bpm":
       return typeof v.bpm === "number" ? String(v.bpm) : "—";
+    case "tempo_ambiguity":
+      return Array.isArray(v.alternatives) ? (v.alternatives as number[]).join(" / ") : "—";
+    case "tempo_stability":
+      return typeof v.cv === "number" ? `±${Math.round(v.cv * 1000) / 10}%` : "—";
+    case "beats":
+      return typeof v.count === "number" ? String(v.count) : "—";
     case "key":
       return typeof v.key === "string" ? v.key : "—";
     case "time_signature":
@@ -279,6 +284,40 @@ function ConfirmationLine({ c }: { c: Confirmation | null }) {
   );
 }
 
+/** Values the analysis estimated, offered to fill a field. Nothing is saved until "Confirm". */
+function Suggestions({
+  values,
+  unit,
+  onPick,
+  testId,
+}: {
+  values: string[];
+  unit?: string;
+  onPick: (v: string) => void;
+  testId: string;
+}) {
+  const { t } = useTranslation("autoarrange");
+  if (values.length === 0) return null;
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs" data-testid={testId}>
+      <span className="text-muted">{t("review.estimate")}</span>
+      {values.map((v, i) => (
+        <button
+          key={v}
+          type="button"
+          onClick={() => onPick(v)}
+          className="rounded-full border border-warn-500/50 bg-warn-500/10 px-2.5 py-1 font-medium hover:bg-warn-500/20"
+        >
+          {i > 0 ? `${t("review.or")} ` : ""}
+          {v}
+          {unit ? ` ${unit}` : ""}
+        </button>
+      ))}
+      <span className="text-muted">· {t("results.review.needs_review")}</span>
+    </div>
+  );
+}
+
 /** The band confirms its own tempo, key and meter. These values feed the live rehearsal. */
 export function ReviewForm({
   bandId,
@@ -306,6 +345,38 @@ export function ReviewForm({
       onSuccess: () => toast(t("autoarrange:review.saved"), "success"),
       onError: (err) => toast(errorText(err), "error"),
     });
+  // The latest estimate of each kind for the current reference recording, if any.
+  const reference = overview.recordings.find((r) => r.isReference) ?? null;
+  const estimate = (kind: string) =>
+    overview.results.find(
+      (r) =>
+        r.kind === kind &&
+        r.origin === "audio_analysis" &&
+        (!reference || r.recordingId === reference.id),
+    ) ?? null;
+  const bpmEst = estimate("bpm");
+  const keyEst = estimate("key");
+  const meterEst = estimate("time_signature");
+  const bpmChoices = bpmEst
+    ? [
+        Number(bpmEst.value.bpm),
+        ...((bpmEst.value.candidates as { bpm: number; score: number }[] | undefined) ?? [])
+          .filter((c) => c.score >= 0.7 && Math.abs(c.bpm - Number(bpmEst.value.bpm)) > 1)
+          .map((c) => c.bpm),
+      ].map((b) => Math.round(b))
+    : [];
+  const keyChoices = keyEst
+    ? (
+        (keyEst.value.candidates as { key: string }[] | undefined) ?? [
+          { key: String(keyEst.value.key) },
+        ]
+      )
+        .slice(0, 2)
+        .map((c) => c.key)
+    : [];
+  const meterChoice = meterEst ? `${meterEst.value.beatsPerBar}/${meterEst.value.beatUnit}` : null;
+  /** The estimate a confirmation refers to: confirmed as is, or corrected (the server tells). */
+  const resultFor = (r: AnalysisResultDto | null) => (r ? r.id : null);
   const bpmNumber = Number(bpm);
   const bpmValid = bpm !== "" && bpmNumber >= LIMITS.bpmMin && bpmNumber <= LIMITS.bpmMax;
   const control =
@@ -329,7 +400,7 @@ export function ReviewForm({
           />
         </label>
         <Button
-          onClick={() => send({ target: "band_bpm", bpm: bpmNumber })}
+          onClick={() => send({ target: "band_bpm", bpm: bpmNumber, resultId: resultFor(bpmEst) })}
           disabled={!bpmValid}
           loading={review.isPending}
           aria-label={`${t("autoarrange:review.confirm")} ${t("autoarrange:review.bpm")}`}
@@ -338,6 +409,12 @@ export function ReviewForm({
         </Button>
         <div className="col-span-2 -mt-1">
           <ConfirmationLine c={overview.confirmations.band_bpm} />
+          <Suggestions
+            testId="suggest-bpm"
+            values={bpmChoices.map(String)}
+            unit="BPM"
+            onPick={(v) => setBpm(v)}
+          />
         </div>
       </div>
       <div className="grid grid-cols-[1fr_auto] items-end gap-2">
@@ -352,7 +429,7 @@ export function ReviewForm({
           />
         </label>
         <Button
-          onClick={() => send({ target: "band_key", key: key.trim() })}
+          onClick={() => send({ target: "band_key", key: key.trim(), resultId: resultFor(keyEst) })}
           disabled={key.trim() === ""}
           loading={review.isPending}
           aria-label={`${t("autoarrange:review.confirm")} ${t("autoarrange:review.key")}`}
@@ -361,6 +438,7 @@ export function ReviewForm({
         </Button>
         <div className="col-span-2 -mt-1">
           <ConfirmationLine c={overview.confirmations.band_key} />
+          <Suggestions testId="suggest-key" values={keyChoices} onPick={(v) => setKey(v)} />
         </div>
       </div>
       <div className="grid grid-cols-[1fr_auto] items-end gap-2">
@@ -380,7 +458,12 @@ export function ReviewForm({
         <Button
           onClick={() => {
             const [a, b] = meter.split("/").map(Number);
-            send({ target: "band_meter", beatsPerBar: a!, beatUnit: b! });
+            send({
+              target: "band_meter",
+              beatsPerBar: a!,
+              beatUnit: b!,
+              resultId: resultFor(meterEst),
+            });
           }}
           loading={review.isPending}
           aria-label={`${t("autoarrange:review.confirm")} ${t("autoarrange:review.meter")}`}
@@ -389,6 +472,11 @@ export function ReviewForm({
         </Button>
         <div className="col-span-2 -mt-1">
           <ConfirmationLine c={overview.confirmations.band_meter} />
+          <Suggestions
+            testId="suggest-meter"
+            values={meterChoice ? [meterChoice] : []}
+            onPick={(v) => setMeter(v)}
+          />
         </div>
       </div>
     </div>

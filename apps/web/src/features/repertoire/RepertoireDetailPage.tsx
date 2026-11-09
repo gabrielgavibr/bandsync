@@ -14,7 +14,6 @@ import {
   useToast,
 } from "../../components/ui";
 import { errorText } from "../../lib/errors";
-// removed "../../lib/api";
 import { ReferenceOpenLink } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useRepertoire, useRepertoireMutations, useSongs } from "./queries";

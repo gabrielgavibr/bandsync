@@ -1,4 +1,5 @@
 import {
+  type AnalysisInput,
   type AnalysisJobDto,
   type AnalysisResultDto,
   type AudioAssetDto,
@@ -788,6 +789,11 @@ interface ResultRow {
   reviewed_by: string | null;
   reviewed_by_name: string | null;
   reviewed_at: string | null;
+  input_source: AnalysisInput | null;
+  audio_asset_id: string | null;
+  analysed_seconds: number | null;
+  created_by: string | null;
+  created_by_name: string | null;
   created_at: string;
 }
 
@@ -808,11 +814,16 @@ const toResultDto = (r: ResultRow): AnalysisResultDto => ({
   reviewedBy: r.reviewed_by,
   reviewedByName: r.reviewed_by_name,
   reviewedAt: r.reviewed_at,
+  input: r.input_source,
+  audioAssetId: r.audio_asset_id,
+  analysedSeconds: r.analysed_seconds,
+  createdBy: r.created_by,
+  createdByName: r.created_by_name,
   createdAt: r.created_at,
 });
 
-const RESULT_SELECT = `SELECT r.*, u.display_name AS reviewed_by_name FROM analysis_results r
-  LEFT JOIN users u ON u.id = r.reviewed_by`;
+const RESULT_SELECT = `SELECT r.*, u.display_name AS reviewed_by_name, c.display_name AS created_by_name
+  FROM analysis_results r LEFT JOIN users u ON u.id = r.reviewed_by LEFT JOIN users c ON c.id = r.created_by`;
 
 export async function listResults(db: D1Database, songId: string): Promise<AnalysisResultDto[]> {
   const { results } = await db
@@ -847,6 +858,10 @@ export interface ResultInput {
   confidenceCalibrated?: boolean;
   origin: ResultOrigin;
   sourceUrl?: string | null;
+  input?: AnalysisInput | null;
+  audioAssetId?: string | null;
+  analysedSeconds?: number | null;
+  createdBy?: string | null;
 }
 
 /**
@@ -871,8 +886,9 @@ export async function insertResult(
   await db
     .prepare(
       `INSERT INTO analysis_results (id, band_id, song_id, recording_id, job_id, kind, value, method, method_version, confidence,
-         confidence_calibrated, origin, source_url, review_status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         confidence_calibrated, origin, source_url, review_status, created_at, input_source, audio_asset_id,
+         analysed_seconds, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
@@ -890,6 +906,10 @@ export async function insertResult(
       input.sourceUrl ?? null,
       initialReviewStatus(input.origin, input.confidence ?? null, calibrated),
       nowIso(),
+      input.input ?? null,
+      input.audioAssetId ?? null,
+      input.analysedSeconds ?? null,
+      input.createdBy ?? null,
     )
     .run();
   return { id, created: true };

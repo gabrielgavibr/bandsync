@@ -193,8 +193,8 @@ band's values and never forces a replacement the API asks to confirm.
 - Short links (`spotify.link`) are refused because resolving them would mean following redirects
   to arbitrary addresses.
 - One reference per song; several band versions of one song are not modelled in the interface.
-- There is no analysis engine: authorised audio can be uploaded and is reported as "analysis
-  pending".
+- Analysis covers tempo, beats, meter and key; chords and sections are not estimated yet. A
+  link is never analysed: the microphone or an authorised file is.
 
 ## 12. Tests
 

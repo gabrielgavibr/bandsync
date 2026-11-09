@@ -18,7 +18,6 @@ import {
   useToast,
 } from "../../components/ui";
 import { errorText } from "../../lib/errors";
-// removed "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { useCurrentBand } from "./BandLayout";

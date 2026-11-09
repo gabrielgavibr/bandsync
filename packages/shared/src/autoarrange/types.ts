@@ -240,6 +240,12 @@ export interface AnalysisResultDto {
   reviewedBy: string | null;
   reviewedByName: string | null;
   reviewedAt: string | null;
+  /** What an audio analysis listened to; null for data read from a source. */
+  input: AnalysisInput | null;
+  audioAssetId: string | null;
+  analysedSeconds: number | null;
+  createdBy: string | null;
+  createdByName: string | null;
   createdAt: string;
 }
 
@@ -464,8 +470,13 @@ export interface PreparationState {
   reference: "none" | "link_pending" | "identified";
   player: "none" | "available" | "unavailable";
   audio: "none" | "available";
-  /** not_possible: no authorised audio. pending: audio exists but nothing analysed it yet. */
+  /**
+   * not_possible: nothing analysed and no authorised file (the microphone can still be used);
+   * pending: an authorised file exists but has not been analysed; done: estimates exist.
+   */
   analysis: "not_possible" | "pending" | "done";
+  /** What the latest analysis of the reference listened to. */
+  analysisFrom: AnalysisInput | null;
   arrangement: "not_started" | "ready_for_review" | "reviewed";
 }
 
@@ -483,3 +494,72 @@ export function hasReferenceDependents(d: ReferenceDependents): boolean {
     d.analyses + d.audioAssets + d.sections + d.readyMaterials > 0 || d.confirmedValues.length > 0
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Analysis done on a member's device                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * microphone – the device listened while a member played the reference (nothing recorded or kept);
+ * audio_file – an audio file the band declared it may process.
+ * A link to YouTube or Spotify is never an analysis input.
+ */
+export const ANALYSIS_INPUTS = ["microphone", "audio_file"] as const;
+export type AnalysisInput = (typeof ANALYSIS_INPUTS)[number];
+
+const finite = (min: number, max: number) => z.number().finite().min(min).max(max);
+const keyLabel = z.string().regex(/^[A-G][#b]?m?$/);
+const keyChoice = z.object({
+  key: keyLabel,
+  tonic: z.number().int().min(0).max(11),
+  mode: z.enum(["major", "minor"]),
+  score: finite(-1, 1),
+});
+
+/** What the browser engine reports (see packages/shared/src/analysis/analyze.ts). */
+export const submitAnalysisSchema = z
+  .object({
+    input: z.enum(ANALYSIS_INPUTS),
+    audioAssetId: idSchema.optional().nullable(),
+    engine: z.literal("bandsync-browser"),
+    engineVersion: z.string().trim().min(1).max(20),
+    analysedSeconds: finite(5, 3600),
+    signal: z.object({
+      rms: finite(0, 2),
+      peak: finite(0, 2),
+      silentRatio: finite(0, 1),
+      tooQuiet: z.boolean(),
+    }),
+    bpm: z
+      .object({
+        value: finite(20, 400),
+        ambiguous: z.boolean(),
+        candidates: z.array(z.object({ bpm: finite(20, 400), score: finite(0, 10) })).max(6),
+      })
+      .nullable(),
+    stability: z
+      .object({ cv: finite(0, 10), windows: z.number().int().min(0).max(100_000) })
+      .nullable(),
+    beats: z.array(finite(0, 3600)).max(5000),
+    meter: z
+      .object({
+        beatsPerBar: z.number().int().min(2).max(12),
+        beatUnit: z.literal(4),
+        candidates: z
+          .array(z.object({ beatsPerBar: z.number().int().min(2).max(12), score: finite(0, 10) }))
+          .max(4),
+      })
+      .nullable(),
+    key: z
+      .object({
+        key: keyLabel,
+        tonic: z.number().int().min(0).max(11),
+        mode: z.enum(["major", "minor"]),
+        candidates: z.array(keyChoice).max(4),
+      })
+      .nullable(),
+  })
+  .refine((v) => v.input !== "audio_file" || !!v.audioAssetId, {
+    message: "an audio file analysis names the file",
+  });
+export type SubmitAnalysisInput = z.infer<typeof submitAnalysisSchema>;

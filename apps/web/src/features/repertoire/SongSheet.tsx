@@ -13,7 +13,6 @@ import {
   useToast,
 } from "../../components/ui";
 import { errorText } from "../../lib/errors";
-// removed "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { useAddReference, useDeleteReference } from "./queries";
 

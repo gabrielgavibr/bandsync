@@ -60,7 +60,7 @@
   },
   "skip": {
     "no_recording_identifier": "No recording identifier: nothing was looked up at the source.",
-    "no_authorized_audio": "No authorised audio file was provided.",
+    "no_authorized_audio": "No authorised audio file was provided. Use “Listen with the microphone” to estimate tempo and key.",
     "engine_not_configured": "The audio analysis engine is not configured in this environment yet.",
     "nothing_to_do": "Nothing to do."
   },
@@ -137,7 +137,9 @@
     "confirmedBy": "Confirmed by {{name}} on {{date}}",
     "notConfirmed": "Not confirmed yet",
     "saved": "Confirmation recorded",
-    "beforeReferenceChange": "confirmed before the reference changed; check again"
+    "beforeReferenceChange": "confirmed before the reference changed; check again",
+    "estimate": "Estimate:",
+    "or": "or"
   },
   "repertoire": {
     "heading": "Add to a repertoire",
@@ -224,14 +226,19 @@
     "audio": {
       "none": "Audio not available for analysis",
       "available": "Authorised audio available",
-      "noneHint": "A link does not allow downloading or processing the audio. To analyse, upload a file the band may use."
+      "noneHint": "A link does not allow downloading or processing the audio. Upload a file the band may use, or use the microphone."
     },
     "analysis": {
       "not_possible": "Analysis not done",
       "pending": "Analysis pending",
       "done": "Analysis done",
-      "pendingHint": "There is authorised audio, but the analysis engine is not configured yet. No value is estimated.",
-      "noneHint": "BPM, key, meter and structure are whatever the band enters."
+      "pendingHint": "There is an authorised file not analysed yet.",
+      "noneHint": "Play the reference and let BandSync listen through the microphone, or upload an authorised file. BPM, key and meter are only estimated from audio.",
+      "doneFrom": {
+        "microphone": "Analysis done (microphone)",
+        "audio_file": "Analysis done (audio file)"
+      },
+      "doneHint": "BandSync's estimates, review needed. Confirm the band's values above."
     },
     "arrangement": {
       "not_started": "Preparation not started",
@@ -298,5 +305,42 @@
     "previous": "Previous references",
     "until": "until {{date}}",
     "noHistory": "No change recorded."
+  },
+  "listen": {
+    "button": "Listen with the microphone",
+    "listenAgain": "Listen again",
+    "analyseFile": "Analyse “{{name}}”",
+    "title": "Listen to the reference recording",
+    "intro": "Play the reference recording and let BandSync listen through this device's microphone for up to a minute. It estimates tempo, beats, meter and key.",
+    "tip1": "Normal volume, close to the device, in a quiet room.",
+    "tip2": "It can play on another device, a speaker or the player below.",
+    "tip3": "Start where the whole band is playing (not the intro).",
+    "playHere": "Play the reference here",
+    "privacy": "The audio is analysed on this device only and then discarded. Nothing is recorded or sent: only the results.",
+    "start": "Start listening",
+    "listening": "Listening…",
+    "level": "Sound level",
+    "progress": "{{seconds}} s of {{max}} s",
+    "quiet": "Almost nothing reaches the microphone. Turn the volume up or move the device closer.",
+    "keepGoing": "Keep playing ({{seconds}} s)",
+    "stop": "Stop and analyse",
+    "analysing": "Analysing…",
+    "saved": "Analysis saved. The values are estimates for the band to review.",
+    "wasQuiet": "The sound came in very low: check the values carefully.",
+    "again": "Listen again",
+    "review": "Review",
+    "notFound": "not identified",
+    "or": "(or {{values}})",
+    "beats_one": "{{count}} beat in {{seconds}} s",
+    "beats_other": "{{count}} beats in {{seconds}} s",
+    "reviewHint": "Check by ear and confirm under “Band arrangement”.",
+    "error": {
+      "mic_denied": "Microphone access was denied. Allow the microphone for this site in the browser settings and try again.",
+      "mic_unavailable": "This device's microphone could not be used.",
+      "too_short": "Too little audio. Listen for at least 15 seconds.",
+      "no_signal": "Almost no sound was picked up. Turn the volume up or move the device closer.",
+      "decode_failed": "This audio file could not be read.",
+      "failed": "The analysis could not finish. Try again."
+    }
   }
 }

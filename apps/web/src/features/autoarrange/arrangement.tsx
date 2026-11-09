@@ -4,17 +4,26 @@ import {
   type SongDto,
   type SongMaterialDto,
 } from "@bandsync/shared";
-import { Check, CircleDashed, ListMusic, TriangleAlert, Upload } from "lucide-react";
+import {
+  AudioLines,
+  Check,
+  CircleDashed,
+  ListMusic,
+  Mic,
+  TriangleAlert,
+  Upload,
+} from "lucide-react";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Badge, Button, Card, Dialog, Input, Select, useToast } from "../../components/ui";
-// removed "../../lib/api";
 import { cn } from "../../lib/cn";
 import { errorText } from "../../lib/errors";
 import { formatDateTime } from "../../lib/format";
 import { useUploadFile } from "../repertoire/queries";
 import { ReferencesCard, SongSheet } from "../repertoire/SongSheet";
+import { ListenError } from "./listen/audio";
+import { ListenDialog, useAnalyseFile } from "./listen/ListenDialog";
 import { JobProgress, ResultsList, ReviewForm } from "./parts";
 import {
   type SongAnalysisOverview,
@@ -79,7 +88,27 @@ export function PreparationList({
   const p: PreparationState = overview.preparation;
   const action = useJobAction(bandId, songId);
   const [uploading, setUploading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const fileAnalysis = useAnalyseFile(bandId, songId);
+  const { toast } = useToast();
   const latestJob = overview.jobs[0] ?? null;
+  const reference = overview.song.reference;
+  // Files whose analysis is not stored yet.
+  const analysedFiles = new Set(
+    overview.results.filter((r) => r.audioAssetId).map((r) => r.audioAssetId!),
+  );
+  const unanalysed = overview.audioAssets.filter((a) => !analysedFiles.has(a.id));
+  const analyseFile = async (assetId: string, fileId: string) => {
+    try {
+      await fileAnalysis.run(assetId, { fileId });
+      toast(t("autoarrange:listen.saved"), "success");
+    } catch (err) {
+      toast(
+        err instanceof ListenError ? t(`autoarrange:listen.error.${err.code}`) : errorText(err),
+        "error",
+      );
+    }
+  };
   const hint = (text: string) => <p className="text-xs text-muted">{text}</p>;
 
   return (
@@ -133,10 +162,43 @@ export function PreparationList({
           item="analysis"
           state={p.analysis}
           tone={p.analysis === "done" ? "ok" : p.analysis === "pending" ? "warn" : "neutral"}
-          label={t(`autoarrange:state.analysis.${p.analysis}`)}
+          label={
+            p.analysis === "done" && p.analysisFrom
+              ? t(`autoarrange:state.analysis.doneFrom.${p.analysisFrom}`)
+              : t(`autoarrange:state.analysis.${p.analysis}`)
+          }
         >
           {p.analysis === "pending" ? hint(t("autoarrange:state.analysis.pendingHint")) : null}
           {p.analysis === "not_possible" ? hint(t("autoarrange:state.analysis.noneHint")) : null}
+          {p.analysis === "done" ? hint(t("autoarrange:state.analysis.doneHint")) : null}
+          {canEdit && reference ? (
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant={p.analysis === "done" ? "ghost" : "primary"}
+                icon={<Mic className="size-4" />}
+                onClick={() => setListening(true)}
+                className={p.analysis === "done" ? "-ml-3" : undefined}
+              >
+                {p.analysis === "done"
+                  ? t("autoarrange:listen.listenAgain")
+                  : t("autoarrange:listen.button")}
+              </Button>
+              {unanalysed.map((a) => (
+                <Button
+                  key={a.id}
+                  size="sm"
+                  variant="secondary"
+                  icon={<AudioLines className="size-4" />}
+                  loading={fileAnalysis.busy === a.id}
+                  disabled={!!fileAnalysis.busy}
+                  onClick={() => void analyseFile(a.id, a.fileId)}
+                >
+                  {t("autoarrange:listen.analyseFile", { name: a.fileName })}
+                </Button>
+              ))}
+            </div>
+          ) : null}
         </StateRow>
         <StateRow
           item="arrangement"
@@ -174,6 +236,13 @@ export function PreparationList({
         bandId={bandId}
         songId={songId}
       />
+      <ListenDialog
+        open={listening}
+        onClose={() => setListening(false)}
+        bandId={bandId}
+        songId={songId}
+        reference={reference}
+      />
     </>
   );
 }
@@ -193,10 +262,11 @@ function AudioDialog({
   const { t } = useTranslation(["autoarrange", "common"]);
   const upload = useUploadFile(bandId);
   const declare = useDeclareAudio(bandId, songId);
+  const fileAnalysis = useAnalyseFile(bandId, songId);
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [declared, setDeclared] = useState(false);
-  const busy = upload.isPending || declare.isPending;
+  const busy = upload.isPending || declare.isPending || !!fileAnalysis.busy;
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -204,12 +274,22 @@ function AudioDialog({
     const fd = new FormData(e.currentTarget);
     try {
       const uploaded = await upload.mutateAsync(file);
-      await declare.mutateAsync({
+      const asset = await declare.mutateAsync({
         fileId: uploaded.id,
         rightsBasis: String(fd.get("rights")),
         rightsNote: String(fd.get("note") ?? "").trim() || null,
       });
       toast(t("autoarrange:audio.saved"), "success");
+      // The file is right here: analyse it now, on this device.
+      try {
+        await fileAnalysis.run(asset.id, file);
+        toast(t("autoarrange:listen.saved"), "success");
+      } catch (err) {
+        toast(
+          err instanceof ListenError ? t(`autoarrange:listen.error.${err.code}`) : errorText(err),
+          "error",
+        );
+      }
       setFile(null);
       setDeclared(false);
       onClose();

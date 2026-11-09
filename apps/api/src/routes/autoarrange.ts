@@ -16,12 +16,14 @@ import {
   type RecordingDetails,
   type ReferenceLinkInfo,
   type ReferencePlatform,
+  type ResultKind,
   recordingPageUrl,
   reviewSchema,
   type SongDto,
   type SongRecordingDto,
   searchRecordingsSchema,
   setReferenceLinkSchema,
+  submitAnalysisSchema,
   workAuthors,
   youtubeLookupSchema,
 } from "@bandsync/shared";
@@ -41,6 +43,7 @@ import {
   getReferenceRecording,
   getResult,
   insertJob,
+  insertResult,
   insertReviewEvent,
   listAudioAssets,
   listJobs,
@@ -570,9 +573,10 @@ async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
   const audioForReference = audioAssets.filter(
     (a) => !reference || a.recordingId === null || a.recordingId === reference.id,
   );
-  const analysed = results.some(
+  const analyses = results.filter(
     (r) => r.origin === "audio_analysis" && (!reference || r.recordingId === reference.id),
   );
+  const analysed = analyses.length > 0;
   const latestJob = jobs[0] ?? null;
   const preparation: PreparationState = {
     reference: !reference ? "none" : reference.link ? "identified" : "link_pending",
@@ -583,6 +587,8 @@ async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
         : "available",
     audio: audioForReference.length > 0 ? "available" : "none",
     analysis: analysed ? "done" : audioForReference.length > 0 ? "pending" : "not_possible",
+    // Results are listed newest first.
+    analysisFrom: analyses[0]?.input ?? null,
     arrangement:
       latestJob?.status === "completed"
         ? "reviewed"
@@ -780,4 +786,84 @@ autoArrangeRoutes.post("/songs/:songId/audio-assets", requireRepertoireEditor, a
     metadata: { assetId: id, rightsBasis: input.rightsBasis },
   });
   return c.json({ audioAsset: await getAudioAsset(c.env.DB, song.id, id) }, 201);
+});
+
+/**
+ * Stores an analysis BandSync's own engine ran on a member's device: from the microphone while the
+ * reference was playing, or from an audio file the band declared it may process. The server cannot
+ * re-run it, so every value is kept as an uncalibrated estimate ("needs review"), with what it
+ * listened to, for how long and who ran it. The band's own values are not touched.
+ */
+autoArrangeRoutes.post("/songs/:songId/analysis", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const user = c.get("user");
+  const db = c.env.DB;
+  const song = await getSong(db, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  await limitExternal(c, "analysis", 20);
+  const input = await parseBody(c, submitAnalysisSchema);
+
+  let recording: SongRecordingDto | null = null;
+  if (input.input === "audio_file") {
+    const asset = await getAudioAsset(db, song.id, input.audioAssetId!);
+    if (!asset) throw notFound("audio asset");
+    recording = asset.recordingId
+      ? await getRecording(db, song.id, asset.recordingId)
+      : await getReferenceRecording(db, song.id);
+  } else {
+    // Listening only makes sense against the recording the band chose as its reference.
+    recording = await getReferenceRecording(db, song.id);
+    if (!recording)
+      throw new ApiError("not_found", "the song has no reference recording", {
+        reason: "no_reference",
+      });
+  }
+
+  const common = {
+    bandId,
+    songId: song.id,
+    recordingId: recording?.id ?? null,
+    jobId: null,
+    origin: "audio_analysis" as const,
+    method: `${input.engine}.${input.input}`,
+    methodVersion: input.engineVersion,
+    // No calibration on real recordings yet: the confidence is unknown, so a person must review.
+    confidence: null,
+    confidenceCalibrated: false,
+    input: input.input,
+    audioAssetId: input.input === "audio_file" ? input.audioAssetId! : null,
+    analysedSeconds: input.analysedSeconds,
+    createdBy: user.id,
+  };
+  const stored: string[] = [];
+  const store = async (kind: ResultKind, value: Record<string, unknown>) => {
+    await insertResult(db, { ...common, kind, value });
+    stored.push(kind);
+  };
+  if (input.bpm)
+    await store("bpm", {
+      bpm: Math.round(input.bpm.value * 10) / 10,
+      ambiguous: input.bpm.ambiguous,
+      candidates: input.bpm.candidates,
+    });
+  if (input.bpm?.ambiguous)
+    await store("tempo_ambiguity", {
+      alternatives: input.bpm.candidates
+        .filter((x) => x.score >= 0.7)
+        .map((x) => Math.round(x.bpm * 10) / 10),
+    });
+  if (input.stability) await store("tempo_stability", input.stability);
+  if (input.meter) await store("time_signature", input.meter);
+  if (input.key) await store("key", input.key);
+  if (input.beats.length > 0)
+    await store("beats", { count: input.beats.length, times: input.beats });
+  await audit(db, {
+    bandId,
+    actorUserId: user.id,
+    action: "analysis.submitted",
+    targetType: "song",
+    targetId: song.id,
+    metadata: { input: input.input, seconds: input.analysedSeconds, kinds: stored },
+  });
+  return c.json(await overview(c, bandId, song.id), 201);
 });

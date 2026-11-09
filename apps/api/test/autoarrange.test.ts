@@ -276,6 +276,7 @@ describe("preparing a song", () => {
       player: "available",
       audio: "none",
       analysis: "not_possible",
+      analysisFrom: null,
       arrangement: "ready_for_review",
     });
 

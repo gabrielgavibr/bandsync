@@ -31,7 +31,9 @@ export default defineConfig({
       timeout: 30_000,
     },
     {
-      command: "pnpm --filter @bandsync/api dev:e2e",
+      // Pending migrations are applied first, so a fresh checkout runs against the current schema.
+      command:
+        "pnpm --filter @bandsync/api db:migrate:local && pnpm --filter @bandsync/api dev:e2e",
       url: "http://localhost:8787/api/health",
       reuseExistingServer: true,
       cwd: "..",

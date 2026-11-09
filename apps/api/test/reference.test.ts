@@ -245,6 +245,7 @@ describe("adding a song from a link", () => {
       player: "available",
       audio: "none",
       analysis: "not_possible",
+      analysisFrom: null,
       arrangement: "ready_for_review",
     });
     expect(o.results).toEqual([]);
@@ -368,6 +369,7 @@ describe("adding a song from a link", () => {
       player: "none",
       audio: "none",
       analysis: "not_possible",
+      analysisFrom: null,
       arrangement: "not_started",
     });
     expect(

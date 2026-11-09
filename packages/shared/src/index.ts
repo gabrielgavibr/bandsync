@@ -1,3 +1,4 @@
+export * from "./analysis/analyze";
 export * from "./api/schemas";
 export * from "./autoarrange/jobs";
 export * from "./autoarrange/musicbrainz";

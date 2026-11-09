@@ -13,7 +13,6 @@ import {
   useToast,
 } from "../../components/ui";
 import { errorText } from "../../lib/errors";
-// removed "../../lib/api";
 import { formatDateTime } from "../../lib/format";
 import { useCurrentBand } from "./BandLayout";
 import { useCreateInvite, useInvites, useRevokeInvite } from "./queries";

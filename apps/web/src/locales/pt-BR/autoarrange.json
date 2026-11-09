@@ -60,7 +60,7 @@
   },
   "skip": {
     "no_recording_identifier": "Sem identificador da gravação: nada foi consultado na fonte.",
-    "no_authorized_audio": "Nenhum arquivo de áudio autorizado foi fornecido.",
+    "no_authorized_audio": "Nenhum arquivo de áudio autorizado foi fornecido. Use “Ouvir pelo microfone” para estimar andamento e tom.",
     "engine_not_configured": "O motor de análise de áudio ainda não está configurado neste ambiente.",
     "nothing_to_do": "Nada a fazer."
   },
@@ -137,7 +137,9 @@
     "confirmedBy": "Confirmado por {{name}} em {{date}}",
     "notConfirmed": "Ainda não confirmado",
     "saved": "Confirmação registrada",
-    "beforeReferenceChange": "confirmado antes da troca de referência; confira de novo"
+    "beforeReferenceChange": "confirmado antes da troca de referência; confira de novo",
+    "estimate": "Estimativa:",
+    "or": "ou"
   },
   "repertoire": {
     "heading": "Incluir no repertório",
@@ -224,14 +226,19 @@
     "audio": {
       "none": "Áudio não disponível para análise",
       "available": "Áudio autorizado disponível",
-      "noneHint": "Um link não autoriza baixar nem processar o áudio. Para analisar, envie um arquivo que a banda possa usar."
+      "noneHint": "Um link não autoriza baixar nem processar o áudio. Envie um arquivo que a banda possa usar, ou use o microfone."
     },
     "analysis": {
       "not_possible": "Análise não realizada",
       "pending": "Análise pendente",
       "done": "Análise realizada",
-      "pendingHint": "Há áudio autorizado, mas o motor de análise ainda não está configurado. Nenhum valor é estimado.",
-      "noneHint": "BPM, tom, compasso e estrutura são os que a banda informar."
+      "pendingHint": "Há um arquivo autorizado ainda não analisado.",
+      "noneHint": "Toque a referência e deixe o BandSync ouvir pelo microfone, ou envie um arquivo autorizado. BPM, tom e compasso só são estimados a partir do áudio.",
+      "doneFrom": {
+        "microphone": "Análise realizada (pelo microfone)",
+        "audio_file": "Análise realizada (arquivo de áudio)"
+      },
+      "doneHint": "Estimativas do BandSync, com revisão necessária. Confirme os valores da banda acima."
     },
     "arrangement": {
       "not_started": "Preparação não iniciada",
@@ -298,5 +305,42 @@
     "previous": "Referências anteriores",
     "until": "até {{date}}",
     "noHistory": "Nenhuma alteração registrada."
+  },
+  "listen": {
+    "button": "Ouvir pelo microfone",
+    "listenAgain": "Ouvir de novo",
+    "analyseFile": "Analisar “{{name}}”",
+    "title": "Ouvir a gravação de referência",
+    "intro": "Toque a gravação de referência e deixe o BandSync escutar pelo microfone deste aparelho por até 1 minuto. Ele estima andamento, batidas, compasso e tom.",
+    "tip1": "Use volume normal, perto do aparelho, num lugar sem conversa.",
+    "tip2": "Pode tocar em outro aparelho, numa caixa de som ou no player abaixo.",
+    "tip3": "Comece numa parte com a banda inteira tocando (não na introdução).",
+    "playHere": "Tocar a referência aqui",
+    "privacy": "O áudio é analisado só neste aparelho e descartado em seguida. Nada é gravado nem enviado: só os resultados.",
+    "start": "Começar a ouvir",
+    "listening": "Ouvindo…",
+    "level": "Nível do som",
+    "progress": "{{seconds}} s de {{max}} s",
+    "quiet": "Quase nada chegando ao microfone. Aumente o volume ou aproxime o aparelho.",
+    "keepGoing": "Continue tocando ({{seconds}} s)",
+    "stop": "Parar e analisar",
+    "analysing": "Analisando…",
+    "saved": "Análise salva. Os valores são estimativas para a banda revisar.",
+    "wasQuiet": "O som chegou muito baixo: confira os valores com atenção.",
+    "again": "Ouvir de novo",
+    "review": "Revisar",
+    "notFound": "não identificado",
+    "or": "(ou {{values}})",
+    "beats_one": "{{count}} batida em {{seconds}} s",
+    "beats_other": "{{count}} batidas em {{seconds}} s",
+    "reviewHint": "Confira de ouvido e confirme em “Arranjo da banda”.",
+    "error": {
+      "mic_denied": "O acesso ao microfone foi negado. Permita o microfone para este site nas configurações do navegador e tente de novo.",
+      "mic_unavailable": "Não foi possível usar o microfone deste aparelho.",
+      "too_short": "Foi pouco tempo de áudio. Ouça pelo menos 15 segundos.",
+      "no_signal": "Quase nenhum som foi captado. Aumente o volume ou aproxime o aparelho.",
+      "decode_failed": "Não foi possível ler este arquivo de áudio.",
+      "failed": "A análise não conseguiu terminar. Tente de novo."
+    }
   }
 }

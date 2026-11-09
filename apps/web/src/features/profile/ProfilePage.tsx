@@ -11,7 +11,6 @@ import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Card, Input, PageHeader, Segmented, Select, useToast } from "../../components/ui";
 import { errorText } from "../../lib/errors";
-// removed "../../lib/api";
 import { useAuth } from "../auth/AuthProvider";
 
 export function ProfilePage() {
