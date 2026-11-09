@@ -260,7 +260,7 @@
   },
   "replace": {
     "title": "Replace the reference recording?",
-    "body": "Work was already done listening to “{{title}}” ({{artist}}):",
+    "body": "This song already has a reference recording. Do you want to replace it? The existing musical data will be kept, but may need to be reviewed.",
     "confirmed": "{{what}} confirmed",
     "sections_one": "{{count}} section in the map",
     "sections_other": "{{count}} sections in the map",
@@ -270,8 +270,10 @@
     "audio_other": "{{count}} audio files",
     "analyses_one": "{{count}} analysis result",
     "analyses_other": "{{count}} analysis results",
-    "kept": "None of it is deleted or changed, but it was set with the previous recording. Worth checking again after the change.",
-    "confirm": "Replace reference"
+    "confirm": "Confirm replacement",
+    "workDone": "Already done with the current reference:",
+    "keepHint": "“Keep current reference” prepares the song with the recording already set; the new link is not used. Nothing is deleted with either option.",
+    "keep": "Keep current reference"
   },
   "technical": {
     "heading": "Technical details",

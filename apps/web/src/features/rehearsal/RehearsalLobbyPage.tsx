@@ -13,7 +13,8 @@ import {
   Select,
   useToast,
 } from "../../components/ui";
-import { errorCode, http } from "../../lib/api";
+import { http } from "../../lib/api";
+import { errorText } from "../../lib/errors";
 import { formatDateTime } from "../../lib/format";
 import { useCurrentBand } from "../bands/BandLayout";
 import { bandKeys, useRehearsals } from "../bands/queries";
@@ -41,7 +42,7 @@ export function RehearsalLobbyPage() {
       await qc.invalidateQueries({ queryKey: bandKeys.rehearsals(band.id) });
       navigate(`/bands/${band.id}/rehearsal/${res.session.id}`);
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     } finally {
       setBusy(false);
     }

@@ -7,6 +7,7 @@ import { AuthProvider } from "../features/auth/AuthProvider";
 import { ApiError } from "../lib/api";
 import { ThemeProvider } from "../lib/theme";
 import { AppRoutes } from "./routes";
+import { UpdateNotice } from "./UpdateNotice";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +30,7 @@ export function App() {
               <Suspense fallback={<LoadingBlock />}>
                 <AppRoutes />
               </Suspense>
+              <UpdateNotice />
             </BrowserRouter>
           </AuthProvider>
         </ToastProvider>

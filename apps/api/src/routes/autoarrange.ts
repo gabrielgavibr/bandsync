@@ -18,6 +18,7 @@ import {
   type ReferencePlatform,
   recordingPageUrl,
   reviewSchema,
+  type SongDto,
   type SongRecordingDto,
   searchRecordingsSchema,
   setReferenceLinkSchema,
@@ -190,7 +191,9 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
     details = await musicBrainz(c.env).lookup(input.recording.mbid);
     if (!details) throw notFound("recording");
   }
-  const rawLink = input.referenceUrl ?? input.youtubeUrl ?? null;
+  // Keeping the current reference ignores any link sent along: the reference does not change.
+  const rawLink =
+    input.recording.source === "current" ? null : (input.referenceUrl ?? input.youtubeUrl ?? null);
   const link = rawLink ? await resolveReferenceLink(c, rawLink) : null;
   const release = details
     ? ((input.recording.source === "musicbrainz" && input.recording.releaseMbid
@@ -212,19 +215,30 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
     const song = await getSong(db, bandId, songId);
     if (!song) throw notFound("song");
     previous = await getReferenceRecording(db, songId);
+    if (input.recording.source === "current") {
+      // "Keep the current reference": prepare again with it, nothing about it changes.
+      if (!previous)
+        throw new ApiError("not_found", "the song has no reference recording", {
+          reason: "no_reference",
+        });
+      return startPreparation(c, { bandId, song, recording: previous, created: false });
+    }
     const target = await findRecordingMatch(db, songId, { mbid: details?.mbid ?? null, link });
     replacing = !!previous && previous.id !== target?.id;
-    if (replacing && previous) {
+    // Replacing the band's reference with a different recording is always the member's explicit
+    // decision. The answer says what the current reference is and what was done with it, so the
+    // interface can explain the consequences. Nothing is changed until the member confirms.
+    if (replacing && previous && !input.confirmReplace) {
       const dependents = await referenceDependents(
         db,
         { id: song.id, versionId: song.version.id },
         previous,
       );
-      if (hasReferenceDependents(dependents) && !input.confirmReplace)
-        throw new ApiError("confirmation_required", "replacing the reference needs confirmation", {
-          dependents,
-          current: toReferenceSummary(previous),
-        });
+      throw new ApiError("confirmation_required", "replacing the reference needs confirmation", {
+        dependents,
+        hasDependents: hasReferenceDependents(dependents),
+        current: toReferenceSummary(previous),
+      });
     }
   } else {
     // …or a new one, created from verified data and from what the member confirmed.
@@ -348,6 +362,19 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
       version: { ...versionOf(song), referenceUrl: recording.link?.url ?? null },
     });
   }
+  if (!replacing && previous && link && previous.link?.url !== recording.link?.url) {
+    // Same recording, another link: recorded like a link change from the song page.
+    await insertReviewEvent(db, {
+      bandId,
+      songId,
+      target: "reference",
+      action: "edit",
+      before: { change: "link", url: previous.link?.url ?? null },
+      after: { url: recording.link?.url ?? null, platform: recording.link?.platform ?? null },
+      resultId: null,
+      userId: user.id,
+    });
+  }
   if (replacing || !previous) {
     await insertReviewEvent(db, {
       bandId,
@@ -369,14 +396,43 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
     });
   }
 
-  if (input.audioAssetId && !(await getAudioAsset(db, songId, input.audioAssetId)))
+  return startPreparation(c, {
+    bandId,
+    song: (await getSong(db, bandId, songId))!,
+    recording,
+    created,
+    replaced: replacing,
+    audioAssetId: input.audioAssetId ?? null,
+    locale: input.locale,
+  });
+});
+
+/** Starts (or joins) the preparation job of a song for one recording. */
+async function startPreparation(
+  c: Context<AppEnv>,
+  opts: {
+    bandId: string;
+    song: SongDto;
+    recording: SongRecordingDto;
+    created: boolean;
+    replaced?: boolean;
+    audioAssetId?: string | null;
+    locale?: "pt-BR" | "en";
+  },
+) {
+  const db = c.env.DB;
+  const user = c.get("user");
+  const { bandId, song, recording } = opts;
+  const songId = song.id;
+  const audioAssetId = opts.audioAssetId ?? null;
+  if (audioAssetId && !(await getAudioAsset(db, songId, audioAssetId)))
     throw notFound("audio asset");
 
-  // 4. One active job per song + recording + audio file: pressing "Prepare" twice reuses it.
+  // One active job per song + recording + audio file: pressing "Prepare" twice reuses it.
   const dedupeKey = jobDedupeKey({
     songId,
     recordingId: recording.id,
-    audioAssetId: input.audioAssetId ?? null,
+    audioAssetId,
     pipelineVersion: PIPELINE_VERSION,
   });
   let reused = false;
@@ -393,11 +449,11 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
       bandId,
       songId,
       recordingId: recording.id,
-      audioAssetId: input.audioAssetId ?? null,
+      audioAssetId,
       pipelineVersion: PIPELINE_VERSION,
       dedupeKey,
       maxAttempts: JOB_MAX_ATTEMPTS,
-      locale: input.locale ?? user.locale ?? "en",
+      locale: opts.locale ?? user.locale ?? "en",
       userId: user.id,
     });
     await startJob(c, jobId);
@@ -409,13 +465,13 @@ autoArrangeRoutes.post("/prepare", requireRepertoireEditor, async (c) => {
       song: await getSong(db, bandId, songId),
       recording,
       job: toJobDto(jobRow),
-      songCreated: created,
+      songCreated: opts.created,
       reused,
-      replaced: replacing,
+      replaced: !!opts.replaced,
     },
     reused ? 200 : 201,
   );
-});
+}
 
 /* ---------------- jobs ---------------- */
 

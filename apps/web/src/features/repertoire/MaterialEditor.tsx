@@ -7,7 +7,8 @@ import {
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Segmented, Select, Textarea, Toggle, useToast } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { useSaveMaterial, useUploadFile } from "./queries";
 
 export function MaterialEditor({
@@ -57,7 +58,7 @@ export function MaterialEditor({
       });
       onDone();
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 
@@ -151,7 +152,7 @@ export function MaterialEditor({
                 setFileId(uploaded.id);
                 setFileName(uploaded.name);
               } catch (err) {
-                toast(t(`common:errors.${errorCode(err)}`), "error");
+                toast(errorText(err), "error");
               }
             }}
           />

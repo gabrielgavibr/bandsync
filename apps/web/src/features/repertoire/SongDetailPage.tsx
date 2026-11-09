@@ -14,8 +14,9 @@ import {
   PageHeader,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+// removed "../../lib/api";
 import { cn } from "../../lib/cn";
+import { errorText } from "../../lib/errors";
 import { resolvePreferredMaterial } from "../../lib/materials";
 import { useAuth } from "../auth/AuthProvider";
 import { BandArrangementCard, TechnicalDetails } from "../autoarrange/arrangement";
@@ -204,7 +205,7 @@ export function SongDetailPage() {
             await del.mutateAsync(song.id);
             navigate(`/bands/${band.id}/songs`);
           } catch (err) {
-            toast(t(`common:errors.${errorCode(err)}`), "error");
+            toast(errorText(err), "error");
           }
         }}
       />
@@ -222,7 +223,7 @@ export function SongDetailPage() {
             setDeletingMaterial(null);
             setSelectedId(null);
           } catch (err) {
-            toast(t(`common:errors.${errorCode(err)}`), "error");
+            toast(errorText(err), "error");
           }
         }}
       />

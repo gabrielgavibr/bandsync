@@ -17,7 +17,8 @@ import {
   Toggle,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { useCurrentBand } from "./BandLayout";
@@ -44,7 +45,7 @@ export function MembersPage() {
   const [leaving, setLeaving] = useState(false);
   const isAdmin = band.myRole === "admin";
 
-  const fail = (err: unknown) => toast(t(`common:errors.${errorCode(err)}`), "error");
+  const fail = (err: unknown) => toast(errorText(err), "error");
 
   return (
     <>

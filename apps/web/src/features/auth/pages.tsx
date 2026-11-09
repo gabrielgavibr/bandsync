@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { Wordmark } from "../../app/Brand";
 import { Button, Input, Select } from "../../components/ui";
 import { ApiError, http } from "../../lib/api";
+import { errorText } from "../../lib/errors";
 import i18n from "../../lib/i18n";
 import { useAuth } from "./AuthProvider";
 
@@ -39,11 +40,9 @@ function AuthFrame({
 }
 
 function useFormError() {
-  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const fromError = (err: unknown) => {
-    const code = err instanceof ApiError ? err.code : "internal_error";
-    setError(t(`errors.${code}`));
+    setError(errorText(err));
   };
   return { error, setError, fromError };
 }

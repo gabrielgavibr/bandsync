@@ -13,8 +13,9 @@ import { Check, CircleDashed, ExternalLink, Loader2, MinusCircle, XCircle } from
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge, Button, useToast } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+// removed "../../lib/api";
 import { cn } from "../../lib/cn";
+import { errorText } from "../../lib/errors";
 import { formatDateTime, formatDuration } from "../../lib/format";
 import { type Confirmation, type SongAnalysisOverview, useJobAction, useReview } from "./queries";
 
@@ -46,7 +47,7 @@ export function JobProgress({ bandId, job }: { bandId: string; job: AnalysisJobD
   const run = (a: "cancel" | "retry") =>
     action.mutate(
       { jobId: job.id, action: a },
-      { onError: (err) => toast(t(`common:errors.${errorCode(err)}`), "error") },
+      { onError: (err) => toast(errorText(err), "error") },
     );
   const tone =
     job.status === "failed"
@@ -303,7 +304,7 @@ export function ReviewForm({
   const send = (input: Parameters<typeof review.mutate>[0]) =>
     review.mutate(input, {
       onSuccess: () => toast(t("autoarrange:review.saved"), "success"),
-      onError: (err) => toast(t(`common:errors.${errorCode(err)}`), "error"),
+      onError: (err) => toast(errorText(err), "error"),
     });
   const bpmNumber = Number(bpm);
   const bpmValid = bpm !== "" && bpmNumber >= LIMITS.bpmMin && bpmNumber <= LIMITS.bpmMax;

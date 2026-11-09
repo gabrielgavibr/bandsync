@@ -10,7 +10,8 @@ import {
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Card, Input, PageHeader, Segmented, Select, useToast } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { useAuth } from "../auth/AuthProvider";
 
 export function ProfilePage() {
@@ -28,7 +29,7 @@ export function ProfilePage() {
       await updatePreferences(patch);
       toast(t("profile:saved"), "success");
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 
@@ -45,7 +46,7 @@ export function ProfilePage() {
       });
       toast(t("common:state.saved"), "success");
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     } finally {
       setBusy(false);
     }

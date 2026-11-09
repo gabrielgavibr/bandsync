@@ -260,7 +260,7 @@
   },
   "replace": {
     "title": "Substituir a gravação de referência?",
-    "body": "Já existe trabalho feito ouvindo “{{title}}” ({{artist}}):",
+    "body": "Esta música já possui uma gravação de referência. Deseja substituí-la? Os dados musicais existentes serão preservados, mas poderão precisar de revisão.",
     "confirmed": "{{what}} confirmado",
     "sections_one": "{{count}} seção no mapa",
     "sections_other": "{{count}} seções no mapa",
@@ -270,8 +270,10 @@
     "audio_other": "{{count}} arquivos de áudio",
     "analyses_one": "{{count}} resultado de análise",
     "analyses_other": "{{count}} resultados de análise",
-    "kept": "Nada disso é apagado nem alterado, mas foi definido com a gravação anterior. Vale conferir de novo depois da troca.",
-    "confirm": "Substituir referência"
+    "confirm": "Confirmar substituição",
+    "workDone": "Já foi feito com a referência atual:",
+    "keepHint": "“Manter referência atual” prepara a música com a gravação que já está definida; o novo link não é usado. Nada é apagado em nenhuma das opções.",
+    "keep": "Manter referência atual"
   },
   "technical": {
     "heading": "Detalhes técnicos",

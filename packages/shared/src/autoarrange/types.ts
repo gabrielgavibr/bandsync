@@ -364,6 +364,11 @@ const recordingChoiceSchema = z.discriminatedUnion("source", [
     releaseTitle: z.string().trim().max(200).optional().nullable(),
     releaseDate: z.string().trim().max(10).optional().nullable(),
   }),
+  /**
+   * Keep the song's current reference recording and prepare with it. Used when a member is asked
+   * whether to replace the reference and answers "keep the current one".
+   */
+  z.object({ source: z.literal("current") }),
   /** Identified by the pasted link alone; title and artist may be corrected by the member. */
   z.object({
     source: z.literal("link"),
@@ -384,8 +389,9 @@ export const prepareSongSchema = z
     /** Older name of `referenceUrl`, still accepted. */
     youtubeUrl: httpUrlSchema.optional().nullable(),
     /**
-     * Required to replace a reference recording that confirmed values, analyses or arrangement
-     * work already depend on. Without it the server answers `confirmation_required`.
+     * Required to replace a song's reference recording with a different one. Without it the
+     * server answers `confirmation_required` with the current reference and what depends on it.
+     * Never needed for the same recording (same catalogue id, or the same video / track).
      */
     confirmReplace: z.boolean().optional(),
     audioAssetId: idSchema.optional().nullable(),
@@ -395,6 +401,9 @@ export const prepareSongSchema = z
   .refine((v) => !!v.songId !== !!v.newSong, { message: "provide either songId or newSong" })
   .refine((v) => v.recording.source !== "link" || !!(v.referenceUrl ?? v.youtubeUrl), {
     message: "a link is required",
+  })
+  .refine((v) => v.recording.source !== "current" || !!v.songId, {
+    message: "keeping the current reference needs an existing song",
   });
 export type PrepareSongInput = z.infer<typeof prepareSongSchema>;
 

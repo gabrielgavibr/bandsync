@@ -387,12 +387,12 @@ describe("preparing a song", () => {
       }),
     );
     await waitForJob(ana, bandId, a.job.id, ["awaiting_review"]);
-    const b = await json(
-      await prepare(ana, bandId, {
-        songId: a.song.id,
-        recording: { source: "musicbrainz", mbid: UM_BANDA_UM },
-      }),
-    );
+    const choice = { songId: a.song.id, recording: { source: "musicbrainz", mbid: UM_BANDA_UM } };
+    // Another version of the same composition is another recording: the member confirms.
+    const asked = await prepare(ana, bandId, choice);
+    expect(asked.status).toBe(409);
+    expect((await json(asked)).error.code).toBe("confirmation_required");
+    const b = await json(await prepare(ana, bandId, { ...choice, confirmReplace: true }));
     await waitForJob(ana, bandId, b.job.id, ["awaiting_review"]);
     const o = await json(
       await api("GET", `${aa(bandId)}/songs/${a.song.id}`, undefined, ana.cookie),

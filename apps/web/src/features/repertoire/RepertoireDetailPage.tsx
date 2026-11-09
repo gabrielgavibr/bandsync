@@ -13,7 +13,8 @@ import {
   PageHeader,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { ReferenceOpenLink } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useRepertoire, useRepertoireMutations, useSongs } from "./queries";
@@ -30,7 +31,7 @@ export function RepertoireDetailPage() {
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const canEdit = band.myPermissions.canEditRepertoire;
-  const fail = (err: unknown) => toast(t(`common:errors.${errorCode(err)}`), "error");
+  const fail = (err: unknown) => toast(errorText(err), "error");
 
   if (rep.isPending) return <LoadingBlock />;
   if (rep.isError) return <ErrorBlock error={rep.error} onRetry={() => rep.refetch()} />;

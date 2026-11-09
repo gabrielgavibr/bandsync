@@ -84,6 +84,14 @@ function isValidId(platform: ReferencePlatform, id: string | null | undefined): 
   return !!id && (platform === "spotify" ? SPOTIFY_ID.test(id) : YOUTUBE_ID.test(id));
 }
 
+/**
+ * Platforms that address the same recording with the same id: a YouTube video and its
+ * YouTube Music page are one recording, so switching between them is not a replacement.
+ */
+export function sameRecordingPlatforms(platform: ReferencePlatform): ReferencePlatform[] {
+  return platform === "spotify" ? ["spotify"] : ["youtube", "youtube_music"];
+}
+
 /** Rebuilds a stored (platform, id) pair into a link; null when the pair is not valid. */
 export function referenceLinkFrom(
   platform: string | null | undefined,

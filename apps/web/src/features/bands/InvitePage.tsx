@@ -12,7 +12,8 @@ import {
   Select,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { formatDateTime } from "../../lib/format";
 import { useCurrentBand } from "./BandLayout";
 import { useCreateInvite, useInvites, useRevokeInvite } from "./queries";
@@ -48,7 +49,7 @@ export function InvitePage() {
       });
       setResult(res);
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 
@@ -139,7 +140,7 @@ export function InvitePage() {
                 try {
                   await revoke.mutateAsync(id);
                 } catch (err) {
-                  toast(t(`common:errors.${errorCode(err)}`), "error");
+                  toast(errorText(err), "error");
                 }
               }}
             />

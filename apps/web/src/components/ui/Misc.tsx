@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { ApiError } from "../../lib/api";
 import { cn } from "../../lib/cn";
+import { errorText } from "../../lib/errors";
 import { Button } from "./Button";
 import { Spinner } from "./Spinner";
 
@@ -64,14 +64,13 @@ export function LoadingBlock({ className }: { className?: string }) {
 
 export function ErrorBlock({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   const { t } = useTranslation();
-  const code = error instanceof ApiError ? error.code : "internal_error";
   return (
     <div
       className="rounded-2xl border border-danger-500/40 bg-danger-500/5 p-5 text-center"
       role="alert"
     >
       <p className="font-medium">{t("state.error")}</p>
-      <p className="mt-1 text-sm text-muted">{t(`errors.${code}`)}</p>
+      <p className="mt-1 text-sm text-muted">{errorText(error)}</p>
       {onRetry ? (
         <Button variant="secondary" className="mt-4" onClick={onRetry}>
           {t("actions.retry")}

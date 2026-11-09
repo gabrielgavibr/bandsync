@@ -14,7 +14,8 @@ import {
   Toggle,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useSaveSong, useSong } from "./queries";
 
@@ -112,7 +113,7 @@ export function SongFormPage() {
       toast(t("repertoire:song.saved"), "success");
       navigate(`/bands/${band.id}/songs/${saved.id}`);
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 

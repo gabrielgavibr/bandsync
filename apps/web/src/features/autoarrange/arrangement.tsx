@@ -9,8 +9,9 @@ import { type FormEvent, type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Badge, Button, Card, Dialog, Input, Select, useToast } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+// removed "../../lib/api";
 import { cn } from "../../lib/cn";
+import { errorText } from "../../lib/errors";
 import { formatDateTime } from "../../lib/format";
 import { useUploadFile } from "../repertoire/queries";
 import { ReferencesCard, SongSheet } from "../repertoire/SongSheet";
@@ -213,7 +214,7 @@ function AudioDialog({
       setDeclared(false);
       onClose();
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 

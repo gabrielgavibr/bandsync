@@ -22,6 +22,7 @@ import {
   type SongRecordingDto,
   type SongReferenceSummary,
   safeThumbnailUrl,
+  sameRecordingPlatforms,
 } from "@bandsync/shared";
 import { newId } from "../lib/ids";
 import { nowIso } from "../lib/time";
@@ -214,13 +215,15 @@ export async function findRecordingMatch(
   if (!row && key.link) {
     // With a catalogue id in hand, a row found by link only counts if nobody identified it yet
     // (the band pasted the link first and found the catalogue entry later).
+    const platforms = sameRecordingPlatforms(key.link.platform);
     row = await db
       .prepare(
-        `SELECT * FROM song_recordings WHERE song_id = ? AND platform = ? AND external_id = ?
+        `SELECT * FROM song_recordings WHERE song_id = ? AND external_id = ?
+           AND platform IN (${platforms.map(() => "?").join(", ")})
            ${key.mbid ? "AND mbid IS NULL" : ""}
          ORDER BY is_reference DESC, created_at DESC LIMIT 1`,
       )
-      .bind(songId, key.link.platform, key.link.externalId)
+      .bind(songId, key.link.externalId, ...platforms)
       .first<RecordingRow>();
   }
   return row ? toRecordingDto(row) : null;

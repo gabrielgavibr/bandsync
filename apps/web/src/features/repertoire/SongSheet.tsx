@@ -12,7 +12,8 @@ import {
   Select,
   useToast,
 } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { formatDuration } from "../../lib/format";
 import { useAddReference, useDeleteReference } from "./queries";
 
@@ -228,7 +229,7 @@ export function ReferencesCard({
       });
       setAdding(false);
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     }
   };
 
@@ -333,7 +334,7 @@ export function ReferencesCard({
             await del.mutateAsync(removing);
             setRemoving(null);
           } catch (err) {
-            toast(t(`common:errors.${errorCode(err)}`), "error");
+            toast(errorText(err), "error");
           }
         }}
       />

@@ -87,9 +87,19 @@ The app has one band version per song, so the reference belongs to the song.
   Pasting the same link again changes nothing.
 - **Same recording, another link** (the track on another platform, a better upload) only updates
   the link: analyses, audio and confirmed values stay attached.
-- **Another recording** replaces the reference. If confirmed values (tempo, key, meter), sections,
-  ready material, authorised audio or analyses depend on the current one, the server answers
-  `confirmation_required` (409) with what exists, and the interface asks before going on.
+- **Same recording** never asks anything: the same catalogue id, or the same video or track
+  (a YouTube video and its YouTube Music page count as one). Only the link is updated, and the
+  change is recorded.
+- **Another recording** while the song already has a reference: the server never replaces it on
+  its own. It answers `confirmation_required` (409) with the current reference and what depends on
+  it (confirmed tempo/key/meter, sections, ready material, authorised audio, analyses), and the
+  interface asks: "This song already has a reference recording. Do you want to replace it? The
+  existing musical data will be kept, but may need to be reviewed." with three choices:
+  - **Cancel**: nothing happens;
+  - **Keep current reference**: the preparation runs with the recording already set
+    (`recording: { source: "current" }`); the new link is not used;
+  - **Confirm replacement**: the request is sent again with `confirmReplace: true`.
+- A song **without** a reference gets the recording with no question.
 - Replacing never deletes or changes anything: the previous recording is kept as retired, the
   band's values stay as they are, and confirmations made before the change are **flagged** so the
   band listens again. Every set, replace, link change and correction is recorded in
@@ -138,13 +148,13 @@ longer lists sources. Links stored earlier are kept and shown only under "Techni
 
 Under `/api/bands/:bandId/autoarrange`; writes need permission to edit the repertoire.
 
-| Method and path                                              | Purpose                                                                                                                                                             |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /reference/identify` `{ url }`                         | Identify a pasted link. Errors: `validation_error` (`invalid_url`, `unsupported_link`), `unsupported_platform` (422), `not_found` (`reference_not_found`)           |
-| `POST /prepare`                                              | `recording: { source: "link", title?, artistCredit? }` with `referenceUrl`; also `musicbrainz` and `manual`. `confirmReplace: true` after a `confirmation_required` |
-| `PUT /songs/:songId/reference/link` `{ url }`                | Same recording, new or first link                                                                                                                                   |
-| `PATCH /songs/:songId/reference` `{ title?, artistCredit? }` | Correct what the band sees                                                                                                                                          |
-| `GET /songs/:songId`                                         | Adds `preparation`, `dependents` and per-confirmation `beforeReferenceChange`                                                                                       |
+| Method and path                                              | Purpose                                                                                                                                                                                                    |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /reference/identify` `{ url }`                         | Identify a pasted link. Errors: `validation_error` (`invalid_url`, `unsupported_link`), `unsupported_platform` (422), `not_found` (`reference_not_found`)                                                  |
+| `POST /prepare`                                              | `recording: { source: "link", title?, artistCredit? }` with `referenceUrl`; also `musicbrainz`, `manual` and `current` (keep the song's reference). `confirmReplace: true` after a `confirmation_required` |
+| `PUT /songs/:songId/reference/link` `{ url }`                | Same recording, new or first link                                                                                                                                                                          |
+| `PATCH /songs/:songId/reference` `{ title?, artistCredit? }` | Correct what the band sees                                                                                                                                                                                 |
+| `GET /songs/:songId`                                         | Adds `preparation`, `dependents` and per-confirmation `beforeReferenceChange`                                                                                                                              |
 
 `SongDto.reference` (song, song list, repertoire items) carries the summary every member sees.
 
@@ -161,7 +171,20 @@ Under `/api/bands/:bandId/autoarrange`; writes need permission to edit the reper
 The script never picks a video or track for a song without a confirmed link, never changes the
 band's values and never forces a replacement the API asks to confirm.
 
-## 10. Limitations
+## 10. Error messages and app updates
+
+- The interface never shows an internal key such as `errors.confirmation_required`. Every error
+  goes through one helper (`apps/web/src/lib/errors.ts`): a code with a translation shows it, any
+  other code shows the generic message in the current language. A test checks that every error
+  code the server can send has a sentence in Portuguese and English.
+- BandSync is installed as an app (PWA) and keeps the interface it downloaded. A page left open,
+  or an installed app brought back from the background, kept running the previous interface
+  after a new version was published, against the new server. The app now checks for a new
+  version when it comes back to the foreground and every 15 minutes, and when one has taken
+  over shows "A new version of BandSync is available" with a Reload button. It never reloads on
+  its own, so a live rehearsal is not interrupted.
+
+## 11. Limitations
 
 - No duration from a link; no artist from Spotify; see section 2.
 - Whether a player works depends on the owner's settings and on the device reaching the platform.
@@ -173,7 +196,7 @@ band's values and never forces a replacement the API asks to confirm.
 - There is no analysis engine: authorised audio can be uploaded and is reported as "analysis
   pending".
 
-## 11. Tests
+## 12. Tests
 
 - `packages/shared/test/reference.test.ts` — link parsing (valid shapes, dangerous schemes,
   look-alike hosts, non-recording links), player and endpoint addresses, thumbnails, real oEmbed
@@ -182,5 +205,10 @@ band's values and never forces a replacement the API asks to confirm.
   refused, unknown), permissions, song from a link, same reference for every member, replacement
   with and without confirmation, link added to a catalogue recording, corrections, history.
 - `e2e/tests/autoarrange.spec.ts` — the flow in the browser, a second member on a phone, the
-  repertoire, the live room, replacement warning, authorised audio upload, Portuguese on a phone.
+  repertoire, the live room, replacement warning, authorised audio upload, Portuguese on a phone,
+  and a dedicated scenario for preparing a song that already has a reference: no question without
+  a reference or for the same recording; the translated three-choice dialog; cancel, keep and
+  confirm, with the band's data compared before and after; no internal key ever on screen.
+- `apps/web/test/errors.test.ts` — every server error code translated in both languages; unknown
+  codes fall back to the generic message.
 - `e2e/staging/homologation.staging.ts` — the same against the real platforms.

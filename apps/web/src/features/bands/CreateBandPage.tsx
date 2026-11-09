@@ -2,7 +2,8 @@ import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Button, Card, Input, PageHeader, Textarea } from "../../components/ui";
-import { errorCode } from "../../lib/api";
+import { errorText } from "../../lib/errors";
+// removed "../../lib/api";
 import { useCreateBand } from "./queries";
 
 export function CreateBandPage() {
@@ -22,7 +23,7 @@ export function CreateBandPage() {
       });
       navigate(`/bands/${band.id}/invite`);
     } catch (err) {
-      setError(t(`common:errors.${errorCode(err)}`));
+      setError(errorText(err));
     }
   };
   return (

@@ -471,7 +471,7 @@ describe("changing the reference", () => {
     expect((await overview(ana, bandId, songId)).recordings).toHaveLength(2);
   });
 
-  it("does not ask when nothing depends on it, nor when the recording is the same", async () => {
+  it("asks before replacing even when nothing depends on it yet, never for the same recording", async () => {
     const { ana, bandId } = await setup();
     const first = await json(
       await prepare(ana, bandId, {
@@ -481,26 +481,187 @@ describe("changing the reference", () => {
       }),
     );
     await waitForJob(ana, bandId, first.job.id);
-    // Same link again: same recording, no replacement.
+    // Same link again, in another shape: same recording, no question, no replacement.
     const again = await prepare(ana, bandId, {
       songId: first.song.id,
       recording: { source: "link", title: "Rascunho" },
-      referenceUrl: "https://youtu.be/JZqFoTIAJj8",
+      referenceUrl: "https://youtu.be/JZqFoTIAJj8?si=share",
     });
     expect(again.status).toBe(201);
     const same = await json(again);
     expect(same.replaced).toBe(false);
     expect(same.recording.id).toBe(first.recording.id);
-    // Another recording, nothing confirmed yet: replaced without a prompt, but recorded.
-    const other = await prepare(ana, bandId, {
+    // The same video on YouTube Music is the same recording too.
+    const music = await prepare(ana, bandId, {
+      songId: first.song.id,
+      recording: { source: "link", title: "Rascunho" },
+      referenceUrl: "https://music.youtube.com/watch?v=JZqFoTIAJj8",
+    });
+    // 200 when it joins the preparation started just above (same work, not run twice).
+    expect([200, 201]).toContain(music.status);
+    const musicBody = await json(music);
+    expect(musicBody.replaced).toBe(false);
+    expect(musicBody.recording.id).toBe(first.recording.id);
+
+    // Another recording: the member decides, even with no work done on the current one.
+    const other = {
       songId: first.song.id,
       recording: { source: "link", title: "Rascunho" },
       referenceUrl: SPOTIFY,
+    };
+    const asked = await prepare(ana, bandId, other);
+    expect(asked.status).toBe(409);
+    const err = (await json(asked)).error;
+    expect(err.code).toBe("confirmation_required");
+    expect(err.details.hasDependents).toBe(false);
+    expect(err.details.dependents).toEqual({
+      analyses: 0,
+      audioAssets: 0,
+      confirmedValues: [],
+      sections: 0,
+      readyMaterials: 0,
     });
-    expect(other.status).toBe(201);
-    expect((await json(other)).replaced).toBe(true);
+    // The last link given for the same recording is the one kept (YouTube Music here).
+    expect(err.details.current).toMatchObject({
+      recordingId: first.recording.id,
+      url: "https://music.youtube.com/watch?v=JZqFoTIAJj8",
+    });
+    const done = await prepare(ana, bandId, { ...other, confirmReplace: true });
+    expect(done.status).toBe(201);
+    expect((await json(done)).replaced).toBe(true);
     const o = await overview(ana, bandId, first.song.id);
-    expect(o.reviews.filter((r: { target: string }) => r.target === "reference")).toHaveLength(2);
+    // Set, link changed to YouTube Music (same recording), replaced.
+    const changes = o.reviews
+      .filter((r: { target: string }) => r.target === "reference")
+      .map((r: { before: { change?: string } | null }) => r.before?.change ?? "set")
+      .reverse();
+    expect(changes).toEqual(["set", "link", "replaced"]);
+  });
+
+  it("a song without a reference gets the recording with no question", async () => {
+    const { ana, bandId } = await setup();
+    const songId = await createSong(ana, bandId, {
+      title: "Sem referência",
+      version: { bpm: 90, key: "A", beatsPerBar: 4, beatUnit: 4 },
+    });
+    const res = await prepare(ana, bandId, {
+      songId,
+      recording: { source: "link", artistCredit: "Natiruts" },
+      referenceUrl: YT,
+    });
+    expect(res.status).toBe(201);
+    const body = await json(res);
+    expect(body.replaced).toBe(false);
+    expect(body.song.reference).toMatchObject({ url: YT, artist: "Natiruts" });
+    expect(body.song.version).toMatchObject({ bpm: 90, key: "A" });
+  });
+
+  it("cancel changes nothing; keeping the current reference prepares with it; confirming replaces and keeps the data", async () => {
+    const { ana, bandId, songId, firstRecordingId } = await songWithConfirmedTempo();
+    // Work done on the current recording: a section and a ready material.
+    await api(
+      "PATCH",
+      `/api/bands/${bandId}/songs/${songId}`,
+      {
+        version: { beatsPerBar: 4, beatUnit: 4 },
+        sections: [{ name: "Intro", bars: 8 }],
+      },
+      ana.cookie,
+    );
+    const material = await api(
+      "POST",
+      `/api/bands/${bandId}/songs/${songId}/materials`,
+      {
+        type: "chords",
+        instrument: "guitar",
+        title: "Nossa cifra",
+        body: "A  D  E",
+        status: "ready",
+      },
+      ana.cookie,
+    );
+    expect(material.status).toBe(201);
+    const snapshot = async () => {
+      const d = await json(
+        await api("GET", `/api/bands/${bandId}/songs/${songId}`, undefined, ana.cookie),
+      );
+      return {
+        bpm: d.song.version.bpm,
+        sections: d.song.sections.map((x: { name: string }) => x.name),
+        materials: d.materials
+          .map((m: { title: string; status: string }) => `${m.title}:${m.status}`)
+          .sort(),
+      };
+    };
+    const before = await snapshot();
+    expect(before.bpm).toBe(72);
+    expect(before.sections).toEqual(["Intro"]);
+    expect(before.materials).toContain("Nossa cifra:ready");
+
+    const other = {
+      songId,
+      recording: { source: "link", title: "Outra" },
+      referenceUrl: SPOTIFY,
+    };
+    // 1. Asked; the member cancels (no further request): nothing changed.
+    const asked = await prepare(ana, bandId, other);
+    expect(asked.status).toBe(409);
+    expect((await json(asked)).error.details).toMatchObject({
+      hasDependents: true,
+      dependents: { confirmedValues: ["band_bpm"], sections: 1, readyMaterials: 1 },
+    });
+    let o = await overview(ana, bandId, songId);
+    expect(o.song.reference).toMatchObject({ recordingId: firstRecordingId, url: YT });
+    expect(o.recordings).toHaveLength(1);
+    expect(await snapshot()).toEqual(before);
+
+    // 2. "Keep the current reference": preparation goes on with it; the new link is not used.
+    const kept = await prepare(ana, bandId, {
+      songId,
+      recording: { source: "current" },
+      referenceUrl: SPOTIFY,
+    });
+    expect(kept.status).toBe(201);
+    const keptBody = await json(kept);
+    expect(keptBody.replaced).toBe(false);
+    expect(keptBody.recording.id).toBe(firstRecordingId);
+    expect(keptBody.job.recordingId).toBe(firstRecordingId);
+    await waitForJob(ana, bandId, keptBody.job.id);
+    o = await overview(ana, bandId, songId);
+    expect(o.song.reference).toMatchObject({ recordingId: firstRecordingId, url: YT });
+    expect(o.recordings).toHaveLength(1);
+    expect(await snapshot()).toEqual(before);
+
+    // 3. Confirmed: replaced, preparation runs, and every piece of the band's data is still there.
+    const confirmed = await prepare(ana, bandId, { ...other, confirmReplace: true });
+    expect(confirmed.status).toBe(201);
+    const body = await json(confirmed);
+    expect(body.replaced).toBe(true);
+    const job = await waitForJob(ana, bandId, body.job.id);
+    expect(job.recordingId).toBe(body.recording.id);
+    o = await overview(ana, bandId, songId);
+    expect(o.song.reference).toMatchObject({ platform: "spotify", url: SPOTIFY });
+    expect(await snapshot()).toEqual(before);
+    const old = o.recordings.find((r: { id: string }) => r.id === firstRecordingId);
+    expect(old).toMatchObject({ isReference: false });
+    expect(old.link.url).toBe(YT); // retired, not deleted
+    expect(o.confirmations.band_bpm.beforeReferenceChange).toBe(true);
+  });
+
+  it("refuses to keep a reference that does not exist", async () => {
+    const { ana, bandId } = await setup();
+    const songId = await createSong(ana, bandId, {
+      title: "Nada",
+      version: { beatsPerBar: 4, beatUnit: 4 },
+    });
+    const res = await prepare(ana, bandId, { songId, recording: { source: "current" } });
+    expect(res.status).toBe(404);
+    expect((await json(res)).error.details.reason).toBe("no_reference");
+    // Only meaningful for an existing song.
+    expect(
+      (await prepare(ana, bandId, { newSong: { title: "X" }, recording: { source: "current" } }))
+        .status,
+    ).toBe(400);
   });
 
   it("adds a link to a recording identified in the catalogue without replacing it", async () => {

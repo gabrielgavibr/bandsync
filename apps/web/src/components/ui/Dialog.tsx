@@ -28,7 +28,7 @@ export function Dialog({ open, onClose, title, children, footer }: DialogProps) 
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="m-auto w-[min(100vw-2rem,32rem)] rounded-2xl border border-line bg-elev p-0 text-fg shadow-2xl backdrop:bg-black/60"
+      className="m-auto max-h-[calc(100dvh-2rem)] w-[min(100vw-2rem,32rem)] overflow-y-auto overscroll-contain rounded-2xl border border-line bg-elev p-0 text-fg shadow-2xl backdrop:bg-black/60"
     >
       <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
         <h2 className="text-lg font-semibold">{title}</h2>

@@ -293,14 +293,14 @@ test("changing the reference asks before replacing; a new link for the same reco
   const warning = page.getByTestId("replace-warning");
   await expect(warning).toContainText("Band BPM confirmed");
   await expect(warning).toContainText("1 audio file");
-  await expect(warning).toContainText("None of it is deleted or changed");
+  await expect(warning).toContainText("The existing musical data will be kept");
   await page.screenshot({ path: "test-results/ref-07-replace-warning.png" });
-  await page.getByRole("button", { name: "Cancel" }).click();
+  await warning.getByRole("button", { name: "Cancel" }).click();
   // Cancelled: nothing changed.
   const before = (await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json()).song;
   expect(before.reference.url).toBe(YT);
   await page.getByRole("button", { name: "Confirm and prepare song" }).click();
-  await page.getByRole("button", { name: "Replace reference" }).click();
+  await page.getByRole("button", { name: "Confirm replacement" }).click();
   await expect(
     page.getByTestId("preparation-state").locator('[data-item="arrangement"]'),
   ).toHaveAttribute("data-state", "ready_for_review", { timeout: 20_000 });
@@ -442,5 +442,125 @@ test("an existing song gets its reference in Portuguese on a phone, and the cata
   await expect(sheet).toHaveAttribute("data-state", "link_pending");
   await expect(sheet).toContainText("Um Banda Um");
   await expect(sheet).toContainText("4:22");
+  await context.close();
+});
+
+test("preparing a song that already has a reference: no raw error, three clear choices, nothing lost", async ({
+  browser,
+}) => {
+  const ana = await registerUser("Ana Drums", "drums", "pt-BR");
+  const bandId = await createBand(ana, `Confirmação ${Date.now()}`);
+  const { page, context } = await contextFor(browser, ana, { ...devices["iPhone 13"] });
+  // An internal key must never reach the screen, whatever happens below.
+  const noRawKeys = async () => expect(page.getByText(/\berrors\.[a-z_]+/)).toHaveCount(0);
+  const pt = { link: "Link da gravação", go: "Identificar" };
+
+  // 1. A song with no reference: the video is attached with no question.
+  const created = await ana.api.post(`/api/bands/${bandId}/songs`, {
+    data: {
+      title: "Esotérico",
+      artist: "Gilberto Gil",
+      version: { bpm: 96, key: "D", beatsPerBar: 4, beatUnit: 4 },
+    },
+  });
+  const songId = (await created.json()).song.id as string;
+  await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
+  await identify(page, YT, pt);
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  const states = page.getByTestId("preparation-state");
+  await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
+  await expect(page.getByTestId("replace-warning")).toHaveCount(0);
+  await noRawKeys();
+
+  // Work done on that recording: a ready material.
+  const material = await ana.api.post(`/api/bands/${bandId}/songs/${songId}/materials`, {
+    data: {
+      type: "chords",
+      instrument: "guitar",
+      title: "Nossa cifra",
+      body: "D  G  A",
+      status: "ready",
+    },
+  });
+  expect(material.status()).toBe(201);
+  const state = async () => {
+    const d = await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json();
+    return {
+      reference: d.song.reference?.url ?? null,
+      bpm: d.song.version.bpm,
+      key: d.song.version.key,
+      materials: d.materials
+        .map((m: { title: string; status: string }) => `${m.title}:${m.status}`)
+        .sort(),
+    };
+  };
+  expect(await state()).toMatchObject({ reference: YT, bpm: 96, key: "D" });
+
+  // 2. The same recording again (YouTube Music page of the same video): no question.
+  await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
+  await identify(page, `https://music.youtube.com/watch?v=${YT_ID}`, pt);
+  await page.getByRole("radio", { name: /Outra gravação/ }).check();
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
+  await expect(page.getByTestId("replace-warning")).toHaveCount(0);
+  await noRawKeys();
+  // Same recording, so only its link was updated; everything else is as it was.
+  const before = await state();
+  expect(before).toMatchObject({
+    reference: `https://music.youtube.com/watch?v=${YT_ID}`,
+    bpm: 96,
+    key: "D",
+  });
+  expect(before.materials).toContain("Nossa cifra:ready");
+
+  // 3. Another recording: a translated question with three choices.
+  await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
+  await identify(page, SPOTIFY, pt);
+  await page.getByRole("radio", { name: /Outra gravação/ }).check();
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  const warning = page.getByTestId("replace-warning");
+  await expect(warning).toContainText(
+    "Esta música já possui uma gravação de referência. Deseja substituí-la? Os dados musicais existentes serão preservados, mas poderão precisar de revisão.",
+  );
+  await expect(warning.getByTestId("replace-current")).toContainText("YouTube");
+  await expect(warning).toContainText("1 material pronto");
+  await expect(warning.getByRole("button", { name: "Cancelar" })).toBeVisible();
+  await expect(warning.getByRole("button", { name: "Manter referência atual" })).toBeVisible();
+  await expect(warning.getByRole("button", { name: "Confirmar substituição" })).toBeVisible();
+  await noRawKeys();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: "test-results/confirm-01-dialog-pt.png" });
+
+  // 3a. Cancel: the dialog closes and nothing changed.
+  await warning.getByRole("button", { name: "Cancelar" }).click();
+  await expect(warning).toHaveCount(0);
+  expect(await state()).toEqual(before);
+
+  // 3b. Keep the current reference: preparation runs with it, nothing changed.
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await warning.getByRole("button", { name: "Manter referência atual" }).click();
+  await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
+  await expect(page.getByTestId("prepared")).toContainText("YouTube Music");
+  expect(await state()).toEqual(before);
+  await noRawKeys();
+
+  // 3c. Confirm the replacement: the new recording is the reference, the band's data is intact.
+  await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
+  await identify(page, SPOTIFY, pt);
+  await page.getByRole("radio", { name: /Outra gravação/ }).check();
+  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await warning.getByRole("button", { name: "Confirmar substituição" }).click();
+  await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
+  await noRawKeys();
+  const after = await state();
+  expect(after).toEqual({ ...before, reference: SPOTIFY });
+  await page.screenshot({ path: "test-results/confirm-02-after-replace-pt.png", fullPage: true });
+  await page.getByRole("link", { name: "Abrir ficha da música" }).click();
+  await expect(
+    page.getByTestId("reference-block").locator('[data-platform="spotify"]'),
+  ).toBeVisible();
   await context.close();
 });

@@ -16,7 +16,7 @@ import {
   Badge,
   Button,
   Card,
-  ConfirmDialog,
+  Dialog,
   ErrorBlock,
   Input,
   LoadingBlock,
@@ -24,8 +24,9 @@ import {
   Select,
   useToast,
 } from "../../components/ui";
-import { ApiError, errorCode, http } from "../../lib/api";
+import { ApiError, http } from "../../lib/api";
 import { cn } from "../../lib/cn";
+import { errorText } from "../../lib/errors";
 import { formatDuration } from "../../lib/format";
 import { useCurrentBand } from "../bands/BandLayout";
 import { repKeys, useRepertoires, useSong } from "../repertoire/queries";
@@ -82,32 +83,58 @@ function linkProblem(err: unknown): string {
 }
 
 /**
- * Runs "prepare" and, when the server says confirmed values or arrangement work depend on the
- * current reference, asks the member before replacing it. Nothing is changed until they confirm.
+ * Runs "prepare". When the song already has a different reference recording the server answers
+ * `confirmation_required` and nothing is changed; the member then chooses:
+ *  - Cancel: nothing happens;
+ *  - Keep the current reference: the preparation runs with the recording already chosen;
+ *  - Confirm replacement: the new recording becomes the reference and the preparation runs.
+ * The band's musical data is never deleted either way.
  */
 function usePrepareFlow(bandId: string, onPrepared: (res: PrepareResponse) => void) {
   const { t } = useTranslation(["autoarrange", "common"]);
   const prepare = usePrepare(bandId);
   const { toast } = useToast();
+  const [choice, setChoice] = useState<"keep" | "replace" | null>(null);
   const [pending, setPending] = useState<{
     input: Record<string, unknown>;
-    dependents: ReferenceDependents;
-    current: SongReferenceSummary;
+    dependents: ReferenceDependents | null;
+    current: SongReferenceSummary | null;
   } | null>(null);
 
-  const run = async (input: Record<string, unknown>, confirmed = false) => {
+  const send = async (input: Record<string, unknown>) => {
     try {
-      const res = await prepare.mutateAsync(confirmed ? { ...input, confirmReplace: true } : input);
+      const res = await prepare.mutateAsync(input);
       setPending(null);
       onPrepared(res);
     } catch (err) {
       if (err instanceof ApiError && err.code === "confirmation_required") {
-        const d = err.details as { dependents: ReferenceDependents; current: SongReferenceSummary };
-        setPending({ input, dependents: d.dependents, current: d.current });
+        const d = (err.details ?? {}) as {
+          dependents?: ReferenceDependents;
+          current?: SongReferenceSummary;
+        };
+        setPending({ input, dependents: d.dependents ?? null, current: d.current ?? null });
         return;
       }
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      setPending(null);
+      toast(errorText(err), "error");
+    } finally {
+      setChoice(null);
     }
+  };
+  const run = (input: Record<string, unknown>) => send(input);
+  const keep = () => {
+    if (!pending) return;
+    setChoice("keep");
+    void send({
+      songId: pending.input.songId,
+      recording: { source: "current" },
+      locale: pending.input.locale,
+    });
+  };
+  const replace = () => {
+    if (!pending) return;
+    setChoice("replace");
+    void send({ ...pending.input, confirmReplace: true });
   };
 
   const d = pending?.dependents;
@@ -127,33 +154,54 @@ function usePrepareFlow(bandId: string, onPrepared: (res: PrepareResponse) => vo
     if (d.audioAssets > 0) items.push(t("autoarrange:replace.audio", { count: d.audioAssets }));
     if (d.analyses > 0) items.push(t("autoarrange:replace.analyses", { count: d.analyses }));
   }
+  const current = pending?.current;
   const dialog = (
-    <ConfirmDialog
+    <Dialog
       open={!!pending}
-      onClose={() => setPending(null)}
+      onClose={() => (prepare.isPending ? undefined : setPending(null))}
       title={t("autoarrange:replace.title")}
-      confirmLabel={t("autoarrange:replace.confirm")}
-      loading={prepare.isPending}
-      onConfirm={() => pending && run(pending.input, true)}
-      body={
-        pending ? (
-          <div className="flex flex-col gap-2 text-sm" data-testid="replace-warning">
-            <p>
-              {t("autoarrange:replace.body", {
-                title: pending.current.title,
-                artist: pending.current.artist ?? "—",
-              })}
-            </p>
-            <ul className="list-disc pl-5">
-              {items.map((i) => (
-                <li key={i}>{i}</li>
-              ))}
-            </ul>
-            <p className="text-muted">{t("autoarrange:replace.kept")}</p>
+    >
+      {pending ? (
+        <div className="flex flex-col gap-3 text-sm" data-testid="replace-warning">
+          <p>{t("autoarrange:replace.body")}</p>
+          {current ? (
+            <div className="rounded-xl bg-sunken p-3" data-testid="replace-current">
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
+                {t("autoarrange:reference.current")}
+              </p>
+              <ReferenceSummaryView reference={current} size="sm" />
+            </div>
+          ) : null}
+          {items.length > 0 ? (
+            <div>
+              <p className="font-medium">{t("autoarrange:replace.workDone")}</p>
+              <ul className="mt-1 list-disc pl-5">
+                {items.map((i) => (
+                  <li key={i}>{i}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          <p className="text-muted">{t("autoarrange:replace.keepHint")}</p>
+          <div className="mt-1 flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
+            <Button variant="ghost" onClick={() => setPending(null)} disabled={prepare.isPending}>
+              {t("common:actions.cancel")}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={keep}
+              loading={choice === "keep"}
+              disabled={prepare.isPending}
+            >
+              {t("autoarrange:replace.keep")}
+            </Button>
+            <Button onClick={replace} loading={choice === "replace"} disabled={prepare.isPending}>
+              {t("autoarrange:replace.confirm")}
+            </Button>
           </div>
-        ) : null
-      }
-    />
+        </div>
+      ) : null}
+    </Dialog>
   );
   return { run, loading: prepare.isPending, dialog };
 }
@@ -379,7 +427,7 @@ function LinkFlow({
         toast(t("autoarrange:link.saved"), "success");
         navigate(`/bands/${bandId}/songs/${song.id}`);
       } catch (err) {
-        toast(t(`common:errors.${errorCode(err)}`), "error");
+        toast(errorText(err), "error");
       }
       return;
     }
@@ -440,7 +488,7 @@ function LinkFlow({
           >
             {knownProblems.includes(problem)
               ? t(`autoarrange:link.problem.${problem}`)
-              : t(`common:errors.${errorCode(identify.error)}`)}
+              : errorText(identify.error)}
           </p>
         ) : null}
       </Card>
@@ -789,7 +837,7 @@ function CatalogueFlow({
                 data-state={problem}
               >
                 {t(`autoarrange:link.problem.${problem}`, {
-                  defaultValue: t(`common:errors.${errorCode(identify.error)}`),
+                  defaultValue: errorText(identify.error),
                 })}
               </p>
             ) : null}
@@ -918,7 +966,7 @@ function PreparedView({
       await qc.invalidateQueries({ queryKey: repKeys.repertoires(bandId) });
       setAddedTo(rep.name);
     } catch (err) {
-      toast(t(`common:errors.${errorCode(err)}`), "error");
+      toast(errorText(err), "error");
     } finally {
       setAdding(false);
     }

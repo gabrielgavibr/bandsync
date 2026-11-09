@@ -3,7 +3,8 @@ import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { Button, Card, Input, PageHeader, useToast } from "../../components/ui";
-import { errorCode, http } from "../../lib/api";
+import { http } from "../../lib/api";
+import { errorText } from "../../lib/errors";
 import { bandKeys } from "./queries";
 
 interface InvitePreview {
@@ -40,7 +41,7 @@ export function JoinPage() {
           setError(t(`common:errors.invite_${res.invite.status}`));
       } catch (err) {
         setPreview(null);
-        setError(t(`common:errors.${errorCode(err)}`));
+        setError(errorText(err));
       } finally {
         setBusy(false);
       }
@@ -63,7 +64,7 @@ export function JoinPage() {
       toast(t("band:join.accepted", { band: res.band.name }), "success");
       navigate(`/bands/${res.band.id}`);
     } catch (err) {
-      setError(t(`common:errors.${errorCode(err)}`));
+      setError(errorText(err));
     } finally {
       setBusy(false);
     }

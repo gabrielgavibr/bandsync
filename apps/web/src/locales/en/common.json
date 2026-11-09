@@ -151,5 +151,9 @@
   "install": {
     "title": "Install BandSync",
     "body": "Add it to your home screen for quick access during rehearsals."
+  },
+  "update": {
+    "body": "A new version of BandSync is available. Reload to use the latest version.",
+    "reload": "Reload"
   }
 }

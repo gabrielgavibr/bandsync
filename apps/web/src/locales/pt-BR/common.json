@@ -151,5 +151,9 @@
   "install": {
     "title": "Instalar o BandSync",
     "body": "Adicione à tela inicial para acesso rápido durante os ensaios."
+  },
+  "update": {
+    "body": "Há uma nova versão do BandSync. Atualize para usar a versão mais recente.",
+    "reload": "Atualizar"
   }
 }
