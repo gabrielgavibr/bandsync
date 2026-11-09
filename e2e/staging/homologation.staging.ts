@@ -280,6 +280,29 @@ test("homologation: reference recordings with real platforms", async ({ browser 
   await expect(block).toHaveAttribute("data-state", "link_pending");
   await expect(block).toContainText("Cássia Reggae, Vol. 1");
 
+  // 2b. Replacing a reference asks first, in words, with three choices. Cancelled: nothing changes.
+  await openSong(/Esotérico/);
+  await block.getByRole("button", { name: "Informar link" }).click();
+  await ana.page.getByLabel("Link da gravação").fill(YT);
+  await ana.page.getByRole("button", { name: "Identificar" }).click();
+  await expect(ana.page.getByTestId("reference-preview")).toBeVisible({ timeout: 30_000 });
+  await ana.page.getByRole("radio", { name: /Outra gravação/ }).check();
+  await ana.page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  const warning = ana.page.getByTestId("replace-warning");
+  await expect(warning).toContainText(
+    "Esta música já possui uma gravação de referência. Deseja substituí-la?",
+  );
+  await expect(warning.getByTestId("replace-current")).toContainText("Um Banda Um");
+  await expect(warning.getByRole("button", { name: "Manter referência atual" })).toBeVisible();
+  await expect(warning.getByRole("button", { name: "Confirmar substituição" })).toBeVisible();
+  await expect(ana.page.getByText(/\berrors\.[a-z_]+/)).toHaveCount(0);
+  await ana.page.screenshot({ path: `${SHOTS}/12b-confirmar-substituicao.png` });
+  await warning.getByRole("button", { name: "Cancelar" }).click();
+  await expect(warning).toHaveCount(0);
+  await openSong(/Esotérico/);
+  await expect(block).toHaveAttribute("data-state", "link_pending");
+  await expect(block).toContainText("Um Banda Um");
+
   // 3. The add-song flow identifies real links (and refuses the rest) without saving anything.
   await ana.page.getByRole("link", { name: "Músicas" }).first().click();
   await ana.page.getByRole("link", { name: "Adicionar música" }).first().click();
