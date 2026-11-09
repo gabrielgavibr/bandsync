@@ -81,6 +81,18 @@ Planned:
 - Production deployment on Cloudflare with custom domain; e-mail provider; monitoring.
 - LGPD: data export and account deletion endpoints.
 
+## AutoArrange — **Stage A done**
+
+Detailed in `AUTOARRANGE.md`.
+
+- **A — Identification and sources — Done.** Add-song wizard (search by title/artist, one result per recording, release choice, YouTube link validated and played in the official player), source registry with what each site allows, preparation jobs on a Durable Object (states, retry, cancel, dedupe, cost budget), results stored with origin/method/review state, human confirmation of the band's tempo, key and meter with who and when, song-sheet panel, live session using the confirmed values.
+- **B — Authorised audio analysis — Not implemented.** Storage for authorised audio with a rights declaration and the pipeline steps exist; there is no analysis engine and no upload screen. Tempo, key, structure and chords are not produced.
+- **C — Arrangement-map editor — Not implemented.** Section timing and cue columns exist.
+- **D — Per-instrument materials — Not implemented.** Harmony table exists; pending workspaces per instrument are created today.
+- **E — Live integration and homologation — Partial.** The live room uses the band's confirmed tempo and meter; it does not follow an arrangement map yet.
+
 ## Next recommended step
 
 Run the **acoustic calibration** on two real phones (`AUDIO_SYNC.md` §9) and log the results. Everything downstream in the sync design (latency compensation, quality thresholds, whether synced mode can be recommended over central click) depends on that measurement, and it is the one acceptance criterion that software tests cannot settle. In parallel, Phase 3 (calendar and board) is the next feature block with no technical unknowns.
+
+For AutoArrange, the next step is **stage B with an in-browser engine** on a file the member provides (no server cost), validated against the three real songs before any estimate is shown without "review needed". A server-side engine is a paid service and needs authorisation first.

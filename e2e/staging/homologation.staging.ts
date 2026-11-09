@@ -174,3 +174,77 @@ test("homologation: gate, two accounts, languages, desktop + mobile, live rehear
   await ana.context.close();
   await bruno.context.close();
 });
+
+/**
+ * AutoArrange against the real services. Read-only for the band: it checks what the preparation
+ * of Pérola Negra stored, and searches the versions of Esotérico without choosing one (that
+ * choice belongs to the band).
+ */
+test("homologation: AutoArrange with real sources", async ({ browser }) => {
+  const c = credentials();
+  const ana = await enter(browser, c.key, { viewport: { width: 1280, height: 900 } });
+  await login(ana.page, "ana@bandsync.demo", c.ana);
+  await ana.page.getByRole("link", { name: /Sala 3/ }).click();
+  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
+
+  // 1. The song sheet of Pérola Negra shows the identified recording and sourced data.
+  await ana.page
+    .getByRole("link", { name: /Pérola Negra/ })
+    .first()
+    .click();
+  const panel = ana.page.getByTestId("autoarrange-panel");
+  await expect(panel).toContainText("Gravação de referência");
+  await expect(panel).toContainText("Natiruts Part. Especial Luiz Melodia");
+  await expect(panel).toContainText("Acústico no Rio de Janeiro");
+  await expect(panel.locator('[data-kind="duration"]')).toContainText("3:30");
+  await expect(panel.locator('[data-kind="duration"]')).toContainText("MusicBrainz");
+  await expect(panel.locator('[data-kind="composer"]')).toContainText("Luiz Melodia");
+  // Nothing analysed is claimed.
+  await expect(panel.locator('[data-kind="bpm"]')).toHaveCount(0);
+  await expect(panel.locator('[data-kind="key"]')).toHaveCount(0);
+  await expect(panel.getByText("não foram analisados")).toBeVisible();
+  const lastJob = panel.locator("details", { hasText: "Última preparação" });
+  if ((await lastJob.getAttribute("open")) === null) await lastJob.locator("summary").click();
+  await expect(panel.locator('[data-step="analyzing_audio"]')).toContainText(
+    "Nenhum arquivo de áudio autorizado foi fornecido.",
+  );
+  await ana.page.screenshot({ path: `${SHOTS}/11-autoarrange-ficha-perola.png`, fullPage: true });
+
+  // 2. The wizard tells the recordings of Esotérico apart (live MusicBrainz).
+  await ana.page.getByRole("link", { name: "Músicas" }).first().click();
+  await ana.page.getByRole("link", { name: "Adicionar música" }).first().click();
+  await expect(ana.page.getByRole("heading", { name: "Adicionar música", level: 1 })).toBeVisible();
+  await expect(ana.page.getByText("Fontes e como o BandSync pode usá-las")).toBeVisible();
+  await ana.page.getByLabel("Título da música").fill("Esotérico");
+  await ana.page.getByLabel("Artista (opcional)").fill("Gilberto Gil");
+  await ana.page.getByRole("button", { name: "Buscar" }).click();
+  const results = ana.page.getByTestId("recording-results");
+  const umBandaUm = results.locator('[data-mbid="8379142a-fe4e-4da2-8edf-fb493665a54f"]');
+  const docesBarbaros = results.locator('[data-mbid="d72d41dd-fb12-4775-8188-d95c1fdabfe3"]');
+  await expect(umBandaUm).toContainText("Um Banda Um", { timeout: 30_000 });
+  await expect(docesBarbaros).toBeVisible();
+  expect(await results.locator("li").count()).toBeGreaterThan(2);
+  await ana.page.screenshot({
+    path: `${SHOTS}/12-autoarrange-versoes-esoterico.png`,
+    fullPage: true,
+  });
+
+  // 3. Selecting one shows what the source says and admits what it does not say.
+  await umBandaUm.getByRole("button", { name: "Selecionar" }).click();
+  const preview = ana.page.getByTestId("recording-preview");
+  await expect(preview).toContainText("Um Banda Um", { timeout: 30_000 });
+  await expect(preview).toContainText("A fonte não informa quem compôs esta gravação");
+
+  // 4. A YouTube link is validated and offered only through the official player.
+  await ana.page.getByLabel("Link do YouTube").fill("https://youtu.be/JZqFoTIAJj8");
+  await ana.page.getByRole("button", { name: "Verificar" }).click();
+  const yt = ana.page.getByTestId("youtube-preview");
+  await expect(yt).toContainText("Canal:", { timeout: 30_000 });
+  await expect(yt.locator("iframe")).toHaveAttribute(
+    "src",
+    "https://www.youtube-nocookie.com/embed/JZqFoTIAJj8",
+  );
+  await ana.page.screenshot({ path: `${SHOTS}/13-autoarrange-selecao.png`, fullPage: true });
+  // Leave without preparing: the band chooses the version of Esotérico itself.
+  await ana.context.close();
+});

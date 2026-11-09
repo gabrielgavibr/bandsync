@@ -3,6 +3,7 @@ import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 import enAuth from "../locales/en/auth.json";
+import enAutoArrange from "../locales/en/autoarrange.json";
 import enBand from "../locales/en/band.json";
 import enCommon from "../locales/en/common.json";
 import enProfile from "../locales/en/profile.json";
@@ -10,6 +11,7 @@ import enRehearsal from "../locales/en/rehearsal.json";
 import enRepertoire from "../locales/en/repertoire.json";
 import enTools from "../locales/en/tools.json";
 import ptAuth from "../locales/pt-BR/auth.json";
+import ptAutoArrange from "../locales/pt-BR/autoarrange.json";
 import ptBand from "../locales/pt-BR/band.json";
 import ptCommon from "../locales/pt-BR/common.json";
 import ptProfile from "../locales/pt-BR/profile.json";
@@ -25,6 +27,7 @@ export const NAMESPACES = [
   "rehearsal",
   "tools",
   "profile",
+  "autoarrange",
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
@@ -37,6 +40,7 @@ export const resources = {
     rehearsal: enRehearsal,
     tools: enTools,
     profile: enProfile,
+    autoarrange: enAutoArrange,
   },
   "pt-BR": {
     common: ptCommon,
@@ -46,6 +50,7 @@ export const resources = {
     rehearsal: ptRehearsal,
     tools: ptTools,
     profile: ptProfile,
+    autoarrange: ptAutoArrange,
   },
 } as const;
 

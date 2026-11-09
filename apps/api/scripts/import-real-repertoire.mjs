@@ -17,6 +17,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { connect } from "./lib/client.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const data = JSON.parse(readFileSync(join(root, "seed", "real-repertoire.json"), "utf8"));
@@ -26,52 +27,6 @@ const ARCHIVE = args.has("--archive-fictional");
 const FICTIONAL_SONGS = ["Luz da Garagem", "Quinta às Oito", "Contagem Regressiva"];
 const FICTIONAL_REPERTOIRES = ["Ensaio de quinta", "Show do bar"];
 
-const base = process.env.BANDSYNC_URL?.replace(/\/$/, "");
-let email = process.env.BANDSYNC_EMAIL;
-let password = process.env.BANDSYNC_PASSWORD;
-let accessKey = process.env.BANDSYNC_ACCESS_KEY;
-const bandName = process.env.BANDSYNC_BAND ?? "Sala 3";
-if (process.env.BANDSYNC_CREDENTIALS) {
-  const text = readFileSync(process.env.BANDSYNC_CREDENTIALS, "utf8");
-  accessKey ??= /Access key[^:]*:\s*(\S+)/.exec(text)?.[1];
-  email ??= "ana@bandsync.demo";
-  password ??= new RegExp(`${email.replace(/\./g, "\\.")}\\s+(\\S+)`).exec(text)?.[1];
-}
-if (!base || !email || !password) {
-  console.error(
-    "Set BANDSYNC_URL, BANDSYNC_EMAIL and BANDSYNC_PASSWORD (or BANDSYNC_CREDENTIALS).",
-  );
-  process.exit(2);
-}
-
-const jar = new Map();
-function remember(res) {
-  for (const c of res.headers.getSetCookie?.() ?? []) {
-    const [pair] = c.split(";");
-    const i = pair.indexOf("=");
-    jar.set(pair.slice(0, i), pair.slice(i + 1));
-  }
-}
-const cookie = () => [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
-
-async function call(method, path, body) {
-  const res = await fetch(`${base}${path}`, {
-    method,
-    redirect: "manual",
-    headers: {
-      cookie: cookie(),
-      origin: base,
-      ...(body === undefined ? {} : { "content-type": "application/json" }),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  remember(res);
-  const text = await res.text();
-  const json = text ? JSON.parse(text) : null;
-  if (!res.ok) throw new Error(`${method} ${path} -> ${res.status} ${text.slice(0, 300)}`);
-  return json;
-}
-
 const report = { songs: {}, repertoire: null, archived: [] };
 const bump = (song, key) => {
   report.songs[song] ??= { song: "existing", referencesAdded: 0, materialsAdded: 0 };
@@ -79,26 +34,8 @@ const bump = (song, key) => {
   else report.songs[song][key] += 1;
 };
 
-// 1. Staging gate (only when a key is given) and login.
-if (accessKey) {
-  const res = await fetch(`${base}/__access`, {
-    method: "POST",
-    redirect: "manual",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ key: accessKey, next: "/" }),
-  });
-  remember(res);
-  if (res.status !== 303) throw new Error(`access gate refused the key (${res.status})`);
-}
-await call("POST", "/api/auth/login", { email, password });
-
-// 2. Band.
-const { bands } = await call("GET", "/api/bands");
-const band = bands.find((b) => b.name === bandName);
-if (!band) throw new Error(`band "${bandName}" not found for ${email}`);
-if (!band.myPermissions.canEditRepertoire)
-  throw new Error(`${email} cannot edit the repertoire of "${bandName}"`);
-const B = `/api/bands/${band.id}`;
+// 1–2. Staging gate, login and band.
+const { base, bandName, call, bandPath: B } = await connect();
 
 // 3. Songs, references and materials.
 const { songs: existing } = await call("GET", `${B}/songs`);

@@ -18,6 +18,7 @@ import { errorCode } from "../../lib/api";
 import { cn } from "../../lib/cn";
 import { resolvePreferredMaterial } from "../../lib/materials";
 import { useAuth } from "../auth/AuthProvider";
+import { AutoArrangePanel } from "../autoarrange/AutoArrangePanel";
 import { useCurrentBand } from "../bands/BandLayout";
 import { useMembers } from "../bands/queries";
 import { MaterialEditor } from "./MaterialEditor";
@@ -82,6 +83,7 @@ export function SongDetailPage() {
       <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
         <div className="flex flex-col gap-4">
           <SongSheet song={song} />
+          <AutoArrangePanel bandId={band.id} songId={song.id} canEdit={canEdit} />
           <MaterialsOverview materials={materials} />
           <ReferencesCard bandId={band.id} song={song} canEdit={canEdit} />
           {song.version.notes ? (

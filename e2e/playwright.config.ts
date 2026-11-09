@@ -23,7 +23,15 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      command: "pnpm --filter @bandsync/api dev",
+      // Replays captured MusicBrainz / YouTube oEmbed responses so tests need no internet access.
+      command: "node e2e/stubs/music-services.ts",
+      url: "http://localhost:8790/__test/calls",
+      reuseExistingServer: true,
+      cwd: "..",
+      timeout: 30_000,
+    },
+    {
+      command: "pnpm --filter @bandsync/api dev:e2e",
       url: "http://localhost:8787/api/health",
       reuseExistingServer: true,
       cwd: "..",

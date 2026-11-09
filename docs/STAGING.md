@@ -72,6 +72,20 @@ STAGING_URL=https://bandsync-staging.<subdomain>.workers.dev pnpm test:staging
 The check passes the gate, refuses a wrong key, confirms the public demo password is blocked, logs in as
 two accounts (desktop and iPhone-sized viewports), switches the language, opens band pages, runs a live
 rehearsal across both devices and saves screenshots to `test-results/staging/`.
+A second scenario checks AutoArrange against the real MusicBrainz and YouTube services: the recording
+identified for Pérola Negra and its sourced data, the versions of Esotérico in the wizard and the
+validation of a YouTube link. It does not prepare or change any song.
+
+## AutoArrange on staging
+
+After a deploy that includes migration `0003`, the preparation of the two songs whose recording the
+band chose is applied through the API (idempotent, never changes the band's own values):
+
+```bash
+BANDSYNC_URL=https://bandsync-staging.<subdomain>.workers.dev BANDSYNC_CREDENTIALS=.staging/credentials.txt pnpm --filter @bandsync/api prepare:real-repertoire
+```
+
+Esotérico is left for the band to choose its recording in the "Adicionar música" wizard.
 
 ## Cost
 
@@ -87,3 +101,6 @@ request; the generated passwords are long and random, so this is acceptable for 
   code or link work.
 - Acoustic simultaneity between phones has not been measured; see `docs/AUDIO_SYNC.md`.
 - Calendar, announcements, polls, tasks and recordings are not implemented yet.
+- AutoArrange does not analyse audio: tempo, key, structure and chords are not produced (see
+  `docs/AUTOARRANGE.md`). MusicBrainz may throttle requests coming from Cloudflare; the app then
+  reports that the source is unavailable and the search can be repeated.

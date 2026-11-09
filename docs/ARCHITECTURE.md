@@ -138,6 +138,16 @@ See `REALTIME_PROTOCOL.md` (session state, messages, conductor rules) and `AUDIO
 | Soft deletes (`deleted_at`) on bands, songs, materials, repertoires, files     | Supports future export/undo; queries always filter `deleted_at IS NULL`                                                                                      |
 | PBKDF2 rather than Argon2/bcrypt                                               | Only Web Crypto is available in Workers without WASM; parameters are stored per hash for future upgrades                                                     |
 
+## AutoArrange
+
+Recording identification, reference sources and preparation jobs live in their own module
+(`packages/shared/src/autoarrange`, `apps/api/src/autoarrange`, `apps/web/src/features/autoarrange`)
+with two more Durable Objects: `MusicBrainzGatewayDO` (a single instance that spaces, retries and
+caches calls to MusicBrainz) and `PrepareJobDO` (one instance per job, one pipeline step per alarm).
+External content is never copied: metadata comes from the MusicBrainz API, video is played through
+YouTube's official player, chord and tab sites are linked only. Audio analysis is not implemented.
+Full description, limits and roadmap in `AUTOARRANGE.md`.
+
 ## Known limitations
 
 - E-mail delivery is not configured; only a Resend adapter stub exists behind `MAIL_PROVIDER=resend`.

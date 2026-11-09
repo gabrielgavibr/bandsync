@@ -1,4 +1,4 @@
-import { COMMON_TIME_SIGNATURES, FACT_STATUSES } from "@bandsync/shared";
+import { COMMON_TIME_SIGNATURES, FACT_STATUSES, type SectionCue } from "@bandsync/shared";
 import { Plus, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,11 @@ interface SectionDraft {
   name: string;
   bars: number;
   notes: string;
+  /** Arrangement-map data this form does not edit; carried through so saving does not drop it. */
+  kind: string | null;
+  startMs: number | null;
+  endMs: number | null;
+  cues: SectionCue[];
 }
 let sectionUid = 0;
 const nextUid = () => ++sectionUid;
@@ -48,6 +53,10 @@ export function SongFormPage() {
           name: s.name,
           bars: s.bars,
           notes: s.notes ?? "",
+          kind: s.kind,
+          startMs: s.startMs,
+          endMs: s.endMs,
+          cues: s.cues,
         })),
       );
       setMeter(`${existing.data.song.version.beatsPerBar}/${existing.data.song.version.beatUnit}`);
@@ -91,7 +100,15 @@ export function SongFormPage() {
         },
         sections: sections
           .filter((s) => s.name.trim())
-          .map((s) => ({ name: s.name.trim(), bars: s.bars, notes: s.notes || null })),
+          .map((s) => ({
+            name: s.name.trim(),
+            bars: s.bars,
+            notes: s.notes || null,
+            kind: s.kind,
+            startMs: s.startMs,
+            endMs: s.endMs,
+            cues: s.cues,
+          })),
       });
       toast(t("repertoire:song.saved"), "success");
       navigate(`/bands/${band.id}/songs/${saved.id}`);
@@ -328,7 +345,19 @@ export function SongFormPage() {
               variant="secondary"
               icon={<Plus className="size-4" />}
               onClick={() =>
-                setSections([...sections, { uid: nextUid(), name: "", bars: 8, notes: "" }])
+                setSections([
+                  ...sections,
+                  {
+                    uid: nextUid(),
+                    name: "",
+                    bars: 8,
+                    notes: "",
+                    kind: null,
+                    startMs: null,
+                    endMs: null,
+                    cues: [],
+                  },
+                ])
               }
             >
               {t("repertoire:sections.add")}

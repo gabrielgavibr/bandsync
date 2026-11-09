@@ -36,8 +36,7 @@ export class MusicBrainzGatewayDO extends DurableObject<Env> {
       Math.max(0, Number(url.searchParams.get("ttl") ?? "0") * 1000),
     );
     const base = (this.env.MUSICBRAINZ_BASE_URL || MUSICBRAINZ_BASE_URL).replace(/\/$/, "");
-    if (!target || !target.startsWith(`${base}/ws/2/`))
-      return new Response("bad target", { status: 400 });
+    if (!target?.startsWith(`${base}/ws/2/`)) return new Response("bad target", { status: 400 });
 
     const key = `${CACHE_PREFIX}${await sha256Hex(target)}`;
     if (ttlMs > 0) {
@@ -78,7 +77,9 @@ export class MusicBrainzGatewayDO extends DurableObject<Env> {
 
   private async call(target: string): Promise<{ status: number; body: string }> {
     const minInterval = Number(this.env.MUSICBRAINZ_MIN_INTERVAL_MS ?? DEFAULT_MIN_INTERVAL_MS);
-    const contact = this.env.MUSICBRAINZ_CONTACT || "https://github.com/gabrielgavibr/bandsync";
+    // The contact is configuration, never source: whoever runs the deployment decides what to share.
+    const contact = this.env.MUSICBRAINZ_CONTACT?.trim();
+    const userAgent = contact ? `BandSync/0.1 ( ${contact} )` : "BandSync/0.1";
     let last = { status: 503, body: JSON.stringify({ error: "unavailable" }) };
     for (let attempt = 1; attempt <= MAX_UPSTREAM_ATTEMPTS; attempt += 1) {
       const wait = this.lastCallAt + minInterval * attempt - Date.now();
@@ -86,7 +87,7 @@ export class MusicBrainzGatewayDO extends DurableObject<Env> {
       this.lastCallAt = Date.now();
       try {
         const res = await fetch(target, {
-          headers: { "user-agent": `BandSync/0.1 ( ${contact} )`, accept: "application/json" },
+          headers: { "user-agent": userAgent, accept: "application/json" },
           signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
         const body = await res.text();

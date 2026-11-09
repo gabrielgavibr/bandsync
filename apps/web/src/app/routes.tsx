@@ -30,6 +30,11 @@ const RehearsalRoomPage = lazy(() =>
 const ToolsPage = lazy(() =>
   import("../features/tools/ToolsPage").then((m) => ({ default: m.ToolsPage })),
 );
+const AddSongWizardPage = lazy(() =>
+  import("../features/autoarrange/AddSongWizardPage").then((m) => ({
+    default: m.AddSongWizardPage,
+  })),
+);
 const SongFormPage = lazy(() =>
   import("../features/repertoire/SongFormPage").then((m) => ({ default: m.SongFormPage })),
 );
@@ -74,6 +79,7 @@ export function AppRoutes() {
           <Route path="/bands/:bandId" element={<BandLayout />}>
             <Route index element={<BandDashboardPage />} />
             <Route path="songs" element={<SongsPage />} />
+            <Route path="songs/add" element={<AddSongWizardPage />} />
             <Route path="songs/new" element={<SongFormPage />} />
             <Route path="songs/:songId" element={<SongDetailPage />} />
             <Route path="songs/:songId/edit" element={<SongFormPage />} />

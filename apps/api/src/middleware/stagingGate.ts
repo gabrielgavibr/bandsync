@@ -40,8 +40,7 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 function safeNext(raw: string | null | undefined): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith(ACCESS_PATH))
-    return "/";
+  if (!raw?.startsWith("/") || raw.startsWith("//") || raw.startsWith(ACCESS_PATH)) return "/";
   return raw;
 }
 

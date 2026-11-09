@@ -31,7 +31,9 @@ Interface em português (pt-BR) e inglês desde o início; a preferência de idi
 | i18n pt-BR / en with key-parity test                                                                                                                        | Done                                                                            |
 | PWA manifest, service worker, icons                                                                                                                         | Done (offline behaviour not polished)                                           |
 | Calendar, attendance, announcements, polls, musical tasks, recordings                                                                                       | **Planned** (tables exist, no API or UI)                                        |
-| External song metadata (MusicBrainz), social login, SMS invites                                                                                             | **Planned**                                                                     |
+| AutoArrange stage A: find the exact recording (MusicBrainz), official YouTube player, source registry, preparation jobs, sourced results, human review      | Done (see `docs/AUTOARRANGE.md`)                                                |
+| AutoArrange audio analysis (tempo, key, structure, chords)                                                                                                  | **Not implemented** (designed; needs authorised audio and an analysis engine)   |
+| Social login, SMS invites                                                                                                                                   | **Planned**                                                                     |
 
 See `docs/ROADMAP.md` for the phase-by-phase picture.
 
@@ -104,7 +106,10 @@ docs/         Product, architecture, database, protocol, audio sync, roadmap, te
 - `docs/ROADMAP.md` — phases and next steps
 - `docs/TESTING.md` — how to run and extend the test suites, multi-device testing
 - `docs/DEPLOYMENT.md` — Cloudflare setup and production deploy
+- `docs/STAGING.md` — homologation environment
+- `docs/REAL_REPERTOIRE.md` — the real songs used for homologation
+- `docs/AUTOARRANGE.md` — recording identification, sources, preparation jobs, analysis roadmap
 
 ## Licensing of musical content
 
-BandSync stores only material the band adds itself. It does not scrape or fetch lyrics, chords or tabs from third-party sites. The demo seed contains fictional songs written for this repository.
+BandSync stores only material the band adds itself. It does not scrape or fetch lyrics, chords or tabs from third-party sites: AutoArrange reads open metadata from the MusicBrainz API, plays YouTube only through the official embedded player (no download or audio extraction) and keeps plain links to chord and tab sites. The demo seed contains fictional songs written for this repository.

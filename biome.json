@@ -17,7 +17,8 @@
       "!**/*.css",
       "!**/*.html",
       "!**/*.svg",
-      "!**/*.webmanifest"
+      "!**/*.webmanifest",
+      "!**/fixtures"
     ]
   },
   "formatter": {

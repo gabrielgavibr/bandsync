@@ -37,7 +37,7 @@ export function SongsPage() {
         subtitle={t("repertoire:songs.subtitle")}
         actions={
           canEdit ? (
-            <Link to={`/bands/${band.id}/songs/new`}>
+            <Link to={`/bands/${band.id}/songs/add`}>
               <Button icon={<Plus className="size-4" />}>{t("repertoire:songs.add")}</Button>
             </Link>
           ) : null
@@ -53,7 +53,7 @@ export function SongsPage() {
           body={t("repertoire:songs.emptyHint")}
           action={
             canEdit ? (
-              <Link to={`/bands/${band.id}/songs/new`}>
+              <Link to={`/bands/${band.id}/songs/add`}>
                 <Button icon={<Plus className="size-4" />}>{t("repertoire:songs.add")}</Button>
               </Link>
             ) : null

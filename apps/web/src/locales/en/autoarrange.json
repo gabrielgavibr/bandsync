@@ -1,0 +1,191 @@
+{
+  "title": "Add song",
+  "subtitle": "Find the exact recording, check what was found and let BandSync prepare the song for the band.",
+  "existingTitle": "Identify recording",
+  "existingSubtitle": "Choose the reference recording of “{{title}}”. What the band already filled in is not changed.",
+  "manual": "Enter manually",
+  "stepLabel": "Step {{n}}",
+  "search": {
+    "heading": "Find the recording",
+    "title": "Song title",
+    "artist": "Artist (optional)",
+    "submit": "Search",
+    "source": "Results from MusicBrainz, an open, community-maintained database.",
+    "results_one": "{{count}} recording found",
+    "results_other": "{{count}} recordings found",
+    "empty": "No recording found.",
+    "emptyHint": "Check the spelling, remove the artist, or continue without an identifier.",
+    "select": "Select",
+    "live": "Live",
+    "compilation": "Compilation",
+    "video": "Video",
+    "noDuration": "duration not listed",
+    "moreReleases_one": "+{{count}} release",
+    "moreReleases_other": "+{{count}} releases",
+    "withoutIdentifier": "Continue without an identifier",
+    "versionsHint": "Each row is a different recording. Live, studio and other performers' versions do not share tempo or arrangement."
+  },
+  "recording": {
+    "heading": "Reference recording",
+    "change": "Change recording",
+    "composer": "Written by",
+    "composerUnknown": "The source does not say who wrote this recording. The field stays empty for the band to fill in.",
+    "release": "Release",
+    "duration": "Duration",
+    "isrc": "ISRC",
+    "openSource": "Open on MusicBrainz",
+    "linked": "Preparation and analysis are tied to this recording, not to other versions of the song.",
+    "manualHeading": "Recording without an identifier",
+    "manualArtist": "Performer",
+    "manualRelease": "Album or project",
+    "manualYear": "Year"
+  },
+  "youtube": {
+    "heading": "Reference video (optional)",
+    "label": "YouTube link",
+    "check": "Check",
+    "invalid": "This link is not an available YouTube video.",
+    "channel": "Channel: {{name}}",
+    "notice": "The video is for listening through the official player. BandSync does not download or extract audio from YouTube.",
+    "remove": "Remove video",
+    "player": "Official YouTube player"
+  },
+  "prepare": {
+    "heading": "Prepare song",
+    "songTitle": "Title in the band",
+    "submit": "Prepare song",
+    "explain": "Preparation checks the recording at the source, gathers reference links and opens a workspace for each instrument. Tempo, key and structure are only analysed from authorised audio.",
+    "running": "Preparing…"
+  },
+  "steps": {
+    "searching_references": "Searching references",
+    "analyzing_audio": "Analysing audio",
+    "detecting_structure": "Detecting structure",
+    "preparing_materials": "Preparing materials"
+  },
+  "outcome": {
+    "done": "Done",
+    "skipped": "Not run",
+    "failed": "Failed",
+    "running": "Running",
+    "waiting": "Waiting"
+  },
+  "skip": {
+    "no_recording_identifier": "No recording identifier: nothing was looked up at the source.",
+    "no_authorized_audio": "No authorised audio file was provided.",
+    "engine_not_configured": "The audio analysis engine is not configured in this environment yet.",
+    "nothing_to_do": "Nothing to do."
+  },
+  "job": {
+    "status": {
+      "pending": "Pending",
+      "searching_references": "Searching references",
+      "analyzing_audio": "Analysing audio",
+      "detecting_structure": "Detecting structure",
+      "preparing_materials": "Preparing materials",
+      "awaiting_review": "Awaiting review",
+      "completed": "Completed",
+      "failed": "Error",
+      "cancelled": "Cancelled"
+    },
+    "cancel": "Cancel",
+    "retry": "Try again",
+    "complete": "Finish review",
+    "attempt": "Attempt {{n}} of {{max}}",
+    "failedBody": "Preparation did not finish. You can try again.",
+    "error": {
+      "upstream_unavailable": "The music data service did not respond.",
+      "song_not_found": "The song no longer exists.",
+      "budget_exceeded": "Preparation reached its external-request limit.",
+      "step_failed": "A step failed."
+    },
+    "linksAdded_one": "{{count}} link added",
+    "linksAdded_other": "{{count}} links added",
+    "slotsCreated_one": "{{count}} workspace opened",
+    "slotsCreated_other": "{{count}} workspaces opened",
+    "fieldsFilled_one": "{{count}} field filled",
+    "fieldsFilled_other": "{{count}} fields filled"
+  },
+  "results": {
+    "heading": "What was found",
+    "none": "No data was obtained automatically.",
+    "notAnalysed": "Tempo, key, time signature, harmony and structure were not analysed. That needs an audio file the band may process and an analysis engine, which is not configured yet. No value is made up.",
+    "kind": {
+      "duration": "Duration",
+      "composer": "Written by",
+      "bpm": "BPM",
+      "tempo_stability": "Tempo stability",
+      "tempo_ambiguity": "Possible half or double time",
+      "time_signature": "Time signature",
+      "key": "Key",
+      "beats": "Beats",
+      "chords": "Harmony",
+      "sections": "Structure"
+    },
+    "origin": {
+      "musicbrainz": "MusicBrainz",
+      "youtube": "YouTube",
+      "audio_analysis": "Audio analysis",
+      "user": "Entered by the band"
+    },
+    "review": {
+      "unreviewed": "Not reviewed",
+      "needs_review": "Review needed",
+      "confirmed": "Confirmed",
+      "edited": "Corrected",
+      "rejected": "Rejected"
+    },
+    "method": "Method: {{method}}",
+    "confidence": "Confidence: {{value}}%",
+    "confidenceNone": "No confidence measure",
+    "obtainedAt": "Obtained on {{date}}",
+    "source": "Source"
+  },
+  "review": {
+    "heading": "Band review",
+    "hint": "The values below belong to the band's version and feed the live rehearsal metronome. Confirm them by ear; nothing is filled in by estimate.",
+    "bpm": "Band BPM",
+    "key": "Band key",
+    "meter": "Band time signature",
+    "confirm": "Confirm",
+    "confirmedBy": "Confirmed by {{name}} on {{date}}",
+    "notConfirmed": "Not confirmed yet",
+    "saved": "Confirmation recorded"
+  },
+  "repertoire": {
+    "heading": "Add to a repertoire",
+    "choose": "Repertoire",
+    "add": "Add",
+    "added": "Added to “{{name}}”",
+    "none": "The band has no repertoires yet."
+  },
+  "done": {
+    "openSong": "Open song sheet",
+    "another": "Add another song"
+  },
+  "sources": {
+    "heading": "Sources and how BandSync may use them",
+    "access": {
+      "api": "Official API",
+      "official_embed": "Official player",
+      "link_only": "Link only"
+    },
+    "policy": {
+      "musicbrainz": "Open data (CC0). BandSync queries the official API and may store the metadata.",
+      "youtube": "The video plays in the official player. No download or audio extraction.",
+      "linkOnly": "The site's terms do not allow copying or showing its content elsewhere. BandSync only keeps the link for you to open."
+    },
+    "terms": "Terms"
+  },
+  "panel": {
+    "heading": "AutoArrange",
+    "noRecording": "No recording identified yet.",
+    "identify": "Identify recording",
+    "prepareAgain": "Prepare again",
+    "listen": "Listen to the reference",
+    "hidePlayer": "Close player",
+    "lastJob": "Latest preparation",
+    "history": "Confirmation history",
+    "changed": "{{name}} · {{date}}"
+  }
+}

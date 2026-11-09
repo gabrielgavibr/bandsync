@@ -1,0 +1,191 @@
+{
+  "title": "Adicionar música",
+  "subtitle": "Busque a gravação exata, confira os dados encontrados e deixe o BandSync preparar a música para a banda.",
+  "existingTitle": "Identificar gravação",
+  "existingSubtitle": "Escolha a gravação de referência de “{{title}}”. Os dados que a banda já preencheu não são alterados.",
+  "manual": "Cadastrar manualmente",
+  "stepLabel": "Passo {{n}}",
+  "search": {
+    "heading": "Buscar gravação",
+    "title": "Título da música",
+    "artist": "Artista (opcional)",
+    "submit": "Buscar",
+    "source": "Resultados do MusicBrainz, base aberta mantida pela comunidade.",
+    "results_one": "{{count}} gravação encontrada",
+    "results_other": "{{count}} gravações encontradas",
+    "empty": "Nenhuma gravação encontrada.",
+    "emptyHint": "Confira a grafia, tire o artista ou continue sem identificador.",
+    "select": "Selecionar",
+    "live": "Ao vivo",
+    "compilation": "Coletânea",
+    "video": "Vídeo",
+    "noDuration": "duração não informada",
+    "moreReleases_one": "+{{count}} lançamento",
+    "moreReleases_other": "+{{count}} lançamentos",
+    "withoutIdentifier": "Continuar sem identificador",
+    "versionsHint": "Cada linha é uma gravação diferente. Versões ao vivo, de estúdio e de outros intérpretes não têm o mesmo andamento nem o mesmo arranjo."
+  },
+  "recording": {
+    "heading": "Gravação de referência",
+    "change": "Trocar gravação",
+    "composer": "Composição",
+    "composerUnknown": "A fonte não informa quem compôs esta gravação. O campo fica em branco para a banda preencher.",
+    "release": "Lançamento",
+    "duration": "Duração",
+    "isrc": "ISRC",
+    "openSource": "Ver no MusicBrainz",
+    "linked": "A preparação e a análise ficam ligadas a esta gravação, não a outras versões da música.",
+    "manualHeading": "Gravação sem identificador",
+    "manualArtist": "Intérprete",
+    "manualRelease": "Álbum ou projeto",
+    "manualYear": "Ano"
+  },
+  "youtube": {
+    "heading": "Vídeo de referência (opcional)",
+    "label": "Link do YouTube",
+    "check": "Verificar",
+    "invalid": "Este link não é de um vídeo disponível no YouTube.",
+    "channel": "Canal: {{name}}",
+    "notice": "O vídeo serve para ouvir pelo player oficial. O BandSync não baixa nem extrai o áudio do YouTube.",
+    "remove": "Remover vídeo",
+    "player": "Player oficial do YouTube"
+  },
+  "prepare": {
+    "heading": "Preparar música",
+    "songTitle": "Título na banda",
+    "submit": "Preparar música",
+    "explain": "A preparação confere a gravação na fonte, reúne os links de referência e abre um espaço de trabalho para cada instrumento. Andamento, tom e estrutura só são analisados a partir de áudio autorizado.",
+    "running": "Preparando…"
+  },
+  "steps": {
+    "searching_references": "Pesquisando referências",
+    "analyzing_audio": "Analisando áudio",
+    "detecting_structure": "Detectando estrutura",
+    "preparing_materials": "Preparando materiais"
+  },
+  "outcome": {
+    "done": "Concluída",
+    "skipped": "Não executada",
+    "failed": "Falhou",
+    "running": "Em andamento",
+    "waiting": "Aguardando"
+  },
+  "skip": {
+    "no_recording_identifier": "Sem identificador da gravação: nada foi consultado na fonte.",
+    "no_authorized_audio": "Nenhum arquivo de áudio autorizado foi fornecido.",
+    "engine_not_configured": "O motor de análise de áudio ainda não está configurado neste ambiente.",
+    "nothing_to_do": "Nada a fazer."
+  },
+  "job": {
+    "status": {
+      "pending": "Pendente",
+      "searching_references": "Pesquisando referências",
+      "analyzing_audio": "Analisando áudio",
+      "detecting_structure": "Detectando estrutura",
+      "preparing_materials": "Preparando materiais",
+      "awaiting_review": "Aguardando revisão",
+      "completed": "Concluído",
+      "failed": "Erro",
+      "cancelled": "Cancelado"
+    },
+    "cancel": "Cancelar",
+    "retry": "Tentar novamente",
+    "complete": "Concluir revisão",
+    "attempt": "Tentativa {{n}} de {{max}}",
+    "failedBody": "A preparação não terminou. Você pode tentar de novo.",
+    "error": {
+      "upstream_unavailable": "O serviço de dados musicais não respondeu.",
+      "song_not_found": "A música não existe mais.",
+      "budget_exceeded": "A preparação atingiu o limite de consultas externas.",
+      "step_failed": "Uma etapa falhou."
+    },
+    "linksAdded_one": "{{count}} link adicionado",
+    "linksAdded_other": "{{count}} links adicionados",
+    "slotsCreated_one": "{{count}} espaço de trabalho aberto",
+    "slotsCreated_other": "{{count}} espaços de trabalho abertos",
+    "fieldsFilled_one": "{{count}} campo preenchido",
+    "fieldsFilled_other": "{{count}} campos preenchidos"
+  },
+  "results": {
+    "heading": "O que foi encontrado",
+    "none": "Nenhum dado foi obtido automaticamente.",
+    "notAnalysed": "Andamento, tom, compasso, harmonia e estrutura não foram analisados. Isso exige um arquivo de áudio que a banda possa processar e um motor de análise, ainda não configurado. Nenhum valor é inventado.",
+    "kind": {
+      "duration": "Duração",
+      "composer": "Composição",
+      "bpm": "BPM",
+      "tempo_stability": "Estabilidade do andamento",
+      "tempo_ambiguity": "Possível metade ou dobro do andamento",
+      "time_signature": "Compasso",
+      "key": "Tom",
+      "beats": "Batidas",
+      "chords": "Harmonia",
+      "sections": "Estrutura"
+    },
+    "origin": {
+      "musicbrainz": "MusicBrainz",
+      "youtube": "YouTube",
+      "audio_analysis": "Análise de áudio",
+      "user": "Informado pela banda"
+    },
+    "review": {
+      "unreviewed": "Não revisado",
+      "needs_review": "Revisão necessária",
+      "confirmed": "Confirmado",
+      "edited": "Corrigido",
+      "rejected": "Descartado"
+    },
+    "method": "Método: {{method}}",
+    "confidence": "Confiança: {{value}}%",
+    "confidenceNone": "Sem medida de confiança",
+    "obtainedAt": "Obtido em {{date}}",
+    "source": "Fonte"
+  },
+  "review": {
+    "heading": "Revisão da banda",
+    "hint": "Os valores abaixo são os da versão da banda e alimentam o metrônomo do Ensaio ao vivo. Confirme de ouvido; nada é preenchido por estimativa.",
+    "bpm": "BPM da banda",
+    "key": "Tom da banda",
+    "meter": "Compasso da banda",
+    "confirm": "Confirmar",
+    "confirmedBy": "Confirmado por {{name}} em {{date}}",
+    "notConfirmed": "Ainda não confirmado",
+    "saved": "Confirmação registrada"
+  },
+  "repertoire": {
+    "heading": "Incluir no repertório",
+    "choose": "Repertório",
+    "add": "Incluir",
+    "added": "Incluída em “{{name}}”",
+    "none": "A banda ainda não tem repertórios."
+  },
+  "done": {
+    "openSong": "Abrir ficha da música",
+    "another": "Adicionar outra música"
+  },
+  "sources": {
+    "heading": "Fontes e como o BandSync pode usá-las",
+    "access": {
+      "api": "API oficial",
+      "official_embed": "Player oficial",
+      "link_only": "Somente link"
+    },
+    "policy": {
+      "musicbrainz": "Dados abertos (CC0). O BandSync consulta a API oficial e pode guardar os metadados.",
+      "youtube": "O vídeo toca no player oficial. Não há download nem extração de áudio.",
+      "linkOnly": "Os termos do site não permitem copiar nem exibir o conteúdo em outro lugar. O BandSync só guarda o link para você abrir."
+    },
+    "terms": "Termos"
+  },
+  "panel": {
+    "heading": "AutoArrange",
+    "noRecording": "Nenhuma gravação identificada ainda.",
+    "identify": "Identificar gravação",
+    "prepareAgain": "Preparar de novo",
+    "listen": "Ouvir a referência",
+    "hidePlayer": "Fechar player",
+    "lastJob": "Última preparação",
+    "history": "Histórico de confirmações",
+    "changed": "{{name}} · {{date}}"
+  }
+}

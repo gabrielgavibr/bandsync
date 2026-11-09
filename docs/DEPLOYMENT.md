@@ -27,7 +27,7 @@ Bucket:
 pnpm --filter @bandsync/api exec wrangler r2 bucket create bandsync-files-prod
 ```
 
-The Durable Object class `RehearsalSessionDO` is declared with the `v1` migration tag (`new_sqlite_classes`); nothing to create manually.
+The Durable Object classes are declared in `wrangler.jsonc` and created by the deploy: `RehearsalSessionDO` (tag `v1`), `MusicBrainzGatewayDO` and `PrepareJobDO` (tag `v2`, AutoArrange). Nothing to create manually.
 
 ## 2. Configure variables and secrets
 
@@ -56,6 +56,16 @@ pnpm --filter @bandsync/api exec wrangler secret put MAIL_FROM --env production
 Supported `MAIL_PROVIDER` value today: `resend` (HTTP API adapter in `src/lib/mailer.ts`). Any other value falls back to console logging.
 
 For local development copy `apps/api/.dev.vars.example` to `apps/api/.dev.vars`; it is git-ignored.
+
+### AutoArrange variables (optional)
+
+| Variable                                      | Purpose                                                                                                                                                                                                                                                                                      |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MUSICBRAINZ_CONTACT`                         | Contact (a URL or an address chosen by whoever runs the deployment) added to the `User-Agent` sent to MusicBrainz, as their API etiquette asks. Without it the app identifies itself only as `BandSync/<version>`, which MusicBrainz may throttle more. Not set anywhere in this repository. |
+| `MUSICBRAINZ_BASE_URL`, `YOUTUBE_OEMBED_BASE` | Override the external endpoints (used by tests and local e2e).                                                                                                                                                                                                                               |
+| `MUSICBRAINZ_MIN_INTERVAL_MS`                 | Minimum spacing between MusicBrainz calls (default 1100).                                                                                                                                                                                                                                    |
+
+AutoArrange needs outbound access to `musicbrainz.org` and `www.youtube.com` only. It uses no API key and no paid service; see `AUTOARRANGE.md` §10.
 
 ## 3. Apply migrations remotely
 
