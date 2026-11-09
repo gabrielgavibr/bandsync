@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+# Optional: transactional e-mail provider. When unset, e-mails are logged to the console.
+# MAIL_PROVIDER=resend
+# MAIL_API_KEY=
+# MAIL_FROM="BandSync <no-reply@example.com>"

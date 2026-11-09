@@ -1,0 +1,53 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bandsync",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-10-01",
+  "compatibility_flags": [],
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_ENV": "development",
+    "APP_URL": "http://localhost:5173",
+    "PBKDF2_ITERATIONS": "100000"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bandsync",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files" }],
+  "durable_objects": {
+    "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] }],
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "env": {
+    "production": {
+      "vars": {
+        "APP_ENV": "production",
+        "APP_URL": "https://bandsync.example.com",
+        "PBKDF2_ITERATIONS": "100000"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "bandsync-prod",
+          "database_id": "REPLACE_WITH_PRODUCTION_D1_ID",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files-prod" }],
+      "durable_objects": {
+        "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+      }
+    }
+  }
+}

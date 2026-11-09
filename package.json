@@ -1,0 +1,28 @@
+{
+  "name": "bandsync",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BandSync — Your band. Your music. In sync.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @bandsync/api --filter @bandsync/web dev",
+    "dev:api": "pnpm --filter @bandsync/api dev",
+    "dev:web": "pnpm --filter @bandsync/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @bandsync/e2e test",
+    "db:migrate:local": "pnpm --filter @bandsync/api db:migrate:local",
+    "db:seed:local": "pnpm --filter @bandsync/api db:seed:local",
+    "db:reset:local": "pnpm --filter @bandsync/api db:reset:local"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.6",
+    "typescript": "^5.9.3"
+  }
+}
