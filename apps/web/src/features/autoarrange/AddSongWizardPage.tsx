@@ -183,7 +183,7 @@ function usePrepareFlow(bandId: string, onPrepared: (res: PrepareResponse) => vo
             </div>
           ) : null}
           <p className="text-muted">{t("autoarrange:replace.keepHint")}</p>
-          <div className="mt-1 flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
+          <div className="mt-1 flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:flex-wrap sm:justify-end">
             <Button variant="ghost" onClick={() => setPending(null)} disabled={prepare.isPending}>
               {t("common:actions.cancel")}
             </Button>
