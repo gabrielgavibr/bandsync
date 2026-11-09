@@ -1,0 +1,149 @@
+{
+  "lobby": {
+    "title": "Ensaio ao vivo",
+    "subtitle": "Cada um entra pelo próprio aparelho. O regente escolhe a música; cada músico vê o seu material.",
+    "active": "Há uma sessão em andamento",
+    "join": "Entrar na sessão",
+    "none": "Nenhuma sessão em andamento",
+    "start": "Iniciar sessão",
+    "repertoire": "Repertório desta sessão",
+    "noRepertoire": "Sem repertório (escolher músicas livremente)",
+    "needsPermission": "Apenas integrantes com permissão de regência podem iniciar uma sessão. Fale com um administrador.",
+    "recent": "Sessões recentes",
+    "ended": "Encerrada",
+    "status": "Situação"
+  },
+  "status": {
+    "created": "Criada",
+    "waiting": "Aguardando música",
+    "ready": "Pronta",
+    "counting_in": "Contagem",
+    "playing": "Executando",
+    "paused": "Parada",
+    "ended": "Encerrada"
+  },
+  "room": {
+    "conductor": "Regente",
+    "noConductor": "Sem regente",
+    "you": "você",
+    "participants": "Músicos",
+    "connected": "conectado",
+    "offline": "offline",
+    "muted": "clique mudo",
+    "noSong": "Nenhuma música selecionada",
+    "noSongBody": "Aguardando o regente escolher uma música.",
+    "noSongConductor": "Escolha uma música na lista para enviá-la a todos.",
+    "currentSong": "Agora",
+    "upNext": "Próxima",
+    "songOf": "{{index}} de {{total}}",
+    "leave": "Sair",
+    "leaveConfirm": "Sair da sala de ensaio? A sessão continua para os demais.",
+    "endedTitle": "Sessão encerrada",
+    "endedBody": "O regente encerrou esta sessão.",
+    "backToBand": "Voltar para a banda",
+    "connectionLost": "Conexão perdida. Reconectando…",
+    "reconnected": "Reconectado e sincronizado.",
+    "conductorOffline": "O regente está offline. Quem tiver permissão pode assumir.",
+    "takeOver": "Assumir a regência",
+    "sessionEndedByServer": "Esta sessão foi encerrada.",
+    "error": {
+      "not_conductor": "Só o regente pode fazer isso.",
+      "not_allowed": "Você não pode fazer isso nesta sessão.",
+      "invalid_message": "O servidor rejeitou esse comando.",
+      "unknown_song": "Essa música não está disponível para esta banda.",
+      "unknown_repertoire": "Esse repertório não está disponível.",
+      "session_ended": "Esta sessão foi encerrada.",
+      "not_running": "O metrônomo não está em execução.",
+      "already_running": "O metrônomo já está em execução.",
+      "conductor_connected": "O regente ainda está conectado."
+    }
+  },
+  "controls": {
+    "title": "Controles do regente",
+    "start": "Iniciar",
+    "stop": "Parar",
+    "next": "Próxima música",
+    "prev": "Música anterior",
+    "selectSong": "Escolher música",
+    "selectRepertoire": "Repertório",
+    "freeSongs": "Todas as músicas",
+    "bpm": "BPM",
+    "tap": "Tap",
+    "timeSignature": "Compasso",
+    "countIn": "Contagem",
+    "countInBars_zero": "Sem contagem",
+    "countInBars_one": "{{count}} compasso",
+    "countInBars_other": "{{count}} compassos",
+    "subdivision": "Subdivisão",
+    "subdivisions": {
+      "1": "Tempos",
+      "2": "Colcheias",
+      "3": "Tercinas",
+      "4": "Semicolcheias"
+    },
+    "clickMode": "Modo do clique",
+    "clickModes": {
+      "synced": "Todos os aparelhos",
+      "central": "Clique central"
+    },
+    "clickModeHelp": {
+      "synced": "Cada celular toca o próprio clique seguindo a linha do tempo compartilhada.",
+      "central": "Só um aparelho (ligado à mesa ou ao retorno) toca o clique. Recomendado quando a precisão acústica é crítica."
+    },
+    "centralDevice": "Aparelho central",
+    "transfer": "Transferir regência",
+    "transferTo": "Transferir para {{name}}",
+    "claim": "Assumir regência",
+    "end": "Encerrar sessão",
+    "endConfirm": "Encerrar a sessão para todos?",
+    "startsIn": "Começa em {{seconds}}s",
+    "tempoChangeNote": "Mudanças de andamento valem a partir do próximo compasso."
+  },
+  "member": {
+    "material": "Seu material",
+    "chooseMaterial": "Outros materiais",
+    "noMaterial": "Não há material para o seu instrumento nesta música.",
+    "noMaterialHint": "Peça a quem cuida do repertório para adicionar um, ou escolha outro material acima.",
+    "zoomIn": "Aumentar",
+    "zoomOut": "Diminuir",
+    "clickOn": "Clique ligado",
+    "clickOff": "Clique desligado",
+    "volume": "Volume do clique",
+    "ready": "Estou pronto",
+    "notReady": "Ainda não",
+    "notes": "Anotações pessoais",
+    "transposeTo": "Mostrar no tom",
+    "originalKey": "como escrito",
+    "sections": "Arranjo"
+  },
+  "audio": {
+    "enable": "Ativar som",
+    "enableBody": "O navegador precisa de um toque antes de tocar o clique. Toque uma vez e mantenha a tela ligada durante o ensaio.",
+    "enabled": "Som pronto",
+    "blocked": "O som está bloqueado pelo navegador. Toque em “Ativar som” de novo.",
+    "suspended": "O áudio foi suspenso pelo sistema (tela bloqueada ou outro aplicativo). Toque para retomar.",
+    "unreliable": "A temporização está instável neste aparelho agora. O clique pode ficar fora de sincronia.",
+    "latency": "Latência de saída {{ms}} ms",
+    "bluetoothWarning": "Fones Bluetooth adicionam latência perceptível. Prefira saída com fio ou o modo de clique central."
+  },
+  "sync": {
+    "title": "Qualidade da sincronização",
+    "offset": "Desvio do relógio",
+    "rtt": "Ida e volta",
+    "jitter": "Variação",
+    "samples": "Amostras",
+    "quality": {
+      "unknown": "Medindo…",
+      "poor": "Ruim",
+      "fair": "Razoável",
+      "good": "Boa"
+    },
+    "help": "Medida em relação ao servidor da sessão. A simultaneidade acústica entre aparelhos ainda precisa ser conferida de ouvido; veja o guia de calibração na documentação.",
+    "resync": "Medir de novo"
+  },
+  "beat": {
+    "countIn": "Contagem",
+    "bar": "Compasso {{bar}}",
+    "ofBars": "{{bar}}/{{total}}"
+  }
+}

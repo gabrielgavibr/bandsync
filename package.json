@@ -2,7 +2,7 @@
   "name": "bandsync",
   "private": true,
   "version": "0.1.0",
-  "description": "BandSync — Your band. Your music. In sync.",
+  "description": "BandSync \u2014 Your band. Your music. In sync.",
   "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=22"
@@ -16,7 +16,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "pnpm -r test",
-    "test:e2e": "pnpm --filter @bandsync/e2e test",
+    "test:e2e": "pnpm --filter @bandsync/e2e test:e2e",
     "db:migrate:local": "pnpm --filter @bandsync/api db:migrate:local",
     "db:seed:local": "pnpm --filter @bandsync/api db:seed:local",
     "db:reset:local": "pnpm --filter @bandsync/api db:reset:local"

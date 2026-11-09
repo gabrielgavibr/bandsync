@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --color-accent-300: #5eead4;
+  --color-accent-400: #2dd4bf;
+  --color-accent-500: #14b8a6;
+  --color-accent-600: #0d9488;
+  --color-accent-700: #0f766e;
+
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-warn-400: #fbbf24;
+  --color-warn-500: #f59e0b;
+  --color-ok-400: #4ade80;
+  --color-ok-500: #22c55e;
+
+  --radius-xl: 0.9rem;
+  --radius-2xl: 1.25rem;
+}
+
+:root {
+  --bg: #f6f7f9;
+  --bg-elev: #ffffff;
+  --bg-sunken: #eceef2;
+  --fg: #0f141a;
+  --fg-muted: #5b6673;
+  --border: #d9dee5;
+  --ring: #14b8a6;
+  color-scheme: light;
+}
+.dark {
+  --bg: #0b0f14;
+  --bg-elev: #121820;
+  --bg-sunken: #070a0e;
+  --fg: #e9edf1;
+  --fg-muted: #94a1b0;
+  --border: #212a35;
+  --ring: #2dd4bf;
+  color-scheme: dark;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply antialiased;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  * {
+    border-color: var(--border);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@utility bg-surface {
+  background: var(--bg);
+}
+@utility bg-elev {
+  background: var(--bg-elev);
+}
+@utility bg-sunken {
+  background: var(--bg-sunken);
+}
+@utility text-fg {
+  color: var(--fg);
+}
+@utility text-muted {
+  color: var(--fg-muted);
+}
+@utility border-line {
+  border-color: var(--border);
+}
+
+@utility safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+@utility safe-top {
+  padding-top: max(env(safe-area-inset-top), 0.5rem);
+}
+
+@keyframes beat-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+.beat-pulse {
+  animation: beat-pulse 180ms ease-out;
+}

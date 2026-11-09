@@ -6,6 +6,8 @@ export interface Env {
   APP_ENV: "development" | "test" | "production" | string;
   APP_URL: string;
   PBKDF2_ITERATIONS?: string;
+  /** "on" (default) or "off". Only turn off for local development. */
+  RATE_LIMITS?: string;
   MAIL_PROVIDER?: string;
   MAIL_API_KEY?: string;
   MAIL_FROM?: string;

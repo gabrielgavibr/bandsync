@@ -1,0 +1,149 @@
+{
+  "lobby": {
+    "title": "Live rehearsal",
+    "subtitle": "Everyone joins from their own device. The conductor picks the song; each musician sees their own material.",
+    "active": "A session is in progress",
+    "join": "Join session",
+    "none": "No session running",
+    "start": "Start session",
+    "repertoire": "Repertoire for this session",
+    "noRepertoire": "No repertoire (pick songs freely)",
+    "needsPermission": "Only members allowed to conduct can start a session. Ask an admin.",
+    "recent": "Recent sessions",
+    "ended": "Ended",
+    "status": "Status"
+  },
+  "status": {
+    "created": "Created",
+    "waiting": "Waiting for a song",
+    "ready": "Ready",
+    "counting_in": "Count-in",
+    "playing": "Playing",
+    "paused": "Stopped",
+    "ended": "Ended"
+  },
+  "room": {
+    "conductor": "Conductor",
+    "noConductor": "No conductor",
+    "you": "you",
+    "participants": "Musicians",
+    "connected": "connected",
+    "offline": "offline",
+    "muted": "click muted",
+    "noSong": "No song selected",
+    "noSongBody": "Waiting for the conductor to choose a song.",
+    "noSongConductor": "Pick a song from the list to send it to everyone.",
+    "currentSong": "Now",
+    "upNext": "Up next",
+    "songOf": "{{index}} of {{total}}",
+    "leave": "Leave",
+    "leaveConfirm": "Leave the rehearsal room? The session keeps running for the others.",
+    "endedTitle": "Session ended",
+    "endedBody": "The conductor closed this session.",
+    "backToBand": "Back to the band",
+    "connectionLost": "Connection lost. Reconnecting…",
+    "reconnected": "Reconnected and back in sync.",
+    "conductorOffline": "The conductor is offline. Anyone allowed to conduct can take over.",
+    "takeOver": "Take over as conductor",
+    "sessionEndedByServer": "This session has ended.",
+    "error": {
+      "not_conductor": "Only the conductor can do that.",
+      "not_allowed": "You are not allowed to do that in this session.",
+      "invalid_message": "The server rejected that command.",
+      "unknown_song": "That song is not available to this band.",
+      "unknown_repertoire": "That repertoire is not available.",
+      "session_ended": "This session has ended.",
+      "not_running": "The metronome is not running.",
+      "already_running": "The metronome is already running.",
+      "conductor_connected": "The conductor is still connected."
+    }
+  },
+  "controls": {
+    "title": "Conductor controls",
+    "start": "Start",
+    "stop": "Stop",
+    "next": "Next song",
+    "prev": "Previous song",
+    "selectSong": "Choose song",
+    "selectRepertoire": "Repertoire",
+    "freeSongs": "All songs",
+    "bpm": "BPM",
+    "tap": "Tap",
+    "timeSignature": "Time signature",
+    "countIn": "Count-in",
+    "countInBars_zero": "No count-in",
+    "countInBars_one": "{{count}} bar",
+    "countInBars_other": "{{count}} bars",
+    "subdivision": "Subdivision",
+    "subdivisions": {
+      "1": "Beats",
+      "2": "Eighths",
+      "3": "Triplets",
+      "4": "Sixteenths"
+    },
+    "clickMode": "Click mode",
+    "clickModes": {
+      "synced": "Every device clicks",
+      "central": "Central click"
+    },
+    "clickModeHelp": {
+      "synced": "Each phone plays its own click following the shared timeline.",
+      "central": "Only one device (connected to the PA or monitors) plays the click. Recommended when acoustic precision is critical."
+    },
+    "centralDevice": "Central device",
+    "transfer": "Hand over conducting",
+    "transferTo": "Hand over to {{name}}",
+    "claim": "Become conductor",
+    "end": "End session",
+    "endConfirm": "End the session for everyone?",
+    "startsIn": "Starting in {{seconds}}s",
+    "tempoChangeNote": "Tempo changes apply at the next bar."
+  },
+  "member": {
+    "material": "Your material",
+    "chooseMaterial": "Other materials",
+    "noMaterial": "No material for your instrument in this song.",
+    "noMaterialHint": "Ask whoever maintains the repertoire to add one, or pick another material above.",
+    "zoomIn": "Larger",
+    "zoomOut": "Smaller",
+    "clickOn": "Click on",
+    "clickOff": "Click off",
+    "volume": "Click volume",
+    "ready": "I'm ready",
+    "notReady": "Not ready",
+    "notes": "Personal notes",
+    "transposeTo": "Show in key",
+    "originalKey": "as written",
+    "sections": "Arrangement"
+  },
+  "audio": {
+    "enable": "Enable sound",
+    "enableBody": "Your browser needs a tap before it can play the click. Tap once and keep the screen on during the rehearsal.",
+    "enabled": "Sound ready",
+    "blocked": "Sound is blocked by the browser. Tap “Enable sound” again.",
+    "suspended": "Audio was suspended by the system (screen lock or another app). Tap to resume.",
+    "unreliable": "Timing is unreliable on this device right now. The click may be out of sync.",
+    "latency": "Output latency {{ms}} ms",
+    "bluetoothWarning": "Bluetooth headphones add noticeable latency. Prefer wired output or the central click mode."
+  },
+  "sync": {
+    "title": "Sync quality",
+    "offset": "Clock offset",
+    "rtt": "Round trip",
+    "jitter": "Jitter",
+    "samples": "Samples",
+    "quality": {
+      "unknown": "Measuring…",
+      "poor": "Poor",
+      "fair": "Fair",
+      "good": "Good"
+    },
+    "help": "Measured against the session server. Acoustic simultaneity between devices must still be checked by ear; see the calibration guide in the docs.",
+    "resync": "Re-measure"
+  },
+  "beat": {
+    "countIn": "Count-in",
+    "bar": "Bar {{bar}}",
+    "ofBars": "{{bar}}/{{total}}"
+  }
+}

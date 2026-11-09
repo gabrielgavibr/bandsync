@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "playwright test --trace off",
-    "test:headed": "playwright test --headed",
+    "test:e2e": "playwright test --trace off",
+    "test:e2e:headed": "playwright test --headed",
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
+    "@types/node": "^24.19.2",
     "typescript": "^5.9.3"
   }
 }

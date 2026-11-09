@@ -8,7 +8,8 @@
   "vars": {
     "APP_ENV": "development",
     "APP_URL": "http://localhost:5173",
-    "PBKDF2_ITERATIONS": "100000"
+    "PBKDF2_ITERATIONS": "100000",
+    "RATE_LIMITS": "off"
   },
   "d1_databases": [
     {
@@ -34,7 +35,8 @@
       "vars": {
         "APP_ENV": "production",
         "APP_URL": "https://bandsync.example.com",
-        "PBKDF2_ITERATIONS": "100000"
+        "PBKDF2_ITERATIONS": "100000",
+        "RATE_LIMITS": "on"
       },
       "d1_databases": [
         {

@@ -1,0 +1,42 @@
+{
+  "title": "Tools",
+  "subtitle": "The same engines used in the live rehearsal, available on their own.",
+  "metronome": {
+    "title": "Metronome",
+    "description": "Precise Web Audio click with accent, subdivisions and count-in.",
+    "start": "Start",
+    "stop": "Stop",
+    "sound": "Click sound",
+    "sounds": { "beep": "Beep", "wood": "Wood", "tick": "Tick" },
+    "accent": "Accent first beat",
+    "volume": "Volume"
+  },
+  "transposer": {
+    "title": "Transposer",
+    "description": "Shift a chord chart to another key while keeping the layout.",
+    "from": "From key",
+    "to": "To key",
+    "semitones": "Semitones",
+    "input": "Paste the chord chart",
+    "output": "Result",
+    "placeholder": "D        A        Bm\nSome lyrics here…",
+    "copy": "Copy result"
+  },
+  "tuner": {
+    "title": "Chromatic tuner",
+    "description": "Uses the microphone to detect pitch.",
+    "start": "Start listening",
+    "stop": "Stop",
+    "permission": "Microphone access is required.",
+    "unsupported": "This browser does not expose the microphone API.",
+    "listening": "Listening…",
+    "cents": "cents",
+    "frequency": "Hz",
+    "quiet": "Play a note…"
+  },
+  "reader": {
+    "title": "Reader",
+    "description": "Comfortable reading of lyrics, chords, tabs and arrangement maps.",
+    "open": "Open a song from the repertoire to read it here."
+  }
+}

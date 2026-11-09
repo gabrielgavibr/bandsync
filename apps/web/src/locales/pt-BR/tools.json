@@ -1,0 +1,42 @@
+{
+  "title": "Ferramentas",
+  "subtitle": "Os mesmos motores usados no ensaio ao vivo, disponíveis separadamente.",
+  "metronome": {
+    "title": "Metrônomo",
+    "description": "Clique preciso em Web Audio com acento, subdivisões e contagem.",
+    "start": "Iniciar",
+    "stop": "Parar",
+    "sound": "Som do clique",
+    "sounds": { "beep": "Bipe", "wood": "Madeira", "tick": "Tique" },
+    "accent": "Acentuar primeiro tempo",
+    "volume": "Volume"
+  },
+  "transposer": {
+    "title": "Transpositor",
+    "description": "Muda uma cifra de tom mantendo o alinhamento.",
+    "from": "Do tom",
+    "to": "Para o tom",
+    "semitones": "Semitons",
+    "input": "Cole a cifra",
+    "output": "Resultado",
+    "placeholder": "D        A        Bm\nAlguma letra aqui…",
+    "copy": "Copiar resultado"
+  },
+  "tuner": {
+    "title": "Afinador cromático",
+    "description": "Usa o microfone para detectar a nota.",
+    "start": "Começar a ouvir",
+    "stop": "Parar",
+    "permission": "É necessário permitir o acesso ao microfone.",
+    "unsupported": "Este navegador não oferece acesso ao microfone.",
+    "listening": "Ouvindo…",
+    "cents": "cents",
+    "frequency": "Hz",
+    "quiet": "Toque uma nota…"
+  },
+  "reader": {
+    "title": "Leitor",
+    "description": "Leitura confortável de letras, cifras, tablaturas e mapas de arranjo.",
+    "open": "Abra uma música do repertório para lê-la aqui."
+  }
+}

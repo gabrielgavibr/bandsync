@@ -1,0 +1,92 @@
+# BandSync — Testing
+
+## Suites at a glance
+
+| Suite             | Command                               | Runtime                                                                                                | Count | Covers                                                                                                                                                                                                                                                                            |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/shared` | `pnpm --filter @bandsync/shared test` | Vitest, Node                                                                                           | 24    | note/key parsing in both notations, chord parsing and transposition, chord-sheet layout preservation, clock estimator (offset recovery, outlier rejection, quality), metronome timeline (count-in, clicks, subdivisions, bar-aligned retime), protocol schemas and `deriveStatus` |
+| `apps/api`        | `pnpm --filter @bandsync/api test`    | Vitest inside workerd (`@cloudflare/vitest-plugin`), real D1/R2/DO bindings, isolated storage per test | 28    | auth (register, validation codes, duplicates, login, logout, reset flow, e-mail non-disclosure, profile/preferences, Origin check, rate limiting), bands/members/invites/permissions, songs/materials/repertoires, R2 files, and **7 WebSocket tests** of the live session        |
+| `apps/web`        | `pnpm --filter @bandsync/web test`    | Vitest, jsdom                                                                                          | 17    | locale key parity, empty strings, placeholder parity, locale resolution, live language switch, Intl formatting, material resolution, metronome scheduler (exact instants, offset use, freeze handling, silent mode), socket client (seq ordering, pings/pongs, reconnect, ended)  |
+| `e2e`             | `pnpm test:e2e`                       | Playwright 1.63, Chromium                                                                              | 5     | UI registration → band → invite → join; pt-BR account and live switch; wrong credentials; **two-device live rehearsal**; permission to start a session                                                                                                                            |
+
+Run everything except e2e:
+
+```bash
+pnpm test
+```
+
+Typecheck and lint:
+
+```bash
+pnpm typecheck
+```
+
+```bash
+pnpm lint
+```
+
+## Worker tests
+
+`apps/api/vitest.config.ts` uses `cloudflareTest` with `wrangler.jsonc`, binds `APP_ENV=test` and `PBKDF2_ITERATIONS=1000` (fast hashing), and loads the D1 migrations through `test/apply-migrations.ts` before each file. `wrangler types` runs before the suite to generate `worker-configuration.d.ts` (git-ignored).
+
+The live-session tests (`test/rehearsal.test.ts`) open real WebSockets against the Durable Object through `SELF.fetch` with `Upgrade: websocket`, use a small `Client` helper that waits for messages from a cursor, and exercise: conductor auto-assignment, authorisation errors, song propagation with bpm/meter, repertoire navigation, `seq` monotonicity, scheduled start anchors, bar-aligned tempo changes, per-member mute, late-join snapshots, REST/DO consistency, transfer/claim/grace, alarms (`runDurableObjectAlarm`) and session end.
+
+### Rate limiting in tests
+
+Under `APP_ENV=test` the per-IP limiter is skipped so suites can create many users. The test `auth.test.ts › rate limiting` opts in by sending `x-test-ratelimit: 1` together with a fixed `cf-connecting-ip`.
+
+## Web tests
+
+`apps/web/test/i18n.test.tsx` is the guard for the "both languages or not done" rule: it flattens every namespace of `en` and `pt-BR` and fails if a key exists in only one, if any string is empty, or if `{{placeholders}}` differ. It also renders a component, switches the language at runtime and checks `<html lang>` and `localStorage`.
+
+The scheduler test uses fake timers and a fake engine whose audio clock equals `performance.now()/1000`, so expected click instants can be asserted exactly.
+
+## End-to-end tests
+
+```bash
+pnpm test:e2e
+```
+
+`e2e/playwright.config.ts` starts both dev servers (`webServer`, `reuseExistingServer: true`) and runs with `--autoplay-policy=no-user-gesture-required` so the Web Audio click can start in headless mode. Tests create their own users through the API (`e2e/tests/helpers.ts`), copying the session cookie into browser contexts, and give each user a distinct `x-forwarded-for` so the registration limiter is not shared.
+
+In this cloud container only, point Playwright at the pre-installed browser:
+
+```bash
+PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e
+```
+
+On a normal machine run `pnpm exec playwright install chromium` once inside `e2e/` and omit the variable.
+
+The live-rehearsal spec runs the conductor on a desktop viewport and the bassist on iPhone 13 emulation and saves `e2e/test-results/member-mobile.png` and `conductor-desktop.png`.
+
+## Testing on two real phones
+
+1. Start everything on a laptop on the same Wi-Fi: `pnpm dev`. Vite already listens on all interfaces (`--host`); use the **Network** URL it prints (for example `http://192.168.1.20:5173`).
+2. On each phone open that URL, sign in as a different band member (demo accounts in the README, or create a band and invite with a code).
+3. Open the band → **Live rehearsal** → start a session on the conductor's phone; join from the other phone (dashboard shows "Live rehearsal in progress").
+4. Tap **Enable sound** on both; iOS Safari and Android Chrome require this gesture.
+5. Keep screens on. Background tabs throttle timers and iOS suspends audio on lock; the UI will show the suspended state.
+
+Notes:
+
+- Web Audio works over plain `http://` on the LAN. The **tuner** (`getUserMedia`) does not: browsers require HTTPS or `localhost`. For microphone tests use `localhost` on the laptop or a tunnel with HTTPS.
+- PWA installation also requires HTTPS; on the LAN you can still use the site in the browser.
+- To test from a phone against a deployed Worker, follow `DEPLOYMENT.md`.
+
+## Manual checklist for the live room
+
+- [ ] Two devices show the same participant count; both show the conductor's name.
+- [ ] Conductor picks a song → title, BPM, meter and key appear on all devices without reload.
+- [ ] Drummer sees the drum map; bassist sees the bass tab; vocalist sees lyrics (default preference), and a user preference changes it.
+- [ ] Zooming, switching material or transposing on one device changes nothing on the others.
+- [ ] Start → count-in dots in amber, then bar/beat indication; status badge goes "Count-in" → "Playing" on every device at the end of the count-in.
+- [ ] Click off on one device: its sound stops, its badge shows "click muted" to the conductor, the others keep clicking.
+- [ ] Tempo +/− or Tap while playing: the change lands on the next bar without a stutter.
+- [ ] Meter change while playing stops the metronome; Start again works.
+- [ ] Next/previous song follows the repertoire order and disables at the edges.
+- [ ] Switch to **Central click**: only the chosen device sounds; others still show the beat.
+- [ ] Put a member's phone in airplane mode for 10 s: banner "Connection lost", then "Reconnected" state restores song and tempo; no second metronome, no stale commands.
+- [ ] Close the conductor's browser: within seconds members see "The conductor is offline" and a member allowed to conduct can take over; after 90 s the role is released automatically.
+- [ ] End session: everyone sees "Session ended"; the lobby allows starting a new one.
+- [ ] Sync dialog shows samples, offset, RTT, jitter and a quality badge; Re-measure resets them.
+- [ ] Switch language in Profile: the room and lobby texts change immediately; reload keeps the account's language.

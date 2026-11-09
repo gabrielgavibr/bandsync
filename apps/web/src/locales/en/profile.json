@@ -1,0 +1,21 @@
+{
+  "title": "Profile & preferences",
+  "account": "Account",
+  "displayName": "Display name",
+  "email": "E-mail",
+  "primaryInstrument": "Main instrument",
+  "secondaryInstruments": "Other instruments",
+  "avatarUrl": "Photo URL",
+  "preferences": "Preferences",
+  "materialPreferences": "Preferred material by instrument",
+  "materialPreferencesHint": "In a live rehearsal you see the first available type from this list.",
+  "click": "Click",
+  "clickSound": "Click sound",
+  "clickVolume": "Click volume",
+  "timeZone": "Time zone",
+  "saved": "Preferences saved",
+  "appearance": "Appearance",
+  "music": "Music",
+  "install": "Install app",
+  "version": "Version"
+}

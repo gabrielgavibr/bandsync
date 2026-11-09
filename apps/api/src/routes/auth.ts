@@ -50,7 +50,7 @@ async function issueSession(c: Context<AppEnv>, userId: string) {
 }
 
 authRoutes.post("/register", async (c) => {
-  await rateLimit(c, "register", 10, 60 * 60 * 1000);
+  await rateLimit(c, "register", 30, 60 * 60 * 1000);
   const input = await parseBody(c, registerSchema);
   const existing = await findUserByEmail(c.env.DB, input.email);
   if (existing) throw new ApiError("email_in_use", "e-mail already registered");

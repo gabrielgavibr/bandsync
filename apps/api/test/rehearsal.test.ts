@@ -302,7 +302,9 @@ describe("live rehearsal session", () => {
       await api("GET", `/api/bands/${bandId}/rehearsals/${sessionId}`, undefined, bassist.cookie),
     );
     expect(rest.live.state.currentSong.songId).toBe(songB);
-    expect(rest.live.state.seq).toBe(snap.state.seq);
+    // The snapshot is sent first; the join broadcast that follows bumps seq by one for everyone.
+    const joined = await b.nextState((s) => s.seq > snap.state.seq);
+    expect(rest.live.state.seq).toBe(joined.seq);
     a.close();
     b.close();
   });

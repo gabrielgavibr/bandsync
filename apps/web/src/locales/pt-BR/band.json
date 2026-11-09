@@ -1,0 +1,105 @@
+{
+  "myBands": {
+    "title": "Minhas bandas",
+    "subtitle": "Escolha uma banda para abrir repertório, ensaios e ferramentas.",
+    "empty": "Você ainda não participa de nenhuma banda.",
+    "emptyHint": "Crie uma ou peça um código de convite a um administrador.",
+    "create": "Criar banda",
+    "join": "Tenho um código de convite",
+    "yourRole": "Seu papel"
+  },
+  "create": {
+    "title": "Nova banda",
+    "subtitle": "Você será o primeiro administrador. Dá para convidar o pessoal logo em seguida.",
+    "submit": "Criar banda"
+  },
+  "fields": {
+    "name": "Nome da banda",
+    "description": "Descrição",
+    "genre": "Gênero musical",
+    "image": "URL da imagem"
+  },
+  "dashboard": {
+    "title": "Visão geral",
+    "liveNow": "Ensaio ao vivo em andamento",
+    "joinLive": "Entrar no ensaio",
+    "startLive": "Iniciar ensaio ao vivo",
+    "songs": "Músicas",
+    "repertoires": "Repertórios",
+    "members": "Integrantes",
+    "tools": "Ferramentas",
+    "recentSessions": "Sessões recentes",
+    "noSessions": "Nenhum ensaio ainda."
+  },
+  "members": {
+    "title": "Integrantes",
+    "invite": "Convidar",
+    "role": "Papel",
+    "instrument": "Instrumento",
+    "joined": "Entrou em {{date}}",
+    "permissions": "Permissões",
+    "permission": {
+      "canEditRepertoire": "Editar músicas e repertórios",
+      "canManageEvents": "Gerenciar agenda",
+      "canControlRehearsal": "Reger ensaios ao vivo",
+      "canPostAnnouncements": "Publicar comunicados"
+    },
+    "makeAdmin": "Tornar administrador",
+    "makeMember": "Remover administração",
+    "removeMember": "Remover da banda",
+    "removeConfirm": "Remover {{name}} da banda?",
+    "leave": "Sair da banda",
+    "leaveConfirm": "Sair desta banda? Você precisará de um novo convite para voltar.",
+    "lastAdmin": "A banda precisa de pelo menos um administrador.",
+    "you": "você"
+  },
+  "invite": {
+    "title": "Convidar integrantes",
+    "subtitle": "Compartilhe um código ou link. Os convites expiram e podem ser revogados a qualquer momento.",
+    "kind": { "code": "Código", "link": "Link", "email": "E-mail" },
+    "kindHelp": {
+      "code": "Código curto que o músico digita no aplicativo.",
+      "link": "Link privado que abre o convite diretamente.",
+      "email": "Enviamos o link para o endereço abaixo (requer envio de e-mail configurado)."
+    },
+    "email": "E-mail do convidado",
+    "instrument": "Instrumento sugerido",
+    "role": "Papel",
+    "expiresIn": "Validade",
+    "hours_one": "{{count}} hora",
+    "hours_other": "{{count}} horas",
+    "days_one": "{{count}} dia",
+    "days_other": "{{count}} dias",
+    "maxUses": "Usos",
+    "create": "Gerar convite",
+    "created": "Convite pronto",
+    "shareCode": "Compartilhe este código",
+    "shareLink": "Compartilhe este link",
+    "emailSent": "E-mail enviado.",
+    "emailNotSent": "O envio de e-mail não está configurado; compartilhe o link manualmente.",
+    "active": "Convites ativos",
+    "history": "Convites anteriores",
+    "revoke": "Revogar",
+    "status": {
+      "active": "Ativo",
+      "revoked": "Revogado",
+      "expired": "Expirado",
+      "used": "Utilizado"
+    },
+    "usesLeft_one": "{{count}} uso restante",
+    "usesLeft_other": "{{count}} usos restantes",
+    "expires": "Expira em {{date}}",
+    "none": "Nenhum convite ainda."
+  },
+  "join": {
+    "title": "Entrar em uma banda",
+    "enterCode": "Digite o código do convite",
+    "codeLabel": "Código do convite",
+    "lookup": "Verificar convite",
+    "invitedBy": "{{inviter}} convidou você para entrar em",
+    "asInstrument": "como {{instrument}}",
+    "accept": "Aceitar e entrar",
+    "decline": "Agora não",
+    "accepted": "Pronto! Bem-vindo(a) à banda {{band}}."
+  }
+}

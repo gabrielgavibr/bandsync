@@ -104,13 +104,18 @@ export class RehearsalSessionDO extends DurableObject<Env> {
       const [client, server] = [pair[0], pair[1]];
       this.ctx.acceptWebSocket(server, [identity.userId]);
       server.serializeAttachment({ userId: identity.userId } satisfies Attachment);
-      this.onJoin(identity);
+      // Order matters: mutate presence, send the joining device its snapshot (which already lists it
+      // as connected), then broadcast the incremented state to everyone, including the new socket.
+      const joined = this.onJoin(identity);
       this.send(server, {
         type: "snapshot",
         state: this.state,
         serverNow: Date.now(),
         you: { userId: identity.userId },
       });
+      this.ctx.waitUntil(
+        this.commit("participant_joined", joined.userId, { userId: joined.userId }),
+      );
       this.ctx.waitUntil(
         touchParticipant(this.env.DB, this.state.sessionId, identity.userId).catch(() => {}),
       );
@@ -404,7 +409,7 @@ export class RehearsalSessionDO extends DurableObject<Env> {
   /* Presence                                                       */
   /* ------------------------------------------------------------ */
 
-  private onJoin(identity: JoinIdentity): void {
+  private onJoin(identity: JoinIdentity): ParticipantState {
     const s = this.state!;
     const now = Date.now();
     let p = s.participants.find((x) => x.userId === identity.userId);
@@ -434,8 +439,7 @@ export class RehearsalSessionDO extends DurableObject<Env> {
     }
     this.allDisconnectedAt = null;
     if (!s.conductorUserId && p.canControl) s.conductorUserId = p.userId;
-    // Fire-and-forget commit: the joining socket receives the snapshot separately.
-    void this.commit("participant_joined", p.userId, { userId: p.userId });
+    return p;
   }
 
   private async onLeave(ws: WebSocket): Promise<void> {

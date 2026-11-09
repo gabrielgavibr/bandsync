@@ -9,7 +9,12 @@ export default defineConfig(async () => {
       cloudflareTest({
         wrangler: { configPath: "./wrangler.jsonc" },
         miniflare: {
-          bindings: { TEST_MIGRATIONS: migrations, APP_ENV: "test", PBKDF2_ITERATIONS: "1000" },
+          bindings: {
+            TEST_MIGRATIONS: migrations,
+            APP_ENV: "test",
+            PBKDF2_ITERATIONS: "1000",
+            RATE_LIMITS: "on",
+          },
         },
       }),
     ],

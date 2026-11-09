@@ -1,0 +1,21 @@
+{
+  "title": "Perfil e preferências",
+  "account": "Conta",
+  "displayName": "Nome de exibição",
+  "email": "E-mail",
+  "primaryInstrument": "Instrumento principal",
+  "secondaryInstruments": "Outros instrumentos",
+  "avatarUrl": "URL da foto",
+  "preferences": "Preferências",
+  "materialPreferences": "Material preferido por instrumento",
+  "materialPreferencesHint": "No ensaio ao vivo você vê o primeiro tipo disponível desta lista.",
+  "click": "Clique",
+  "clickSound": "Som do clique",
+  "clickVolume": "Volume do clique",
+  "timeZone": "Fuso horário",
+  "saved": "Preferências salvas",
+  "appearance": "Aparência",
+  "music": "Música",
+  "install": "Instalar aplicativo",
+  "version": "Versão"
+}

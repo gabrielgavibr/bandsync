@@ -34,8 +34,11 @@ export async function enforceRateLimit(
 }
 
 /**
- * Route-level helper. Under APP_ENV=test the limiter is skipped unless the request opts in with
- * `x-test-ratelimit: 1`, so functional tests can create many users while one test still covers limiting.
+ * Route-level helper.
+ * - `RATE_LIMITS=off` (local development, where every client arrives through the Vite proxy as
+ *   127.0.0.1) disables limiting entirely. Production must keep it on.
+ * - Under APP_ENV=test the limiter is skipped unless the request opts in with `x-test-ratelimit: 1`,
+ *   so functional tests can create many users while one test still covers limiting.
  */
 export async function rateLimit(
   c: Context<AppEnv>,
@@ -43,6 +46,7 @@ export async function rateLimit(
   limit: number,
   windowMs: number,
 ): Promise<void> {
+  if (c.env.RATE_LIMITS === "off") return;
   if (c.env.APP_ENV === "test" && c.req.header("x-test-ratelimit") !== "1") return;
   await enforceRateLimit(c.env.DB, `${bucket}:${clientIp(c.req.raw)}`, limit, windowMs);
 }

@@ -1,0 +1,100 @@
+{
+  "myBands": {
+    "title": "My bands",
+    "subtitle": "Pick a band to open its repertoire, rehearsals and tools.",
+    "empty": "You are not in a band yet.",
+    "emptyHint": "Create one or ask an admin for an invitation code.",
+    "create": "Create a band",
+    "join": "I have an invitation code",
+    "yourRole": "Your role"
+  },
+  "create": {
+    "title": "New band",
+    "subtitle": "You will be its first admin. You can invite the others right after.",
+    "submit": "Create band"
+  },
+  "fields": {
+    "name": "Band name",
+    "description": "Description",
+    "genre": "Genre",
+    "image": "Image URL"
+  },
+  "dashboard": {
+    "title": "Overview",
+    "liveNow": "Live rehearsal in progress",
+    "joinLive": "Join the rehearsal",
+    "startLive": "Start a live rehearsal",
+    "songs": "Songs",
+    "repertoires": "Repertoires",
+    "members": "Members",
+    "tools": "Tools",
+    "recentSessions": "Recent sessions",
+    "noSessions": "No rehearsals yet."
+  },
+  "members": {
+    "title": "Members",
+    "invite": "Invite",
+    "role": "Role",
+    "instrument": "Instrument",
+    "joined": "Joined {{date}}",
+    "permissions": "Permissions",
+    "permission": {
+      "canEditRepertoire": "Edit songs and repertoires",
+      "canManageEvents": "Manage calendar events",
+      "canControlRehearsal": "Conduct live rehearsals",
+      "canPostAnnouncements": "Post announcements"
+    },
+    "makeAdmin": "Make admin",
+    "makeMember": "Remove admin",
+    "removeMember": "Remove from band",
+    "removeConfirm": "Remove {{name}} from the band?",
+    "leave": "Leave band",
+    "leaveConfirm": "Leave this band? You will need a new invitation to come back.",
+    "lastAdmin": "A band needs at least one admin.",
+    "you": "you"
+  },
+  "invite": {
+    "title": "Invite members",
+    "subtitle": "Share a code or a link. Invitations expire and can be revoked at any time.",
+    "kind": { "code": "Code", "link": "Link", "email": "E-mail" },
+    "kindHelp": {
+      "code": "Short code the musician types in the app.",
+      "link": "Private link that opens the invitation directly.",
+      "email": "We send the link to the address below (requires e-mail delivery to be configured)."
+    },
+    "email": "Recipient e-mail",
+    "instrument": "Suggested instrument",
+    "role": "Role",
+    "expiresIn": "Valid for",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "maxUses": "Uses",
+    "create": "Generate invitation",
+    "created": "Invitation ready",
+    "shareCode": "Share this code",
+    "shareLink": "Share this link",
+    "emailSent": "E-mail sent.",
+    "emailNotSent": "E-mail delivery is not configured; share the link manually.",
+    "active": "Active invitations",
+    "history": "Past invitations",
+    "revoke": "Revoke",
+    "status": { "active": "Active", "revoked": "Revoked", "expired": "Expired", "used": "Used" },
+    "usesLeft_one": "{{count}} use left",
+    "usesLeft_other": "{{count}} uses left",
+    "expires": "Expires {{date}}",
+    "none": "No invitations yet."
+  },
+  "join": {
+    "title": "Join a band",
+    "enterCode": "Enter the invitation code",
+    "codeLabel": "Invitation code",
+    "lookup": "Check invitation",
+    "invitedBy": "{{inviter}} invited you to join",
+    "asInstrument": "as {{instrument}}",
+    "accept": "Accept and join",
+    "decline": "Not now",
+    "accepted": "You are in! Welcome to {{band}}."
+  }
+}
