@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import type { AppEnv } from "./env";
+import { appUrl } from "./lib/appUrl";
 import { ApiError } from "./lib/errors";
 import { newId } from "./lib/ids";
 import { log } from "./lib/logger";
+import { stagingGate } from "./middleware/stagingGate";
 import { authRoutes } from "./routes/auth";
 import { bandRoutes, inviteRoutes } from "./routes/bands";
 import { fileRoutes } from "./routes/files";
@@ -33,6 +35,9 @@ app.use("*", async (c, next) => {
   }
 });
 
+/* Pre-production access gate (no-op unless STAGING_ACCESS_KEY is set). */
+app.use("*", stagingGate);
+
 /* Same-origin guard for state-changing requests (defence in depth on top of SameSite cookies). */
 app.use("/api/*", async (c, next) => {
   const method = c.req.method;
@@ -40,7 +45,7 @@ app.use("/api/*", async (c, next) => {
     const origin = c.req.header("origin");
     if (origin) {
       const expected = new URL(c.req.url).origin;
-      const allowed = new Set([expected, c.env.APP_URL.replace(/\/$/, "")]);
+      const allowed = new Set([expected, appUrl(c)]);
       if (!allowed.has(origin)) throw new ApiError("forbidden", "cross-origin request rejected");
     }
   }

@@ -21,6 +21,7 @@ import {
   updatePasswordHash,
 } from "../db/users";
 import type { AppEnv } from "../env";
+import { appUrl, exposesDevLinks } from "../lib/appUrl";
 import { clearSessionCookie, sessionCookie } from "../lib/cookies";
 import { ApiError } from "../lib/errors";
 import { log } from "../lib/logger";
@@ -95,10 +96,11 @@ authRoutes.post("/forgot-password", async (c) => {
   let devResetUrl: string | undefined;
   if (row) {
     const token = await createPasswordReset(c.env.DB, row.id);
-    const url = `${c.env.APP_URL}/reset-password?token=${encodeURIComponent(token)}`;
+    const url = `${appUrl(c)}/reset-password?token=${encodeURIComponent(token)}`;
     const mailer = createMailer(c.env);
     await mailer.send(resetPasswordMail(row.locale, row.email, url));
-    if (!mailer.configured && c.env.APP_ENV !== "production") devResetUrl = url;
+    // Never on shared environments: anyone could reset anyone else's password from the screen.
+    if (!mailer.configured && exposesDevLinks(c.env.APP_ENV)) devResetUrl = url;
     log("info", "auth.reset_requested", { userId: row.id });
   }
   // Always the same answer so e-mail addresses cannot be probed.

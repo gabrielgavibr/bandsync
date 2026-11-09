@@ -1,0 +1,81 @@
+# Staging (homologation) environment
+
+A private copy of BandSync for visual and functional review. It is fully separate from production:
+its own Worker (`bandsync-staging`), D1 database (`bandsync-staging`), R2 bucket
+(`bandsync-files-staging`) and Durable Object namespace.
+
+## How it is protected
+
+1. **Access gate.** Every request (pages, static files, API and WebSockets) needs a cookie obtained by
+   typing an access key on `/__access`. The key is a Worker secret (`STAGING_ACCESS_KEY`); the cookie
+   holds an HMAC derived from it, so rotating the secret logs every device out of the gate.
+   Attempts are rate-limited per IP. Responses carry `X-Robots-Tag: noindex`.
+2. **BandSync login.** After the gate, the normal account login applies.
+3. **Staging-only passwords.** The demo accounts get random passwords generated for this environment.
+   The public local demo password (`bandsync-demo`) does not work on staging.
+4. **No on-screen password-reset links.** Outside `development`/`test`, the reset link is never shown,
+   so a tester cannot take over another account. E-mail delivery is not configured, so password reset
+   does not work on staging (see limitations).
+
+Cloudflare Access (Zero Trust) can replace or complement the gate later for per-person identities.
+
+## Credentials
+
+Generated locally and never committed:
+
+```bash
+pnpm --filter @bandsync/api staging:credentials
+```
+
+This writes three files with mode 600 to `apps/api/.staging/` (git-ignored):
+
+| File              | Content                                                                   |
+| ----------------- | ------------------------------------------------------------------------- |
+| `credentials.txt` | Access key and one password per demo account                              |
+| `access-key.txt`  | Access key only, piped into `wrangler secret put`                         |
+| `seed.sql`        | Fictional demo data plus `UPDATE` statements with the new password hashes |
+
+Running it again and re-applying `seed.sql` rotates every password and revokes existing sessions.
+Re-running `wrangler secret put STAGING_ACCESS_KEY` with the new key rotates the gate.
+
+Share credentials only through a private channel (password manager, direct message). Never paste them
+in an issue, pull request or public chat.
+
+## Deploy
+
+Requires a Cloudflare API token (or `wrangler login`) for the account that will host staging.
+Token permissions: Workers Scripts Edit, D1 Edit, Workers R2 Storage Edit, Account Settings Read,
+User Details Read, Workers Tail Read (optional).
+
+```bash
+pnpm staging:deploy
+```
+
+The script builds the web app, deploys `bandsync-staging` (D1 and R2 are created automatically on the
+first deploy), applies migrations, sets the access-key secret and loads the seed. It never uses
+`--env production`.
+
+## Verify
+
+```bash
+STAGING_URL=https://bandsync-staging.<subdomain>.workers.dev pnpm test:staging
+```
+
+The check passes the gate, refuses a wrong key, confirms the public demo password is blocked, logs in as
+two accounts (desktop and iPhone-sized viewports), switches the language, opens band pages, runs a live
+rehearsal across both devices and saves screenshots to `test-results/staging/`.
+
+## Cost
+
+Everything used fits the Cloudflare Workers Free plan at homologation volumes:
+Workers requests, SQLite-backed Durable Objects, D1 and R2 free tiers. R2 must be enabled once in the
+dashboard, which can require a payment method on file even when usage stays free.
+Staging uses 10,000 PBKDF2 iterations because 100,000 exceeds the Free plan's 10 ms CPU budget per
+request; the generated passwords are long and random, so this is acceptable for staging only.
+
+## Known limitations of staging
+
+- Password reset and e-mail invitations do not send e-mail (no provider configured). Invitations by
+  code or link work.
+- Acoustic simultaneity between phones has not been measured; see `docs/AUDIO_SYNC.md`.
+- Calendar, announcements, polls, tasks and recordings are not implemented yet.

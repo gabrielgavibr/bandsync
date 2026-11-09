@@ -104,6 +104,7 @@ pnpm --filter @bandsync/api exec wrangler tail --env production
 ## Environments
 
 - `development` (default, `wrangler dev`): local D1/R2/DO state under `apps/api/.wrangler/state`, `APP_URL=http://localhost:5173`, dev-only reset links.
+- `staging` (`--env staging`): homologation Worker `bandsync-staging` on `*.workers.dev`, its own D1 (`bandsync-staging`), R2 bucket and Durable Object namespace, protected by an access key. See `docs/STAGING.md`.
 - `production` (`--env production`): separate D1 database and bucket as above.
 - Tests use `APP_ENV=test` through the Vitest plugin bindings, never a remote resource.
 

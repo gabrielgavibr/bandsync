@@ -27,6 +27,7 @@ import {
   updateMember,
 } from "../db/bands";
 import type { AppEnv } from "../env";
+import { appUrl } from "../lib/appUrl";
 import { ApiError, forbidden, notFound } from "../lib/errors";
 import { createMailer, inviteMail } from "../lib/mailer";
 import { p } from "../lib/params";
@@ -146,7 +147,7 @@ bandRoutes.post("/:bandId/invites", requireMembership, requireAdmin, async (c) =
   const user = c.get("user");
   const row = await createInvite(c.env.DB, bandId, user.id, input);
   const band = await getBand(c.env.DB, bandId, c.get("membership"));
-  const url = `${c.env.APP_URL}/join/${row.code}`;
+  const url = `${appUrl(c)}/join/${row.code}`;
   let emailSent = false;
   if (input.kind === "email" && input.email) {
     const mailer = createMailer(c.env);

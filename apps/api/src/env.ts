@@ -6,6 +6,8 @@ export interface Env {
   APP_ENV: "development" | "test" | "production" | string;
   APP_URL: string;
   PBKDF2_ITERATIONS?: string;
+  /** Secret. When set, every request needs the staging access cookie (see middleware/stagingGate). */
+  STAGING_ACCESS_KEY?: string;
   /** "on" (default) or "off". Only turn off for local development. */
   RATE_LIMITS?: string;
   MAIL_PROVIDER?: string;

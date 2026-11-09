@@ -376,7 +376,7 @@ export function RehearsalRoomPage() {
 
       {/* Bottom panel */}
       <footer className="border-t border-line bg-elev px-3 pt-3 safe-bottom">
-        <div className="mb-3 flex items-center gap-3">
+        <div className="mb-3 flex flex-wrap items-center gap-3">
           <Button
             variant={me?.audioEnabled ? "secondary" : "outline"}
             size="lg"
@@ -388,7 +388,7 @@ export function RehearsalRoomPage() {
           >
             {me?.audioEnabled ? t("rehearsal:member.clickOn") : t("rehearsal:member.clickOff")}
           </Button>
-          <label className="flex flex-1 items-center gap-2 text-sm text-muted">
+          <label className="order-last flex min-w-40 basis-full items-center gap-2 text-sm text-muted sm:order-none sm:basis-auto sm:flex-1">
             <span className="sr-only">{t("rehearsal:member.volume")}</span>
             <input
               type="range"

@@ -11,3 +11,6 @@ test-results/
 playwright-report/
 .DS_Store
 apps/api/worker-configuration.d.ts
+
+# Staging credentials and generated seed (never commit)
+apps/api/.staging/

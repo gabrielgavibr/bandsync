@@ -19,7 +19,9 @@
     "test:e2e": "pnpm --filter @bandsync/e2e test:e2e",
     "db:migrate:local": "pnpm --filter @bandsync/api db:migrate:local",
     "db:seed:local": "pnpm --filter @bandsync/api db:seed:local",
-    "db:reset:local": "pnpm --filter @bandsync/api db:reset:local"
+    "db:reset:local": "pnpm --filter @bandsync/api db:reset:local",
+    "staging:deploy": "pnpm --filter @bandsync/api staging:deploy",
+    "test:staging": "pnpm --filter @bandsync/e2e test:staging"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",

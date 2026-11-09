@@ -31,6 +31,36 @@
     "run_worker_first": ["/api/*"]
   },
   "env": {
+    // Homologation / staging: separate Worker, database, bucket and Durable Object namespace.
+    // D1 and R2 are created automatically by `wrangler deploy` (no IDs needed).
+    // Secret required: STAGING_ACCESS_KEY (see docs/STAGING.md).
+    "staging": {
+      "name": "bandsync-staging",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": {
+        "APP_ENV": "staging",
+        "APP_URL": "",
+        // Free-plan CPU budget (10 ms) cannot fit 100k iterations; staging passwords are random and long.
+        "PBKDF2_ITERATIONS": "10000",
+        "RATE_LIMITS": "on"
+      },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "bandsync-staging", "migrations_dir": "migrations" }
+      ],
+      "r2_buckets": [{ "binding": "FILES", "bucket_name": "bandsync-files-staging" }],
+      "durable_objects": {
+        "bindings": [{ "name": "REHEARSAL", "class_name": "RehearsalSessionDO" }]
+      },
+      "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RehearsalSessionDO"] }],
+      // The worker runs first for every path so the access gate also covers the static app.
+      "assets": {
+        "directory": "../web/dist",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": true
+      }
+    },
     "production": {
       "vars": {
         "APP_ENV": "production",

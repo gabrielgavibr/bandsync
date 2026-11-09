@@ -6,7 +6,8 @@
   "scripts": {
     "test:e2e": "playwright test --trace off",
     "test:e2e:headed": "playwright test --headed",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test:staging": "playwright test -c staging/playwright.staging.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
