@@ -1,5 +1,5 @@
 import { type BandMemberDto, INSTRUMENTS, type MemberPermissions } from "@bandsync/shared";
-import { UserPlus } from "lucide-react";
+import { Pencil, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
@@ -7,12 +7,12 @@ import { Avatar } from "../../app/AppShell";
 import {
   Badge,
   Button,
-  Card,
   ConfirmDialog,
   Dialog,
   ErrorBlock,
   LoadingBlock,
   PageHeader,
+  RowList,
   Select,
   Toggle,
   useToast,
@@ -63,40 +63,53 @@ export function MembersPage() {
       ) : members.isError ? (
         <ErrorBlock error={members.error} onRetry={() => members.refetch()} />
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <RowList data-testid="member-list">
           {members.data.map((m) => {
             const me = m.userId === user?.id;
             return (
-              <li key={m.userId}>
-                <Card className="flex items-center gap-3">
-                  <Avatar name={m.displayName} url={m.avatarUrl} className="size-11" />
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-2 font-medium">
-                      <span className="truncate">{m.displayName}</span>
-                      {me ? (
-                        <span className="text-xs text-muted">({t("band:members.you")})</span>
-                      ) : null}
-                    </p>
-                    <p className="text-sm text-muted">
-                      {m.instrument
-                        ? t(`common:instrument.${m.instrument}`)
-                        : t("common:instrument.none")}{" "}
+              <li
+                key={m.userId}
+                className="flex min-h-13 items-center gap-3 py-1.5 pl-3 pr-1 sm:pl-4"
+              >
+                <Avatar name={m.displayName} url={m.avatarUrl} className="size-9" />
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1.5 font-medium leading-tight">
+                    <span className="truncate">{m.displayName}</span>
+                    {me ? (
+                      <span className="shrink-0 text-xs font-normal text-muted">
+                        ({t("band:members.you")})
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="truncate text-sm text-muted">
+                    {m.instrument
+                      ? t(`common:instrument.${m.instrument}`)
+                      : t("common:instrument.none")}
+                    <span className="hidden sm:inline">
+                      {" "}
                       · {t("band:members.joined", { date: formatDate(m.joinedAt, i18n.language) })}
-                    </p>
-                  </div>
-                  <Badge tone={m.role === "admin" ? "accent" : "neutral"}>
-                    {t(`common:role.${m.role}`)}
-                  </Badge>
-                  {isAdmin || me ? (
-                    <Button variant="ghost" size="sm" onClick={() => setEditing(m)}>
-                      {t("common:actions.edit")}
-                    </Button>
-                  ) : null}
-                </Card>
+                    </span>
+                  </p>
+                </div>
+                <Badge tone={m.role === "admin" ? "accent" : "neutral"}>
+                  {t(`common:role.${m.role}`)}
+                </Badge>
+                {isAdmin || me ? (
+                  <button
+                    type="button"
+                    onClick={() => setEditing(m)}
+                    aria-label={`${t("common:actions.edit")}: ${m.displayName}`}
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-sunken hover:text-fg"
+                  >
+                    <Pencil className="size-4" />
+                  </button>
+                ) : (
+                  <span className="w-2" />
+                )}
               </li>
             );
           })}
-        </ul>
+        </RowList>
       )}
 
       {!isAdmin || (members.data && members.data.filter((m) => m.role === "admin").length > 1) ? (

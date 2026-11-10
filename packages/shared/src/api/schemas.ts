@@ -101,6 +101,10 @@ export const updatePreferencesSchema = z.object({
   clickSound: z.enum(["beep", "wood", "tick"]).optional(),
   clickVolume: z.number().min(0).max(1).optional(),
   timeZone: z.string().max(80).optional(),
+  /** Tuner: 0 (only strong, clear notes) .. 100 (weak notes too). */
+  tunerSensitivity: z.number().int().min(0).max(100).optional(),
+  /** Tuner: reference pitch of A4 in Hz. */
+  tunerA4: z.number().min(415).max(466).optional(),
 });
 export type UpdatePreferencesInput = z.infer<typeof updatePreferencesSchema>;
 
@@ -122,6 +126,8 @@ export interface UserPreferencesDto {
   clickSound: string;
   clickVolume: number;
   timeZone: string | null;
+  tunerSensitivity: number;
+  tunerA4: number;
 }
 
 /* ------------------------------------------------------------------ */

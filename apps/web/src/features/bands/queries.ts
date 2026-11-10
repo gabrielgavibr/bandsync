@@ -17,8 +17,9 @@ export function useBands() {
   });
 }
 
-export function useBand(bandId: string) {
+export function useBand(bandId: string, opts: { enabled?: boolean } = {}) {
   return useQuery({
+    enabled: (opts.enabled ?? true) && !!bandId,
     queryKey: bandKeys.one(bandId),
     queryFn: () => http.get<{ band: BandDto }>(`/api/bands/${bandId}`).then((r) => r.band),
   });
@@ -41,8 +42,9 @@ export function useInvites(bandId: string, enabled = true) {
   });
 }
 
-export function useRehearsals(bandId: string) {
+export function useRehearsals(bandId: string, opts: { enabled?: boolean } = {}) {
   return useQuery({
+    enabled: (opts.enabled ?? true) && !!bandId,
     queryKey: bandKeys.rehearsals(bandId),
     refetchInterval: 15_000,
     queryFn: () =>

@@ -7,7 +7,11 @@
     "start": "Iniciar",
     "stop": "Parar",
     "sound": "Som do clique",
-    "sounds": { "beep": "Bipe", "wood": "Madeira", "tick": "Tique" },
+    "sounds": {
+      "beep": "Bipe",
+      "wood": "Madeira",
+      "tick": "Tique"
+    },
     "accent": "Acentuar primeiro tempo",
     "volume": "Volume"
   },
@@ -27,12 +31,45 @@
     "description": "Usa o microfone para detectar a nota.",
     "start": "Começar a ouvir",
     "stop": "Parar",
-    "permission": "É necessário permitir o acesso ao microfone.",
+    "permission": "Microfone indisponível: permita o acesso ao microfone para este site e tente de novo.",
     "unsupported": "Este navegador não oferece acesso ao microfone.",
-    "listening": "Ouvindo…",
     "cents": "cents",
     "frequency": "Hz",
-    "quiet": "Toque uma nota…"
+    "state": {
+      "idle": "Toque em “Começar a ouvir”",
+      "waiting": "Aguardando o microfone…",
+      "listening": "Ouvindo… toque uma nota",
+      "weak": "Sinal fraco",
+      "note": "Nota detectada",
+      "unclear": "Som sem nota definida: toque uma corda só",
+      "clipping": "Sinal excessivo: afaste o instrumento"
+    },
+    "zone": {
+      "none": "Sem sinal",
+      "weak": "Sinal fraco",
+      "good": "Sinal adequado",
+      "hot": "Sinal excessivo"
+    },
+    "input": "Entrada do microfone",
+    "gate": "Nível mínimo para analisar",
+    "gateHint": "O traço marca o nível mínimo para analisar com a sensibilidade atual.",
+    "weakHint": "Aproxime o instrumento ou aumente a sensibilidade.",
+    "noisyRoom": "Ruído ambiente alto: notas fracas podem não ser lidas.",
+    "sensitivity": "Sensibilidade do microfone",
+    "settings": "Ajustes do microfone",
+    "preset": {
+      "low": "Baixa",
+      "normal": "Normal",
+      "high": "Alta"
+    },
+    "fine": "Ajuste fino",
+    "sensitivityHelp": "A sensibilidade muda o nível mínimo e o quanto o som precisa se destacar do ruído do ambiente. Não aumenta o ganho do microfone do aparelho (uma página não pode fazer isso); alta sensibilidade aceita notas mais fracas e exige mais leituras iguais antes de mostrar a nota.",
+    "a4": "Referência (Lá 4)",
+    "a4Down": "Baixar a referência em 1 Hz",
+    "a4Up": "Subir a referência em 1 Hz",
+    "reference": "Lá 4 = {{hz}} Hz",
+    "short": "Afinador",
+    "settingsShort": "Ajustes"
   },
   "reader": {
     "title": "Leitor",

@@ -15,7 +15,11 @@
     "logout": "Sair",
     "back": "Voltar",
     "menu": "Menu",
-    "skipToContent": "Ir para o conteúdo"
+    "skipToContent": "Ir para o conteúdo",
+    "home": "Início",
+    "band": "Banda",
+    "rehearsalShort": "Ensaio",
+    "backToHome": "Voltar ao início"
   },
   "actions": {
     "save": "Salvar",

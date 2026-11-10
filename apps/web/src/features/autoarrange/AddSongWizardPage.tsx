@@ -463,7 +463,7 @@ function LinkFlow({
         <StepHeading n={1}>{t("autoarrange:link.heading")}</StepHeading>
         <form
           onSubmit={onIdentify}
-          className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
           noValidate
         >
           <Input
@@ -669,7 +669,7 @@ function CatalogueFlow({
         <StepHeading n={1}>{t("autoarrange:search.heading")}</StepHeading>
         <form
           onSubmit={onSearch}
-          className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
           noValidate
         >
           <Input
@@ -791,7 +791,7 @@ function CatalogueFlow({
               </div>
             )
           ) : (
-            <div className="grid gap-3 sm:grid-cols-[1fr_1fr_6rem]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_6rem]">
               <Input
                 label={t("autoarrange:recording.manualArtist")}
                 value={manual.artist}
@@ -819,7 +819,7 @@ function CatalogueFlow({
 
           <div className="mt-5 border-t border-line pt-4">
             <h3 className="mb-2 font-semibold">{t("autoarrange:link.optionalHeading")}</h3>
-            <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
               <Input
                 label={t("autoarrange:link.label")}
                 type="url"
@@ -990,7 +990,11 @@ function PreparedView({
   const reference = data?.song.reference ?? null;
   const [listening, setListening] = useState(false);
   return (
-    <div className="grid gap-6 lg:grid-cols-2" data-testid="prepared" data-running={running}>
+    <div
+      className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+      data-testid="prepared"
+      data-running={running}
+    >
       <div className="flex min-w-0 flex-col gap-6">
         {reference ? (
           <Card>

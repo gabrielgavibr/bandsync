@@ -6,7 +6,9 @@
     "emptyHint": "Create one or ask an admin for an invitation code.",
     "create": "Create a band",
     "join": "I have an invitation code",
-    "yourRole": "Your role"
+    "yourRole": "Your role",
+    "joinShort": "Use invite",
+    "createShort": "Create band"
   },
   "create": {
     "title": "New band",
@@ -29,7 +31,10 @@
     "members": "Members",
     "tools": "Tools",
     "recentSessions": "Recent sessions",
-    "noSessions": "No rehearsals yet."
+    "noSessions": "No rehearsals yet.",
+    "repertoire": "Repertoire",
+    "repertoireInSession": "Repertoire of the rehearsal in progress",
+    "rehearseList": "Rehearse"
   },
   "members": {
     "title": "Members",
@@ -56,7 +61,11 @@
   "invite": {
     "title": "Invite members",
     "subtitle": "Share a code or a link. Invitations expire and can be revoked at any time.",
-    "kind": { "code": "Code", "link": "Link", "email": "E-mail" },
+    "kind": {
+      "code": "Code",
+      "link": "Link",
+      "email": "E-mail"
+    },
     "kindHelp": {
       "code": "Short code the musician types in the app.",
       "link": "Private link that opens the invitation directly.",
@@ -80,7 +89,12 @@
     "active": "Active invitations",
     "history": "Past invitations",
     "revoke": "Revoke",
-    "status": { "active": "Active", "revoked": "Revoked", "expired": "Expired", "used": "Used" },
+    "status": {
+      "active": "Active",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "used": "Used"
+    },
     "usesLeft_one": "{{count}} use left",
     "usesLeft_other": "{{count}} uses left",
     "expires": "Expires {{date}}",
@@ -96,5 +110,12 @@
     "accept": "Accept and join",
     "decline": "Not now",
     "accepted": "You are in! Welcome to {{band}}."
+  },
+  "home": {
+    "title": "Home",
+    "hello": "Hi, {{name}}",
+    "continue": "Pick up where you left off",
+    "live": "Live",
+    "manage": "Manage"
   }
 }

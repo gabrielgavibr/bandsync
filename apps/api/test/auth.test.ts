@@ -143,6 +143,37 @@ describe("auth", () => {
     expect(body.preferences.materialPreferences.guitar).toEqual(["guitar_tab", "chords"]);
   });
 
+  it("keeps tuner settings per person, with defaults, and refuses values out of range", async () => {
+    const ana = await register();
+    const bruno = await register();
+    const me = async (cookie: string) =>
+      (await json(await api("GET", "/api/me", undefined, cookie))).preferences;
+    expect(await me(ana.cookie)).toMatchObject({ tunerSensitivity: 50, tunerA4: 440 });
+    const saved = await api(
+      "PATCH",
+      "/api/me/preferences",
+      { tunerSensitivity: 85, tunerA4: 442 },
+      ana.cookie,
+    );
+    expect(saved.status).toBe(200);
+    expect((await json(saved)).preferences).toMatchObject({ tunerSensitivity: 85, tunerA4: 442 });
+    // Another setting saved later leaves them alone; another person is not affected.
+    await api("PATCH", "/api/me/preferences", { notation: "latin" }, ana.cookie);
+    expect(await me(ana.cookie)).toMatchObject({
+      tunerSensitivity: 85,
+      tunerA4: 442,
+      notation: "latin",
+    });
+    expect(await me(bruno.cookie)).toMatchObject({ tunerSensitivity: 50, tunerA4: 440 });
+    for (const bad of [
+      { tunerSensitivity: 101 },
+      { tunerSensitivity: 2.5 },
+      { tunerA4: 300 },
+      { tunerA4: 500 },
+    ])
+      expect((await api("PATCH", "/api/me/preferences", bad, ana.cookie)).status).toBe(400);
+  });
+
   it("rejects cross-origin state-changing requests", async () => {
     const res = await api(
       "POST",

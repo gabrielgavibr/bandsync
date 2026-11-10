@@ -24,8 +24,8 @@ export function TransposerTool() {
     });
   }, [from, to, input, preferences?.notation]);
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="flex flex-col gap-3">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="flex min-w-0 flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
           <Select
             label={t("transposer.from")}
@@ -48,17 +48,17 @@ export function TransposerTool() {
           onChange={(e) => setInput(e.target.value)}
           placeholder={t("transposer.placeholder")}
           className="font-mono"
-          rows={12}
+          rows={8}
           spellCheck={false}
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">{t("transposer.output")}</span>
           <CopyButton text={out} label={t("transposer.copy")} />
         </div>
         <pre
-          className="min-h-72 flex-1 whitespace-pre-wrap rounded-xl border border-line bg-sunken p-3 font-mono text-sm leading-relaxed"
+          className="min-h-40 flex-1 whitespace-pre-wrap break-words md:min-h-72 rounded-xl border border-line bg-sunken p-3 font-mono text-sm leading-relaxed"
           data-testid="transposer-output"
         >
           {out}

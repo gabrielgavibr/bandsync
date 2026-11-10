@@ -72,7 +72,7 @@ export function InvitePage() {
         subtitle={t("band:invite.subtitle")}
         backTo={`/bands/${band.id}/members`}
       />
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.1fr]">
         <Card>
           <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
             <Segmented

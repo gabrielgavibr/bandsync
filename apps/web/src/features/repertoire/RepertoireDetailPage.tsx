@@ -3,9 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 import {
-  Badge,
   Button,
-  Card,
   ConfirmDialog,
   Dialog,
   ErrorBlock,
@@ -87,22 +85,34 @@ export function RepertoireDetailPage() {
       {items.length === 0 ? (
         <p className="text-muted">{t("repertoire:repertoires.emptyList")}</p>
       ) : (
-        <ol className="flex flex-col gap-2">
+        <ol
+          className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-elev"
+          data-testid="repertoire-items"
+        >
           {items.map((it, i) => (
             <li key={it.id}>
-              <Card className="flex items-center gap-3 py-3">
-                <span className="w-7 text-center font-mono text-sm text-muted">{i + 1}</span>
-                <Link to={`/bands/${band.id}/songs/${it.songId}`} className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{it.song.title}</p>
-                  <p className="truncate text-sm text-muted">
-                    {it.song.artist ?? "—"}
-                    {it.notes ? ` · ${it.notes}` : ""}
-                  </p>
-                </Link>
-                <span className="hidden gap-1 sm:flex">
-                  {it.song.key ? <Badge>{it.song.key}</Badge> : null}
-                  {it.song.bpm ? <Badge>{it.song.bpm} BPM</Badge> : null}
+              <div className="flex min-h-13 items-center gap-2 py-1.5 pl-3 pr-1 sm:gap-3 sm:pl-4">
+                <span className="w-5 shrink-0 text-center font-mono text-sm text-muted">
+                  {i + 1}
                 </span>
+                <Link
+                  to={`/bands/${band.id}/songs/${it.songId}`}
+                  className="flex min-h-11 min-w-0 flex-1 flex-col justify-center"
+                >
+                  <span className="line-clamp-2 break-words font-medium leading-snug">
+                    {it.song.title}
+                  </span>
+                  <span className="truncate text-sm text-muted">
+                    {[
+                      it.song.artist,
+                      it.song.bpm ? `${it.song.bpm} BPM` : null,
+                      it.song.key,
+                      it.notes,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "—"}
+                  </span>
+                </Link>
                 <ReferenceOpenLink reference={it.song.reference} />
                 {canEdit ? (
                   <span className="flex items-center">
@@ -131,7 +141,7 @@ export function RepertoireDetailPage() {
                     />
                   </span>
                 ) : null}
-              </Card>
+              </div>
             </li>
           ))}
         </ol>

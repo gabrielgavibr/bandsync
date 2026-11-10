@@ -163,6 +163,8 @@ interface PrefRow {
   click_sound: string;
   click_volume: number;
   time_zone: string | null;
+  tuner_sensitivity: number | null;
+  tuner_a4: number | null;
 }
 
 export async function getPreferences(db: D1Database, userId: string): Promise<UserPreferencesDto> {
@@ -179,6 +181,8 @@ export async function getPreferences(db: D1Database, userId: string): Promise<Us
       clickSound: "beep",
       clickVolume: 0.8,
       timeZone: null,
+      tunerSensitivity: 50,
+      tunerA4: 440,
     };
   }
   let prefs: Record<string, string[]> = {};
@@ -195,6 +199,8 @@ export async function getPreferences(db: D1Database, userId: string): Promise<Us
     clickSound: row.click_sound,
     clickVolume: row.click_volume,
     timeZone: row.time_zone,
+    tunerSensitivity: row.tuner_sensitivity ?? 50,
+    tunerA4: row.tuner_a4 ?? 440,
   };
 }
 
@@ -209,6 +215,8 @@ export async function updatePreferences(
     clickSound?: string;
     clickVolume?: number;
     timeZone?: string;
+    tunerSensitivity?: number;
+    tunerA4?: number;
   },
 ) {
   const current = await getPreferences(db, userId);
@@ -222,14 +230,17 @@ export async function updatePreferences(
     clickSound: patch.clickSound ?? current.clickSound,
     clickVolume: patch.clickVolume ?? current.clickVolume,
     timeZone: patch.timeZone ?? current.timeZone,
+    tunerSensitivity: patch.tunerSensitivity ?? current.tunerSensitivity,
+    tunerA4: patch.tunerA4 ?? current.tunerA4,
   };
   await db
     .prepare(
-      `INSERT INTO user_preferences (user_id, locale, theme, notation, material_preferences, click_sound, click_volume, time_zone, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO user_preferences (user_id, locale, theme, notation, material_preferences, click_sound, click_volume, time_zone, tuner_sensitivity, tuner_a4, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(user_id) DO UPDATE SET locale = excluded.locale, theme = excluded.theme, notation = excluded.notation,
          material_preferences = excluded.material_preferences, click_sound = excluded.click_sound,
-         click_volume = excluded.click_volume, time_zone = excluded.time_zone, updated_at = excluded.updated_at`,
+         click_volume = excluded.click_volume, time_zone = excluded.time_zone,
+         tuner_sensitivity = excluded.tuner_sensitivity, tuner_a4 = excluded.tuner_a4, updated_at = excluded.updated_at`,
     )
     .bind(
       userId,
@@ -240,6 +251,8 @@ export async function updatePreferences(
       merged.clickSound,
       merged.clickVolume,
       merged.timeZone,
+      merged.tunerSensitivity,
+      merged.tunerA4,
       nowIso(),
     )
     .run();

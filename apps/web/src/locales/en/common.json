@@ -15,7 +15,11 @@
     "logout": "Sign out",
     "back": "Back",
     "menu": "Menu",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "home": "Home",
+    "band": "Band",
+    "rehearsalShort": "Rehearsal",
+    "backToHome": "Back to home"
   },
   "actions": {
     "save": "Save",

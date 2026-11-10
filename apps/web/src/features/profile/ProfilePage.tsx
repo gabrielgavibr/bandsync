@@ -64,7 +64,7 @@ export function ProfilePage() {
           </Button>
         }
       />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <h2 className="mb-4 font-semibold">{t("profile:account")}</h2>
           <form onSubmit={onProfile} className="flex flex-col gap-4" noValidate>

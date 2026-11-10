@@ -1,15 +1,15 @@
-import { Plus, Search } from "lucide-react";
+import { ChevronRight, Headphones, ListMusic, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import {
-  Badge,
   Button,
-  Card,
   EmptyState,
   ErrorBlock,
   LoadingBlock,
   PageHeader,
+  RowList,
+  rowClass,
 } from "../../components/ui";
 import { ReferenceThumb } from "../autoarrange/reference";
 import { useCurrentBand } from "../bands/BandLayout";
@@ -62,7 +62,7 @@ export function SongsPage() {
         />
       ) : (
         <>
-          <label className="mb-4 flex h-12 items-center gap-2 rounded-xl border border-line bg-elev px-3.5">
+          <label className="mb-3 flex h-11 items-center gap-2 rounded-xl border border-line bg-elev px-3.5">
             <Search className="size-4 text-muted" />
             <input
               type="search"
@@ -76,37 +76,57 @@ export function SongsPage() {
           {filtered.length === 0 ? (
             <p className="text-muted">{t("repertoire:songs.noResults")}</p>
           ) : (
-            <ul className="grid gap-2">
+            <RowList data-testid="song-list">
               {filtered.map((s) => {
                 const count = s.materialSummary.reduce((n, m) => n + m.count, 0);
                 return (
                   <li key={s.id}>
-                    <Link to={`/bands/${band.id}/songs/${s.id}`}>
-                      <Card className="flex items-center gap-4 py-3 transition-colors hover:border-accent-500/60">
-                        <ReferenceThumb
-                          url={s.reference?.thumbnailUrl ?? null}
-                          className="size-11"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium">{s.title}</p>
-                          <p className="truncate text-sm text-muted">{s.artist ?? "—"}</p>
-                        </div>
-                        <div className="hidden items-center gap-2 text-sm text-muted sm:flex">
-                          {s.version.key ? <Badge>{s.version.key}</Badge> : null}
-                          {s.version.bpm ? <Badge>{s.version.bpm} BPM</Badge> : null}
-                          <Badge>
-                            {s.version.beatsPerBar}/{s.version.beatUnit}
-                          </Badge>
-                        </div>
-                        <span className="text-sm text-muted">
-                          {t("repertoire:songs.materials", { count })}
+                    <Link
+                      to={`/bands/${band.id}/songs/${s.id}`}
+                      className={rowClass}
+                      data-testid="song-row"
+                    >
+                      <ReferenceThumb url={s.reference?.thumbnailUrl ?? null} className="size-10" />
+                      <span className="min-w-0 flex-1">
+                        {/* Long names stay readable: two lines before cutting. */}
+                        <span className="line-clamp-2 break-words font-medium leading-snug">
+                          {s.title}
                         </span>
-                      </Card>
+                        <span className="block truncate text-sm text-muted">{s.artist ?? "—"}</span>
+                      </span>
+                      <span className="flex shrink-0 flex-col items-end gap-0.5 text-xs text-muted">
+                        {s.version.bpm ? (
+                          <span className="font-medium tabular-nums text-fg" data-testid="song-bpm">
+                            {s.version.bpm} BPM
+                          </span>
+                        ) : (
+                          <span className="text-warn-500">{t("repertoire:songs.bpmPending")}</span>
+                        )}
+                        <span className="flex items-center gap-1.5">
+                          {s.version.key ? <span>{s.version.key}</span> : null}
+                          {s.reference ? (
+                            <Headphones
+                              className="size-3.5 text-accent-500"
+                              aria-label={t("repertoire:songs.hasReference")}
+                            />
+                          ) : null}
+                          {s.sections.length > 0 ? (
+                            <ListMusic
+                              className="size-3.5 text-accent-500"
+                              aria-label={t("repertoire:songs.hasArrangement")}
+                            />
+                          ) : null}
+                          <span className="hidden sm:inline">
+                            {t("repertoire:songs.materials", { count })}
+                          </span>
+                        </span>
+                      </span>
+                      <ChevronRight className="size-4 shrink-0 text-muted" aria-hidden="true" />
                     </Link>
                   </li>
                 );
               })}
-            </ul>
+            </RowList>
           )}
         </>
       )}

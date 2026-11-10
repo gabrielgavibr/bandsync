@@ -8,7 +8,10 @@
     "search": "Search by title or artist",
     "noResults": "No songs match your search.",
     "materials_one": "{{count}} material",
-    "materials_other": "{{count}} materials"
+    "materials_other": "{{count}} materials",
+    "bpmPending": "no BPM",
+    "hasReference": "Has a reference recording",
+    "hasArrangement": "Has a band arrangement"
   },
   "song": {
     "new": "New song",

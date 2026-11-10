@@ -165,5 +165,28 @@
     "enter": "Full screen",
     "exit": "Leave full screen",
     "showControls": "Show controls"
+  },
+  "entry": {
+    "title": {
+      "resume": "Your rehearsal is open",
+      "join": "Rehearsal in progress",
+      "start": "Live rehearsal",
+      "none": "Live rehearsal"
+    },
+    "action": {
+      "resume": "Resume session",
+      "join": "Join the rehearsal",
+      "start": "Start rehearsal"
+    },
+    "since": "Started {{when}}",
+    "waitConductor": "When the conductor starts one, the way in appears here.",
+    "lastEnded": "Last session ended {{when}}",
+    "neverRan": "The band has not held a live rehearsal yet.",
+    "explain": {
+      "resume": "You started this session. Resuming makes you the conductor again if nobody took over.",
+      "join": "You join as a musician: you see your own material and hear the synchronised click. The conductor picks the song.",
+      "start": "You will be the conductor: you pick the songs and count in. The others join from their own devices."
+    },
+    "idle": "None in progress"
   }
 }

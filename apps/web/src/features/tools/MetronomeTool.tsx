@@ -79,7 +79,7 @@ export function MetronomeTool() {
           type="number"
           inputMode="numeric"
           aria-label={t("common:music.bpm")}
-          className="h-14 flex-1 rounded-xl border border-line bg-elev text-center text-3xl font-semibold tabular-nums outline-none"
+          className="h-14 min-w-0 flex-1 rounded-xl border border-line bg-elev text-center text-3xl font-semibold tabular-nums outline-none"
           value={Math.round(m.bpm)}
           min={LIMITS.bpmMin}
           max={LIMITS.bpmMax}
@@ -102,6 +102,21 @@ export function MetronomeTool() {
         className="w-full accent-accent-500"
         aria-label={t("common:music.bpm")}
       />
+      <Button
+        size="lg"
+        block
+        variant={m.running ? "danger" : "primary"}
+        onClick={toggle}
+        icon={
+          m.running ? (
+            <Square className="size-5 fill-current" />
+          ) : (
+            <Play className="size-5 fill-current" />
+          )
+        }
+      >
+        {m.running ? t("tools:metronome.stop") : t("tools:metronome.start")}
+      </Button>
       <div className="grid grid-cols-2 gap-3">
         <Select
           label={t("common:music.timeSignature")}
@@ -147,6 +162,7 @@ export function MetronomeTool() {
       <div>
         <p className="mb-1.5 text-sm font-medium">{t("rehearsal:controls.countIn")}</p>
         <Segmented
+          block
           ariaLabel={t("rehearsal:controls.countIn")}
           value={String(m.countInBars)}
           onChange={(v) => setM((s) => ({ ...s, countInBars: Number(v) }))}
@@ -165,23 +181,9 @@ export function MetronomeTool() {
           step={0.05}
           value={volume}
           onChange={(e) => setVolume(Number(e.target.value))}
-          className="flex-1 accent-accent-500"
+          className="min-w-0 flex-1 accent-accent-500"
         />
       </label>
-      <Button
-        size="xl"
-        variant={m.running ? "danger" : "primary"}
-        onClick={toggle}
-        icon={
-          m.running ? (
-            <Square className="size-7 fill-current" />
-          ) : (
-            <Play className="size-7 fill-current" />
-          )
-        }
-      >
-        {m.running ? t("tools:metronome.stop") : t("tools:metronome.start")}
-      </Button>
     </div>
   );
 }

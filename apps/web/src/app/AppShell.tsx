@@ -1,8 +1,20 @@
-import { Guitar, Settings2, Users, Wrench } from "lucide-react";
+import {
+  ChevronLeft,
+  Guitar,
+  Home,
+  LayoutGrid,
+  ListMusic,
+  Music2,
+  Radio,
+  Settings2,
+  Users,
+  Wrench,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink, Outlet, useMatch } from "react-router";
 import { useAuth } from "../features/auth/AuthProvider";
+import { useBand } from "../features/bands/queries";
 import { cn } from "../lib/cn";
 import { Wordmark } from "./Brand";
 
@@ -21,15 +33,44 @@ function useOnline() {
   return online;
 }
 
+/** Last band opened on this device: the home page offers it first. */
+export const LAST_BAND_KEY = "bandsync.lastBand";
+
 export function AppShell() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const online = useOnline();
-  const items = [
-    { to: "/bands", label: t("nav.bands"), icon: Users },
-    { to: "/tools", label: t("nav.tools"), icon: Wrench },
-    { to: "/profile", label: t("nav.profile"), icon: Settings2 },
+  // Inside a band the bottom bar is the band's own (one bar, never two): the way back to the
+  // rest of the app is the arrow in the header.
+  const match = useMatch("/bands/:bandId/*");
+  const bandId = match?.params.bandId && match.params.bandId !== "new" ? match.params.bandId : null;
+  const band = useBand(bandId ?? "", { enabled: !!bandId });
+  const global = [
+    { to: "/", label: t("nav.home"), icon: Home, end: true },
+    { to: "/bands", label: t("nav.bands"), icon: Users, end: true },
+    { to: "/tools", label: t("nav.tools"), icon: Wrench, end: false },
+    { to: "/profile", label: t("nav.profile"), icon: Settings2, end: false },
   ];
+  const inBand = bandId
+    ? [
+        { to: `/bands/${bandId}`, label: t("nav.band"), icon: LayoutGrid, end: true },
+        {
+          to: `/bands/${bandId}/rehearsal`,
+          label: t("nav.rehearsalShort"),
+          icon: Radio,
+          end: false,
+        },
+        { to: `/bands/${bandId}/songs`, label: t("nav.songs"), icon: Music2, end: false },
+        {
+          to: `/bands/${bandId}/repertoires`,
+          label: t("nav.repertoires"),
+          icon: ListMusic,
+          end: false,
+        },
+        { to: `/bands/${bandId}/members`, label: t("nav.members"), icon: Users, end: false },
+      ]
+    : null;
+  const bottom = inBand ?? global;
   return (
     <div className="flex min-h-full flex-col">
       <a
@@ -39,15 +80,32 @@ export function AppShell() {
         {t("nav.skipToContent")}
       </a>
       <header className="sticky top-0 z-30 border-b border-line bg-surface/85 backdrop-blur safe-top">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
-          <Link to="/bands" aria-label="BandSync">
+        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-3 px-3 sm:h-14 sm:gap-4 sm:px-4">
+          {inBand ? (
+            // Phone, inside a band: back to the app, and which band this is.
+            <div
+              className="flex min-w-0 flex-1 items-center gap-1 sm:hidden"
+              data-testid="band-header"
+            >
+              <Link
+                to="/"
+                aria-label={t("nav.backToHome")}
+                className="-ml-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted hover:text-fg"
+              >
+                <ChevronLeft className="size-6" />
+              </Link>
+              <span className="truncate text-base font-semibold">{band.data?.name ?? ""}</span>
+            </div>
+          ) : null}
+          <Link to="/" aria-label="BandSync" className={cn(inBand && "hidden sm:block")}>
             <Wordmark />
           </Link>
           <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.menu")}>
-            {items.map((it) => (
+            {global.map((it) => (
               <NavLink
                 key={it.to}
                 to={it.to}
+                end={it.end}
                 className={({ isActive }) =>
                   cn(
                     "rounded-lg px-3 py-2 text-sm font-medium",
@@ -66,6 +124,9 @@ export function AppShell() {
               <span className="max-w-32 truncate">{user?.displayName}</span>
             </Link>
           </nav>
+          <Link to="/profile" aria-label={t("nav.profile")} className="shrink-0 sm:hidden">
+            <Avatar name={user?.displayName ?? "?"} url={user?.avatarUrl} />
+          </Link>
         </div>
         {!online ? (
           <div
@@ -76,29 +137,35 @@ export function AppShell() {
           </div>
         ) : null}
       </header>
-      <main id="content" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:pb-10">
+      <main
+        id="content"
+        className="mx-auto w-full max-w-6xl flex-1 px-3 pb-24 pt-3 sm:px-4 sm:pb-10 sm:pt-6"
+      >
         <Outlet />
-        <p className="mt-10 text-center text-[11px] text-muted/80" data-testid="credit">
+        <p className="mt-8 text-center text-[11px] text-muted/80 sm:mt-10" data-testid="credit">
           {t("credit")}
         </p>
       </main>
       <nav
         className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 backdrop-blur safe-bottom sm:hidden"
-        aria-label={t("nav.menu")}
+        aria-label={inBand ? (band.data?.name ?? t("nav.menu")) : t("nav.menu")}
+        data-testid="bottom-nav"
+        data-context={inBand ? "band" : "app"}
       >
-        {items.map((it) => (
+        {bottom.map((it) => (
           <NavLink
             key={it.to}
             to={it.to}
+            end={it.end}
             className={({ isActive }) =>
               cn(
-                "flex flex-1 flex-col items-center gap-0.5 py-2 text-xs",
-                isActive ? "text-accent-500" : "text-muted",
+                "flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 pt-1.5 text-[11px] leading-tight",
+                isActive ? "font-medium text-accent-500" : "text-muted",
               )
             }
           >
-            <it.icon className="size-5" />
-            {it.label}
+            <it.icon className="size-5 shrink-0" />
+            <span className="max-w-full truncate">{it.label}</span>
           </NavLink>
         ))}
       </nav>

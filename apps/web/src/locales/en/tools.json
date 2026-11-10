@@ -7,7 +7,11 @@
     "start": "Start",
     "stop": "Stop",
     "sound": "Click sound",
-    "sounds": { "beep": "Beep", "wood": "Wood", "tick": "Tick" },
+    "sounds": {
+      "beep": "Beep",
+      "wood": "Wood",
+      "tick": "Tick"
+    },
     "accent": "Accent first beat",
     "volume": "Volume"
   },
@@ -24,15 +28,48 @@
   },
   "tuner": {
     "title": "Chromatic tuner",
-    "description": "Uses the microphone to detect pitch.",
+    "description": "Uses the microphone to detect the note.",
     "start": "Start listening",
     "stop": "Stop",
-    "permission": "Microphone access is required.",
-    "unsupported": "This browser does not expose the microphone API.",
-    "listening": "Listening…",
+    "permission": "Microphone unavailable: allow microphone access for this site and try again.",
+    "unsupported": "This browser does not offer microphone access.",
     "cents": "cents",
     "frequency": "Hz",
-    "quiet": "Play a note…"
+    "state": {
+      "idle": "Tap “Start listening”",
+      "waiting": "Waiting for the microphone…",
+      "listening": "Listening… play a note",
+      "weak": "Weak signal",
+      "note": "Note detected",
+      "unclear": "Sound without a clear note: play one string",
+      "clipping": "Signal too strong: move the instrument away"
+    },
+    "zone": {
+      "none": "No signal",
+      "weak": "Weak signal",
+      "good": "Good signal",
+      "hot": "Signal too strong"
+    },
+    "input": "Microphone input",
+    "gate": "Minimum level to analyse",
+    "gateHint": "The mark shows the minimum level analysed at the current sensitivity.",
+    "weakHint": "Move the instrument closer or raise the sensitivity.",
+    "noisyRoom": "The room is noisy: weak notes may not be read.",
+    "sensitivity": "Microphone sensitivity",
+    "settings": "Microphone settings",
+    "preset": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High"
+    },
+    "fine": "Fine adjustment",
+    "sensitivityHelp": "Sensitivity changes the minimum level and how far the sound must stand out of the room's noise. It does not raise the device's microphone gain (a page cannot do that); high sensitivity accepts weaker notes and asks for more matching readings before showing the note.",
+    "a4": "Reference (A4)",
+    "a4Down": "Lower the reference by 1 Hz",
+    "a4Up": "Raise the reference by 1 Hz",
+    "reference": "A4 = {{hz}} Hz",
+    "short": "Tuner",
+    "settingsShort": "Settings"
   },
   "reader": {
     "title": "Reader",

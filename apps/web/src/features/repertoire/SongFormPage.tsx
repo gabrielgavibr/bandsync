@@ -124,7 +124,7 @@ export function SongFormPage() {
         title={song ? t("repertoire:song.edit") : t("repertoire:song.new")}
         backTo={song ? `/bands/${band.id}/songs/${song.id}` : `/bands/${band.id}/songs`}
       />
-      <form onSubmit={onSubmit} className="grid gap-6 lg:grid-cols-2" noValidate>
+      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-2" noValidate>
         <Card className="flex flex-col gap-4">
           <h2 className="font-semibold">{t("repertoire:song.details")}</h2>
           <Input

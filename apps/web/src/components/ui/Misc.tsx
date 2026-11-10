@@ -19,17 +19,25 @@ export function PageHeader({
 }) {
   const { t } = useTranslation();
   return (
-    <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="min-w-0">
+    // Phones: one compact line (title, actions beside it); the explanatory subtitle is for
+    // larger screens, where there is room for it.
+    <header className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mb-6 sm:items-end">
+      <div className="min-w-0 flex-1 basis-40">
         {backTo ? (
-          <Link to={backTo} className="mb-1 inline-block text-sm text-muted hover:text-fg">
+          <Link
+            to={backTo}
+            className="-my-1 inline-flex h-9 items-center text-sm text-muted hover:text-fg sm:mb-1 sm:h-auto"
+          >
             ← {t("nav.back")}
           </Link>
         ) : null}
-        <h1 className="truncate text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-        {subtitle ? <p className="mt-1 max-w-2xl text-muted">{subtitle}</p> : null}
+        <h1 className="truncate text-xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
+        {subtitle ? <p className="mt-1 hidden max-w-2xl text-muted sm:block">{subtitle}</p> : null}
       </div>
-      {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
+      {actions ? (
+        // Several actions wrap onto a second line rather than push the page wider than the screen.
+        <div className="flex max-w-full flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
     </header>
   );
 }
@@ -44,7 +52,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line px-5 py-8 text-center sm:px-6 sm:py-12">
       <p className="text-lg font-medium">{title}</p>
       {body ? <p className="mt-1 max-w-md text-muted">{body}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
@@ -86,18 +94,24 @@ export function Segmented<T extends string>({
   options,
   ariaLabel,
   size = "md",
+  block = false,
 }: {
   value: T;
   onChange: (v: T) => void;
   options: { value: T; label: ReactNode }[];
   ariaLabel: string;
   size?: "md" | "lg";
+  /** Fills the width, the options sharing it equally. */
+  block?: boolean;
 }) {
   return (
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className="inline-flex max-w-full overflow-x-auto rounded-xl border border-line bg-sunken p-1"
+      className={cn(
+        "max-w-full overflow-x-auto rounded-xl border border-line bg-sunken p-1",
+        block ? "flex w-full" : "inline-flex",
+      )}
     >
       {options.map((o) => (
         <button
@@ -108,6 +122,7 @@ export function Segmented<T extends string>({
           onClick={() => onChange(o.value)}
           className={cn(
             "whitespace-nowrap rounded-lg px-3 font-medium transition-colors",
+            block && "min-w-0 flex-1 truncate px-1.5",
             size === "lg" ? "h-12 text-base" : "h-9 text-sm",
             value === o.value ? "bg-elev text-fg shadow-sm" : "text-muted hover:text-fg",
           )}

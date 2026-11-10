@@ -1,18 +1,19 @@
 import { REPERTOIRE_KINDS } from "@bandsync/shared";
-import { Plus } from "lucide-react";
+import { ChevronRight, ListMusic, Plus } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import {
   Badge,
   Button,
-  Card,
   Dialog,
   EmptyState,
   ErrorBlock,
   Input,
   LoadingBlock,
   PageHeader,
+  RowList,
+  rowClass,
   Select,
   useToast,
 } from "../../components/ui";
@@ -71,26 +72,26 @@ export function RepertoiresPage() {
           }
         />
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <RowList data-testid="repertoire-list">
           {reps.data.map((r) => (
             <li key={r.id}>
-              <Link to={`/bands/${band.id}/repertoires/${r.id}`}>
-                <Card className="flex h-full flex-col gap-2 transition-colors hover:border-accent-500/60">
-                  <div className="flex items-start justify-between gap-2">
-                    <h2 className="font-semibold">{r.name}</h2>
-                    <Badge tone="accent">
-                      {t(`repertoire:repertoires.kinds.${r.kind}`, { defaultValue: r.kind })}
-                    </Badge>
-                  </div>
-                  {r.description ? <p className="text-sm text-muted">{r.description}</p> : null}
-                  <p className="mt-auto text-sm text-muted">
+              <Link to={`/bands/${band.id}/repertoires/${r.id}`} className={rowClass}>
+                <ListMusic className="size-5 shrink-0 text-accent-500" aria-hidden="true" />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{r.name}</span>
+                  <span className="block truncate text-sm text-muted">
                     {t("repertoire:repertoires.items", { count: r.itemCount })}
-                  </p>
-                </Card>
+                    {r.description ? ` · ${r.description}` : ""}
+                  </span>
+                </span>
+                <Badge tone="accent">
+                  {t(`repertoire:repertoires.kinds.${r.kind}`, { defaultValue: r.kind })}
+                </Badge>
+                <ChevronRight className="size-4 shrink-0 text-muted" aria-hidden="true" />
               </Link>
             </li>
           ))}
-        </ul>
+        </RowList>
       )}
       <Dialog open={open} onClose={() => setOpen(false)} title={t("repertoire:repertoires.create")}>
         <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>

@@ -165,5 +165,28 @@
     "enter": "Tela cheia",
     "exit": "Sair da tela cheia",
     "showControls": "Mostrar controles"
+  },
+  "entry": {
+    "title": {
+      "resume": "Seu ensaio está aberto",
+      "join": "Ensaio em andamento",
+      "start": "Ensaio ao vivo",
+      "none": "Ensaio ao vivo"
+    },
+    "action": {
+      "resume": "Retomar sessão",
+      "join": "Entrar no ensaio",
+      "start": "Iniciar ensaio"
+    },
+    "since": "Iniciado em {{when}}",
+    "waitConductor": "Quando o regente iniciar, a entrada aparece aqui.",
+    "lastEnded": "Última sessão encerrada em {{when}}",
+    "neverRan": "A banda ainda não fez um ensaio ao vivo.",
+    "explain": {
+      "resume": "Você iniciou esta sessão. Ao retomar, volta a ser o regente se ninguém assumiu.",
+      "join": "Você entra como músico: vê o seu material e ouve o clique sincronizado. O regente escolhe a música.",
+      "start": "Você será o regente: escolhe as músicas e dá a partida. Os outros entram pelo próprio aparelho."
+    },
+    "idle": "Nenhum em andamento"
   }
 }

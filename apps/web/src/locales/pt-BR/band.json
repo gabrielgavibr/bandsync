@@ -6,7 +6,9 @@
     "emptyHint": "Crie uma ou peça um código de convite a um administrador.",
     "create": "Criar banda",
     "join": "Tenho um código de convite",
-    "yourRole": "Seu papel"
+    "yourRole": "Seu papel",
+    "joinShort": "Usar convite",
+    "createShort": "Criar banda"
   },
   "create": {
     "title": "Nova banda",
@@ -29,7 +31,10 @@
     "members": "Integrantes",
     "tools": "Ferramentas",
     "recentSessions": "Sessões recentes",
-    "noSessions": "Nenhum ensaio ainda."
+    "noSessions": "Nenhum ensaio ainda.",
+    "repertoire": "Repertório",
+    "repertoireInSession": "Repertório do ensaio em andamento",
+    "rehearseList": "Ensaiar"
   },
   "members": {
     "title": "Integrantes",
@@ -56,7 +61,11 @@
   "invite": {
     "title": "Convidar integrantes",
     "subtitle": "Compartilhe um código ou link. Os convites expiram e podem ser revogados a qualquer momento.",
-    "kind": { "code": "Código", "link": "Link", "email": "E-mail" },
+    "kind": {
+      "code": "Código",
+      "link": "Link",
+      "email": "E-mail"
+    },
     "kindHelp": {
       "code": "Código curto que o músico digita no aplicativo.",
       "link": "Link privado que abre o convite diretamente.",
@@ -101,5 +110,12 @@
     "accept": "Aceitar e entrar",
     "decline": "Agora não",
     "accepted": "Pronto! Bem-vindo(a) à banda {{band}}."
+  },
+  "home": {
+    "title": "Início",
+    "hello": "Olá, {{name}}",
+    "continue": "Continuar de onde parou",
+    "live": "Ao vivo",
+    "manage": "Gerenciar"
   }
 }

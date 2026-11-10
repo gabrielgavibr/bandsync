@@ -11,6 +11,7 @@ import {
 import { BandDashboardPage } from "../features/bands/BandDashboardPage";
 import { BandLayout } from "../features/bands/BandLayout";
 import { CreateBandPage } from "../features/bands/CreateBandPage";
+import { HomePage } from "../features/bands/HomePage";
 import { InvitePage } from "../features/bands/InvitePage";
 import { JoinPage } from "../features/bands/JoinPage";
 import { MembersPage } from "../features/bands/MembersPage";
@@ -59,7 +60,7 @@ function AnonymousOnly() {
   const { status } = useAuth();
   const location = useLocation() as { state?: { from?: string } };
   if (status === "loading") return <LoadingBlock className="min-h-screen" />;
-  if (status === "authenticated") return <Navigate to={location.state?.from ?? "/bands"} replace />;
+  if (status === "authenticated") return <Navigate to={location.state?.from ?? "/"} replace />;
   return <Outlet />;
 }
 
@@ -74,7 +75,7 @@ export function AppRoutes() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
-          <Route path="/" element={<Navigate to="/bands" replace />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/bands" element={<MyBandsPage />} />
           <Route path="/bands/new" element={<CreateBandPage />} />
           <Route path="/join" element={<JoinPage />} />

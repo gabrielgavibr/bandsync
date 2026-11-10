@@ -81,7 +81,7 @@ export function SongDetailPage() {
           ) : null
         }
       />
-      <div className="grid gap-6 lg:grid-cols-[26rem_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[26rem_1fr]">
         <div className="flex min-w-0 flex-col gap-4">
           <ReferenceBlock bandId={band.id} song={song} canEdit={canEdit} />
           <BandArrangementCard
