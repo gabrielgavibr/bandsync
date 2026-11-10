@@ -298,7 +298,7 @@ test("homologation: reference recordings with real platforms", async ({ browser 
   await ana.page.getByRole("button", { name: "Identificar" }).click();
   await expect(ana.page.getByTestId("reference-preview")).toBeVisible({ timeout: 30_000 });
   await ana.page.getByRole("radio", { name: /Outra gravação/ }).check();
-  await ana.page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await ana.page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   const warning = ana.page.getByTestId("replace-warning");
   await expect(warning).toContainText(
     "Esta música já possui uma gravação de referência. Deseja substituí-la?",

@@ -33,6 +33,7 @@ import {
 import { type Context, Hono } from "hono";
 import { identifyReferenceLink, musicBrainz, youtubeVideoInfo } from "../autoarrange/clients";
 import { CONNECTORS } from "../autoarrange/connectors";
+import { discoverPublishedTempo } from "../autoarrange/pipeline";
 import { audit } from "../db/audit";
 import {
   countRecentJobs,
@@ -907,9 +908,10 @@ autoArrangeRoutes.post("/songs/:songId/prearrangement", requireRepertoireEditor,
   if (input.source === "audio_file") {
     const asset = await getAudioAsset(db, song.id, input.audioAssetId!);
     if (!asset) throw notFound("audio asset");
-    if (asset.recordingId) recording = await getRecording(db, song.id, asset.recordingId);
-  }
-  if (!recording)
+    // The file's own recording; a file declared for no recording (e.g. the band's own demo of
+    // a song with no published reference) maps that file only.
+    recording = asset.recordingId ? await getRecording(db, song.id, asset.recordingId) : null;
+  } else if (!recording)
     throw new ApiError("not_found", "the song has no reference recording", {
       reason: "no_reference",
     });
@@ -917,7 +919,7 @@ autoArrangeRoutes.post("/songs/:songId/prearrangement", requireRepertoireEditor,
   const id = await insertRecordingArrangement(db, {
     bandId,
     songId: song.id,
-    recordingId: recording.id,
+    recordingId: recording?.id ?? null,
     source,
     audioAssetId: source === "audio_file" ? audioAssetId! : null,
     engine,
@@ -930,7 +932,7 @@ autoArrangeRoutes.post("/songs/:songId/prearrangement", requireRepertoireEditor,
     const common = {
       bandId,
       songId: song.id,
-      recordingId: recording.id,
+      recordingId: recording?.id ?? null,
       jobId: null,
       origin: "audio_analysis" as const,
       method: `${engine}.${source}`,
@@ -1041,6 +1043,14 @@ autoArrangeRoutes.post("/songs/:songId/reference/duration", requireRepertoireEdi
     origin: "youtube",
     sourceUrl: reference.link.url,
     createdBy: c.get("user").id,
+  });
+  // With a length, the published tempo of this exact recording can be looked up.
+  await limitExternal(c, "deezer", 10);
+  await discoverPublishedTempo(c.env, c.env.DB, {
+    bandId,
+    songTitle: song.title,
+    recording: (await getReferenceRecording(c.env.DB, song.id)) ?? reference,
+    userId: c.get("user").id,
   });
   return c.json(await overview(c, bandId, song.id));
 });

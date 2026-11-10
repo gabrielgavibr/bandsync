@@ -8,7 +8,7 @@ import {
   type SongReferenceSummary,
 } from "@bandsync/shared";
 import { useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, Headphones, Link2, Mic, Search } from "lucide-react";
+import { AudioWaveform, ExternalLink, Headphones, Link2, Mic, Search } from "lucide-react";
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -998,16 +998,40 @@ function PreparedView({
             <ReferenceSummaryView reference={reference} />
           </Card>
         ) : null}
-        {!running && data && reference && data.preparation.analysis !== "done" ? (
-          // Right after adding: the next step is to let BandSync hear the recording.
-          <Card className="border-accent-500/60" data-testid="listen-next">
+        {data && reference ? (
+          // Right after adding: the next step is the recording's pre-arrangement.
+          <Card className="border-accent-500/60" data-testid="prearrange-next">
             <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
-              <Mic className="size-5 text-accent-500" /> {t("autoarrange:listen.nextTitle")}
+              <AudioWaveform className="size-5 text-accent-500" /> {t("autoarrange:pre.nextTitle")}
             </h2>
-            <p className="mb-3 text-sm text-muted">{t("autoarrange:listen.nextBody")}</p>
-            <Button size="lg" icon={<Mic className="size-5" />} onClick={() => setListening(true)}>
-              {t("autoarrange:listen.button")}
-            </Button>
+            <p className="mb-3 text-sm text-muted">
+              {running
+                ? t("autoarrange:pre.stage.searching_information")
+                : data.prearrangement
+                  ? t("autoarrange:pre.nextReady")
+                  : data.preparation.audio === "available"
+                    ? t("autoarrange:pre.nextWithAudio")
+                    : t("autoarrange:pre.nextNoAudio")}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Link to={`/bands/${bandId}/songs/${songId}/arrangement`}>
+                <Button size="lg" icon={<AudioWaveform className="size-5" />} disabled={running}>
+                  {data.prearrangement
+                    ? t("autoarrange:pre.openReview")
+                    : t("autoarrange:pre.generate")}
+                </Button>
+              </Link>
+              {!running && data.preparation.analysis !== "done" ? (
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  icon={<Mic className="size-5" />}
+                  onClick={() => setListening(true)}
+                >
+                  {t("autoarrange:listen.button")}
+                </Button>
+              ) : null}
+            </div>
             <ListenDialog
               open={listening}
               onClose={() => setListening(false)}

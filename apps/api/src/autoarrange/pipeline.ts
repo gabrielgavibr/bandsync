@@ -227,8 +227,8 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
  * The Deezer track that is this recording: by ISRC when the catalogue gave one (and the length
  * agrees), otherwise by title + artist + length. Returns null when it cannot be told apart.
  */
-async function discoverOnDeezer(
-  ctx: StepContext,
+export async function discoverOnDeezer(
+  ctx: Pick<StepContext, "env" | "db" | "spend">,
   songTitle: string,
   recording: SongRecordingDto,
 ): Promise<(DeezerTrack & { match: "isrc" | "title_duration" }) | null> {
@@ -260,6 +260,49 @@ async function discoverOnDeezer(
   ctx.spend();
   const full = await dz.track(pick.id);
   return full ? { ...full, match: "title_duration" } : null;
+}
+
+/**
+ * Runs the Deezer lookup outside a job, once the official player reported the video's length
+ * (a link-only reference has no length when it is prepared, and a title search needs one).
+ * At most three external calls; an unavailable source just finds nothing.
+ */
+export async function discoverPublishedTempo(
+  env: Env,
+  db: D1Database,
+  input: { bandId: string; songTitle: string; recording: SongRecordingDto; userId: string },
+): Promise<boolean> {
+  const existing = await db
+    .prepare(
+      "SELECT 1 FROM analysis_results WHERE song_id = ? AND recording_id = ? AND origin = 'deezer' LIMIT 1",
+    )
+    .bind(input.recording.songId, input.recording.id)
+    .first();
+  if (existing) return false;
+  let calls = 0;
+  const spend = () => {
+    calls += 1;
+    if (calls > 3) throw new PermanentStepError("budget_exceeded");
+  };
+  try {
+    const found = await discoverOnDeezer({ env, db, spend }, input.songTitle, input.recording);
+    if (!found?.bpm) return false;
+    await insertResult(db, {
+      bandId: input.bandId,
+      songId: input.recording.songId,
+      recordingId: input.recording.id,
+      jobId: null,
+      origin: "deezer",
+      sourceUrl: found.link,
+      kind: "bpm",
+      value: { bpm: found.bpm, deezerTrackId: found.id, match: found.match },
+      method: "deezer.track.bpm",
+      createdBy: input.userId,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /* ------------------------------------------------------------------ */

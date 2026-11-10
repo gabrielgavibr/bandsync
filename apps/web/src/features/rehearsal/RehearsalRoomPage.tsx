@@ -20,6 +20,7 @@ import type { ClickSound } from "../../lib/audio/AudioEngine";
 import { audioEngine } from "../../lib/audio/AudioEngine";
 import { cn } from "../../lib/cn";
 import { resolvePreferredMaterial } from "../../lib/materials";
+import { InstrumentViews, viewFor } from "../arrangement/InstrumentViews";
 import { useAuth } from "../auth/AuthProvider";
 import { ReferenceListen, ReferenceSummaryView } from "../autoarrange/reference";
 import { useBand } from "../bands/queries";
@@ -385,19 +386,20 @@ export function RehearsalRoomPage() {
               </div>
             )}
             {songQ.data && songQ.data.song.sections.length > 0 ? (
-              <div className="border-t border-line p-3">
-                <p className="mb-2 text-xs uppercase tracking-wide text-muted">
-                  {t("rehearsal:member.sections")}
-                </p>
-                <ol className="flex flex-wrap gap-1.5">
-                  {songQ.data.song.sections.map((s) => (
-                    <li key={s.id} className="rounded-lg bg-sunken px-2.5 py-1 text-sm">
-                      <span className="font-medium">{s.name}</span>{" "}
-                      <span className="text-muted">{s.bars}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
+              <details className="border-t border-line p-3" data-testid="live-arrangement">
+                <summary className="cursor-pointer text-xs uppercase tracking-wide text-muted">
+                  {t("rehearsal:member.sections")} ·{" "}
+                  {songQ.data.song.sections.map((s) => `${s.name} ${s.bars}`).join(" · ")}
+                </summary>
+                <div className="mt-3">
+                  <InstrumentViews
+                    compact
+                    song={songQ.data.song}
+                    materials={materials}
+                    initial={viewFor(me?.instrument ?? user?.primaryInstrument)}
+                  />
+                </div>
+              </details>
             ) : null}
           </>
         )}

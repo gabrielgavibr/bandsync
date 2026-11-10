@@ -17,6 +17,7 @@ import {
 import { cn } from "../../lib/cn";
 import { errorText } from "../../lib/errors";
 import { resolvePreferredMaterial } from "../../lib/materials";
+import { InstrumentViews, viewFor } from "../arrangement/InstrumentViews";
 import { useAuth } from "../auth/AuthProvider";
 import { BandArrangementCard, TechnicalDetails } from "../autoarrange/arrangement";
 import { ReferenceBlock } from "../autoarrange/reference";
@@ -89,6 +90,13 @@ export function SongDetailPage() {
             materials={materials}
             canEdit={canEdit}
           />
+          {song.sections.length > 0 ? (
+            <InstrumentViews
+              song={song}
+              materials={materials}
+              initial={viewFor(user?.primaryInstrument)}
+            />
+          ) : null}
         </div>
         <Card className="flex min-h-[50vh] flex-col p-0">
           <div className="flex flex-wrap items-center gap-2 border-b border-line p-3">

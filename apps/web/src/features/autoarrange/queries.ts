@@ -5,6 +5,7 @@ import {
   type AudioAssetDto,
   isRunningJob,
   type PreparationState,
+  type RecordingArrangementDto,
   type RecordingCandidate,
   type RecordingDetails,
   type RecordingRelease,
@@ -13,8 +14,10 @@ import {
   type ReferenceUsedBy,
   type ReviewEventDto,
   type ReviewInput,
+  type SaveArrangementInput,
   type SongDto,
   type SongRecordingDto,
+  type SubmitPrearrangementInput,
 } from "@bandsync/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../lib/api";
@@ -52,6 +55,18 @@ export interface SongAnalysisOverview {
   dependents: ReferenceDependents | null;
   confirmations: Record<"band_bpm" | "band_key" | "band_meter", Confirmation | null>;
   engines: { audioAnalysis: string };
+  /** Newest pre-arrangement made for the current reference recording. */
+  prearrangement: RecordingArrangementDto | null;
+  prearrangements: PrearrangementSummary[];
+}
+
+export interface PrearrangementSummary {
+  id: string;
+  source: RecordingArrangementDto["source"];
+  recordingId: string | null;
+  createdAt: string;
+  createdByName: string | null;
+  sections: number;
 }
 
 export function useRecordingSearch(
@@ -233,4 +248,27 @@ export function useDeclareAudio(bandId: string, songId: string) {
         .then((r) => r.audioAsset),
     onSuccess: () => qc.invalidateQueries({ queryKey: aaKeys.overview(bandId, songId) }),
   });
+}
+
+/** Stores a pre-arrangement of the reference recording built on this device. */
+export function useSubmitPrearrangement(bandId: string, songId: string) {
+  return useOverviewMutation(bandId, songId, (input: SubmitPrearrangementInput) =>
+    http.post<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/prearrangement`, input),
+  );
+}
+
+/** Saves the band's own arrangement; the recording's pre-arrangement is never changed. */
+export function useSaveArrangement(bandId: string, songId: string) {
+  return useOverviewMutation(bandId, songId, (input: SaveArrangementInput) =>
+    http.put<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/arrangement`, input),
+  );
+}
+
+/** The duration the official player reports, kept as a fact about the reference. */
+export function useReportPlayerDuration(bandId: string, songId: string) {
+  return useOverviewMutation(bandId, songId, (seconds: number) =>
+    http.post<SongAnalysisOverview>(`${base(bandId)}/songs/${songId}/reference/duration`, {
+      seconds,
+    }),
+  );
 }

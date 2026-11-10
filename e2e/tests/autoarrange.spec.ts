@@ -107,7 +107,7 @@ test("add a song by pasting a link; every member finds the same reference, also 
   await page.screenshot({ path: "test-results/ref-02-identified.png", fullPage: true });
 
   // 3. Confirm and prepare: a known link is not audio, and nothing is analysed.
-  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+  await page.getByRole("button", { name: "Confirm and generate pre-arrangement" }).click();
   const states = page.getByTestId("preparation-state");
   await expect(states.locator('[data-item="arrangement"]')).toHaveAttribute(
     "data-state",
@@ -128,9 +128,9 @@ test("add a song by pasting a link; every member finds the same reference, also 
   );
   await expect(states).toContainText("Arrangement ready for review");
   await expect(page.getByRole("spinbutton", { name: "Band BPM" })).toHaveValue(""); // nothing invented
-  // The next step is offered right away: let BandSync hear the recording.
-  await expect(page.getByTestId("listen-next")).toContainText(
-    "Now let BandSync hear the recording",
+  // The next step is offered right away: the recording's pre-arrangement, honestly worded.
+  await expect(page.getByTestId("prearrange-next")).toContainText(
+    "The link lets the band play the recording, not analyse it",
   );
 
   // 4. The band's own values, the repertoire, and the end of the review.
@@ -291,7 +291,7 @@ test("changing the reference asks before replacing; a new link for the same reco
   await expect(page.getByText("Spotify does not name the artist")).toBeVisible();
   await page.getByLabel("Artist").fill("Rick Astley");
   await expect(page.getByRole("radio", { name: /Another recording/ })).toBeChecked();
-  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+  await page.getByRole("button", { name: "Confirm and generate pre-arrangement" }).click();
 
   // 3. Confirmed tempo and audio depend on the current recording: the app asks first.
   const warning = page.getByTestId("replace-warning");
@@ -303,7 +303,7 @@ test("changing the reference asks before replacing; a new link for the same reco
   // Cancelled: nothing changed.
   const before = (await (await ana.api.get(`/api/bands/${bandId}/songs/${songId}`)).json()).song;
   expect(before.reference.url).toBe(YT);
-  await page.getByRole("button", { name: "Confirm and prepare song" }).click();
+  await page.getByRole("button", { name: "Confirm and generate pre-arrangement" }).click();
   await page.getByRole("button", { name: "Confirm replacement" }).click();
   await expect(
     page.getByTestId("preparation-state").locator('[data-item="arrangement"]'),
@@ -409,7 +409,7 @@ test("an existing song gets its reference in Portuguese on a phone, and the cata
   );
   expect(overflow).toBeLessThanOrEqual(1);
   await page.screenshot({ path: "test-results/ref-10-mobile-pt.png", fullPage: true });
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   const states = page.getByTestId("preparation-state");
   await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
   await expect(states).toContainText("Referência identificada");
@@ -470,7 +470,7 @@ test("preparing a song that already has a reference: no raw error, three clear c
   const songId = (await created.json()).song.id as string;
   await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
   await identify(page, YT, pt);
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   const states = page.getByTestId("preparation-state");
   await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
   await expect(page.getByTestId("replace-warning")).toHaveCount(0);
@@ -516,7 +516,7 @@ test("preparing a song that already has a reference: no raw error, three clear c
   await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
   await identify(page, `https://music.youtube.com/watch?v=${YT_ID}`, pt);
   await page.getByRole("radio", { name: /Outra gravação/ }).check();
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
   await expect(page.getByTestId("replace-warning")).toHaveCount(0);
   await noRawKeys();
@@ -533,7 +533,7 @@ test("preparing a song that already has a reference: no raw error, three clear c
   await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
   await identify(page, SPOTIFY, pt);
   await page.getByRole("radio", { name: /Outra gravação/ }).check();
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   const warning = page.getByTestId("replace-warning");
   await expect(warning).toContainText(
     "Esta música já possui uma gravação de referência. Deseja substituí-la? Os dados musicais existentes serão preservados, mas poderão precisar de revisão.",
@@ -556,7 +556,7 @@ test("preparing a song that already has a reference: no raw error, three clear c
   expect(await state()).toEqual(before);
 
   // 3b. Keep the current reference: preparation runs with it, nothing changed.
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   await warning.getByRole("button", { name: "Manter referência atual" }).click();
   await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
   await expect(page.getByTestId("prepared")).toContainText("YouTube Music");
@@ -567,7 +567,7 @@ test("preparing a song that already has a reference: no raw error, three clear c
   await page.goto(`/bands/${bandId}/songs/add?song=${songId}`);
   await identify(page, SPOTIFY, pt);
   await page.getByRole("radio", { name: /Outra gravação/ }).check();
-  await page.getByRole("button", { name: "Confirmar e preparar música" }).click();
+  await page.getByRole("button", { name: "Confirmar e gerar pré-arranjo" }).click();
   await warning.getByRole("button", { name: "Confirmar substituição" }).click();
   await expect(states).toContainText("Arranjo pronto para revisão", { timeout: 20_000 });
   await noRawKeys();

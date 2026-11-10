@@ -1,4 +1,12 @@
-import { AnalysisError, type AnalysisReport, analyzeAudio } from "@bandsync/shared";
+import {
+  AnalysisError,
+  type AnalysisReport,
+  analyzeAudio,
+  type PreArrangement,
+  PrearrangeError,
+  prearrange,
+  type SubmitPrearrangementInput,
+} from "@bandsync/shared";
 
 /**
  * Getting audio into BandSync's analysis, on the device only:
@@ -11,6 +19,7 @@ import { AnalysisError, type AnalysisReport, analyzeAudio } from "@bandsync/shar
 export type AnalysisFailure =
   | "too_short"
   | "no_signal"
+  | "no_pulse"
   | "failed"
   | "mic_denied"
   | "mic_unavailable"
@@ -157,5 +166,79 @@ export async function startMicCapture(maxSeconds = 60): Promise<MicCapture> {
       close();
       chunks.length = 0;
     },
+  };
+}
+
+/** The whole pre-arrangement of a recording, computed on this device (in a worker). */
+export function prearrangeOnDevice(pcm: Pcm): Promise<PreArrangement> {
+  if (typeof Worker === "undefined") {
+    try {
+      return Promise.resolve(prearrange(pcm.channels, pcm.sampleRate));
+    } catch (err) {
+      return Promise.reject(
+        new ListenError(
+          err instanceof AnalysisError || err instanceof PrearrangeError ? err.code : "failed",
+        ),
+      );
+    }
+  }
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL("./analysis.worker.ts", import.meta.url), {
+      type: "module",
+    });
+    worker.onmessage = (
+      e: MessageEvent<
+        { ok: true; prearrangement: PreArrangement } | { ok: false; code: AnalysisFailure }
+      >,
+    ) => {
+      worker.terminate();
+      if (e.data.ok) resolve(e.data.prearrangement);
+      else reject(new ListenError(e.data.code));
+    };
+    worker.onerror = () => {
+      worker.terminate();
+      reject(new ListenError("failed"));
+    };
+    worker.postMessage(
+      { ...pcm, mode: "prearrange" },
+      pcm.channels.map((c) => c.buffer as ArrayBuffer),
+    );
+  });
+}
+
+/** What is sent to the server for a pre-arrangement computed from audio. */
+export function toSubmission(
+  pre: PreArrangement,
+  source: "audio_file" | "microphone",
+  audioAssetId: string | null,
+): SubmitPrearrangementInput {
+  const bpm = pre.report.bpm;
+  return {
+    source,
+    audioAssetId,
+    engine: pre.engine,
+    version: pre.version,
+    analysedSeconds: pre.analysedSeconds,
+    bpm: bpm
+      ? {
+          value: bpm.value,
+          ambiguous: bpm.ambiguous,
+          alternatives: bpm.candidates
+            .filter((c) => c.score >= 0.7 && Math.abs(c.bpm - bpm.value) > 1)
+            .map((c) => c.bpm),
+          origin: "audio_analysis",
+        }
+      : null,
+    beatsPerBar: pre.beatsPerBar,
+    key: pre.report.key
+      ? {
+          key: pre.report.key.key,
+          alternatives: pre.report.key.candidates.slice(1, 3).map((k) => k.key),
+        }
+      : null,
+    firstDownbeatSec: pre.firstDownbeatSec,
+    barSeconds: pre.barSeconds,
+    bars: pre.bars,
+    sections: pre.sections,
   };
 }

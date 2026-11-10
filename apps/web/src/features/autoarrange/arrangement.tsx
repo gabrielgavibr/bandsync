@@ -403,7 +403,14 @@ export function BandArrangementCard({
       )}
 
       <div className="mt-5 border-t border-line pt-4">
-        <SubHeading>{t("repertoire:sections.title")}</SubHeading>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <SubHeading>{t("repertoire:sections.title")}</SubHeading>
+          <Link to={`/bands/${bandId}/songs/${song.id}/arrangement`} data-testid="open-arrangement">
+            <Button size="sm" variant="secondary" icon={<AudioLines className="size-4" />}>
+              {canEdit ? t("autoarrange:pre.openEditor") : t("autoarrange:pre.openView")}
+            </Button>
+          </Link>
+        </div>
         {song.sections.length === 0 ? (
           <p className="text-sm text-muted">{t("repertoire:sections.empty")}</p>
         ) : (

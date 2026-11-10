@@ -35,6 +35,11 @@ const AddSongWizardPage = lazy(() =>
     default: m.AddSongWizardPage,
   })),
 );
+const ArrangementPage = lazy(() =>
+  import("../features/arrangement/ArrangementPage").then((m) => ({
+    default: m.ArrangementPage,
+  })),
+);
 const SongFormPage = lazy(() =>
   import("../features/repertoire/SongFormPage").then((m) => ({ default: m.SongFormPage })),
 );
@@ -83,6 +88,7 @@ export function AppRoutes() {
             <Route path="songs/new" element={<SongFormPage />} />
             <Route path="songs/:songId" element={<SongDetailPage />} />
             <Route path="songs/:songId/edit" element={<SongFormPage />} />
+            <Route path="songs/:songId/arrangement" element={<ArrangementPage />} />
             <Route path="repertoires" element={<RepertoiresPage />} />
             <Route path="repertoires/:repertoireId" element={<RepertoireDetailPage />} />
             <Route path="members" element={<MembersPage />} />

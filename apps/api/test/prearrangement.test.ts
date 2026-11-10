@@ -1,10 +1,10 @@
-import { runDurableObjectAlarm } from "cloudflare:test";
+import { runDurableObjectAlarm, SELF } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import type { AnalysisJobDto } from "@bandsync/shared";
 import { describe, expect, it } from "vitest";
 import { prearrange } from "../../../packages/shared/src/analysis/prearrange";
 import { CHORDS, synthSong } from "../../../packages/shared/src/analysis/synth";
-import { api, joinByCode, json, register, type Session } from "./helpers";
+import { api, BASE, joinByCode, json, register, type Session } from "./helpers";
 import { SPOTIFY_TRACK_ID } from "./outbound";
 
 const YT = "https://www.youtube.com/watch?v=JZqFoTIAJj8";
@@ -168,6 +168,66 @@ describe("published analyses of the exact recording (Deezer)", () => {
     // Six versions of Esotérico on Deezer and no length known: nothing is taken.
     const o = await overview(ana, bandId, body.song.id);
     expect(o.results.filter((r: { origin: string }) => r.origin === "deezer")).toEqual([]);
+  });
+});
+
+describe("published tempo once the player reports the length", () => {
+  it("finds the exact Deezer recording by title and length, and only once", async () => {
+    const { ana, bandId } = await setup();
+    // Link only (no catalogue entry): no length when prepared, so no lookup yet.
+    const body = await prepare(ana, bandId, {
+      newSong: { title: "Esotérico" },
+      recording: { source: "link", title: "Esotérico", artistCredit: "Um Banda Um" },
+      referenceUrl: YT,
+    });
+    await waitForJob(ana, bandId, body.job.id);
+    const songId = body.song.id as string;
+    const deezerOf = (o: { results: { origin: string; kind: string }[] }) =>
+      o.results.filter((r) => r.origin === "deezer");
+    expect(deezerOf(await overview(ana, bandId, songId))).toEqual([]);
+
+    const res = await api(
+      "POST",
+      `${aa(bandId)}/songs/${songId}/reference/duration`,
+      { seconds: 262.3 },
+      ana.cookie,
+    );
+    expect(res.status).toBe(200);
+    const found = deezerOf(await json(res));
+    expect(found).toHaveLength(1);
+    expect(found[0]).toMatchObject({
+      kind: "bpm",
+      method: "deezer.track.bpm",
+      reviewStatus: "needs_review",
+      value: { bpm: 110.5, deezerTrackId: 876104442, match: "title_duration" },
+    });
+    // Reported again: no second lookup, no duplicate.
+    const again = await api(
+      "POST",
+      `${aa(bandId)}/songs/${songId}/reference/duration`,
+      { seconds: 262.3 },
+      ana.cookie,
+    );
+    expect(deezerOf(await json(again))).toHaveLength(1);
+  });
+
+  it("takes nothing when the length matches no version", async () => {
+    const { ana, bandId } = await setup();
+    const body = await prepare(ana, bandId, {
+      newSong: { title: "Esotérico" },
+      recording: { source: "link", title: "Esotérico", artistCredit: "Um Banda Um" },
+      referenceUrl: YT,
+    });
+    await waitForJob(ana, bandId, body.job.id);
+    const res = await api(
+      "POST",
+      `${aa(bandId)}/songs/${body.song.id}/reference/duration`,
+      { seconds: 999 },
+      ana.cookie,
+    );
+    expect(
+      (await json(res)).results.filter((r: { origin: string }) => r.origin === "deezer"),
+    ).toEqual([]);
   });
 });
 
@@ -389,6 +449,57 @@ describe("pre-arrangement of the recording and the band's arrangement", () => {
     expect(o.prearrangement.source).toBe("member_marks");
     expect(o.results.filter((r: { origin: string }) => r.origin === "audio_analysis")).toEqual([]);
     expect(o.preparation.analysis).toBe("not_possible");
+  });
+
+  it("maps the band's own authorised file for a song with no published reference", async () => {
+    const { ana, bandId } = await setup();
+    const songId = (
+      await json(
+        await api("POST", `/api/bands/${bandId}/songs`, { title: "Nossa autoral" }, ana.cookie),
+      )
+    ).song.id as string;
+    const pre = devicePrearrangement();
+    const path = `${aa(bandId)}/songs/${songId}/prearrangement`;
+    // No reference: the microphone and marks have nothing to listen to.
+    expect((await api("POST", path, { source: "microphone", ...pre }, ana.cookie)).status).toBe(
+      404,
+    );
+    const form = new FormData();
+    form.set("file", new File([new Uint8Array([1, 2, 3, 4])], "ensaio.ogg", { type: "audio/ogg" }));
+    const fileId = (
+      await json(
+        await SELF.fetch(`${BASE}/api/bands/${bandId}/files`, {
+          method: "POST",
+          body: form,
+          headers: { cookie: ana.cookie },
+        }),
+      )
+    ).file.id;
+    const asset = (
+      await json(
+        await api(
+          "POST",
+          `${aa(bandId)}/songs/${songId}/audio-assets`,
+          { fileId, rightsBasis: "own_recording", declaration: true },
+          ana.cookie,
+        ),
+      )
+    ).audioAsset;
+    expect(asset.recordingId).toBeNull();
+    const res = await api(
+      "POST",
+      path,
+      { source: "audio_file", audioAssetId: asset.id, ...pre },
+      ana.cookie,
+    );
+    expect(res.status).toBe(201);
+    const o = await json(res);
+    expect(o.prearrangement).toMatchObject({
+      source: "audio_file",
+      recordingId: null,
+      audioAssetId: asset.id,
+    });
+    expect(o.prearrangement.data.sections).toHaveLength(pre.sections.length);
   });
 
   it("validates, needs the file for a file analysis, and needs permission", async () => {
