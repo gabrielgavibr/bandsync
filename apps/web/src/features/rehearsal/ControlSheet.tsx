@@ -102,7 +102,7 @@ export function ControlSheet({
           }}
           className="sticky top-0 z-10 flex h-6 w-full touch-none items-center justify-center bg-elev"
         >
-          <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-muted/50" />
+          <span aria-hidden="true" className="h-1.5 w-12 rounded-full bg-fg/30" />
         </button>
         <Fold open={level === "full"}>
           <div className="px-3 pb-3" data-testid="sheet-full">
