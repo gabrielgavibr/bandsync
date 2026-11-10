@@ -226,3 +226,108 @@ export function transposeChordLabel(chord: string, semitones: number, flats: boo
 }
 
 export const totalBars = (list: EditableSection[]) => list.reduce((a, s) => a + s.bars, 0);
+
+/* ------------------------------------------------------------------ */
+/* Limits of a section in the recording, edited while listening        */
+/* ------------------------------------------------------------------ */
+
+/** Shortest stretch a section may be given. */
+export const MIN_SECTION_MS = 500;
+/** Two limits this close are the same boundary (one section ends where the next starts). */
+const SHARED_MS = 60;
+
+/** Bars that fit a stretch of the recording, from the length of a bar when it is known. */
+export function barsFor(startMs: number, endMs: number, barSeconds: number | null): number | null {
+  if (!barSeconds || barSeconds <= 0) return null;
+  return Math.max(1, Math.round((endMs - startMs) / 1000 / barSeconds));
+}
+
+/** Keeps the section's harmony when its length changes: cut, or carried on in its own cycle. */
+function resize(s: EditableSection, bars: number | null): EditableSection {
+  if (bars === null || bars === s.bars) return s;
+  const chords =
+    s.chords.length === 0
+      ? []
+      : Array.from({ length: bars }, (_, k) => s.chords[k % s.chords.length]!);
+  return { ...s, bars, chords, cues: s.cues.filter((c) => (c.bar ?? 1) <= bars) };
+}
+
+/**
+ * Moves the start and/or the end of a section in the recording. A neighbour that shared the
+ * limit moves with it, so no gap or overlap appears; bars follow the new lengths when the bar
+ * length is known. Limits never cross: a section keeps at least half a second.
+ */
+export function setTimes(
+  list: EditableSection[],
+  i: number,
+  patch: { startMs?: number; endMs?: number },
+  barSeconds: number | null,
+): EditableSection[] {
+  const s = list[i];
+  if (!s || s.startMs === null || s.endMs === null) return list;
+  const prev = list[i - 1];
+  const next = list[i + 1];
+  const sharesStart =
+    !!prev && prev.endMs !== null && Math.abs(prev.endMs - s.startMs) <= SHARED_MS;
+  const sharesEnd =
+    !!next && next.startMs !== null && Math.abs(next.startMs - s.endMs) <= SHARED_MS;
+  // The edge that is not being moved stays where it is; the moved one stops short of it.
+  let start = s.startMs;
+  let end = s.endMs;
+  if (patch.endMs !== undefined) end = Math.round(patch.endMs);
+  if (patch.startMs !== undefined) {
+    const floor = sharesStart && prev!.startMs !== null ? prev!.startMs + MIN_SECTION_MS : 0;
+    const limit = (patch.endMs === undefined ? s.endMs : end) - MIN_SECTION_MS;
+    start = Math.max(floor, Math.min(Math.round(patch.startMs), limit));
+  }
+  const ceil =
+    sharesEnd && next!.endMs !== null ? next!.endMs - MIN_SECTION_MS : Number.POSITIVE_INFINITY;
+  end = Math.min(ceil, Math.max(end, start + MIN_SECTION_MS));
+  if (start === s.startMs && end === s.endMs) return list;
+  return list.map((x, k) => {
+    if (k === i)
+      return resize({ ...x, startMs: start, endMs: end }, barsFor(start, end, barSeconds));
+    if (k === i - 1 && sharesStart && start !== s.startMs)
+      return resize({ ...x, endMs: start }, barsFor(x.startMs ?? 0, start, barSeconds));
+    if (k === i + 1 && sharesEnd && end !== s.endMs)
+      return resize({ ...x, startMs: end }, barsFor(end, x.endMs ?? end, barSeconds));
+    return x;
+  });
+}
+
+/** Splits a section at a moment of the recording (e.g. where playback is). */
+export function splitAtTime(
+  list: EditableSection[],
+  i: number,
+  ms: number,
+  barSeconds: number | null,
+): EditableSection[] {
+  const s = list[i];
+  if (!s || s.startMs === null || s.endMs === null) return list;
+  const at = Math.round(ms);
+  if (at - s.startMs < MIN_SECTION_MS || s.endMs - at < MIN_SECTION_MS) return list;
+  const ratio = (at - s.startMs) / (s.endMs - s.startMs);
+  const firstBars = barsFor(s.startMs, at, barSeconds) ?? Math.max(1, Math.round(s.bars * ratio));
+  const secondBars =
+    barsFor(at, s.endMs, barSeconds) ?? Math.max(1, s.bars - Math.round(s.bars * ratio));
+  const cut = Math.min(s.chords.length, firstBars);
+  const first: EditableSection = {
+    ...s,
+    bars: firstBars,
+    chords: s.chords.slice(0, cut),
+    cues: s.cues.filter((c) => (c.bar ?? 1) <= firstBars),
+    endMs: at,
+  };
+  const second: EditableSection = {
+    ...s,
+    key: nextKey(),
+    name: `${s.name} (2)`,
+    bars: secondBars,
+    chords: s.chords.slice(cut, cut + secondBars),
+    cues: s.cues
+      .filter((c) => (c.bar ?? 1) > firstBars)
+      .map((c) => ({ ...c, bar: (c.bar ?? 1) - firstBars })),
+    startMs: at,
+  };
+  return [...list.slice(0, i), first, second, ...list.slice(i + 1)];
+}

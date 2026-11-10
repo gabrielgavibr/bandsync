@@ -439,10 +439,14 @@
       "stop": "parada",
       "entry": "entrada",
       "drop": "queda de intensidade",
-      "texture": "mudança de instrumentação"
+      "texture": "mudança de instrumentação",
+      "maybe": "possível divisão"
     },
     "noChordsMarks": "Sem acordes: marcações não analisam o áudio.",
-    "honesty": "Estimativas do BandSync a partir do que foi ouvido. Classificações como “Refrão” só aparecem quando um trecho se repete; senão, as seções levam letras. Confira de ouvido antes de ensaiar."
+    "honesty": "Estimativas do BandSync a partir do que foi ouvido. Classificações como “Refrão” só aparecem quando um trecho se repete; senão, as seções levam letras. Confira de ouvido antes de ensaiar.",
+    "loop_one": "Laço harmônico de {{count}} compasso",
+    "loop_other": "Laço harmônico de {{count}} compassos",
+    "loopHint": "A harmonia se repete a cada volta; as seções foram comparadas volta a volta, não compasso a compasso."
   },
   "editor": {
     "heading": "Arranjo da banda",
@@ -465,7 +469,6 @@
     "nameOf": "Nome da seção {{n}}",
     "barsOf": "Compassos da seção {{n}}",
     "barsShort": "comp.",
-    "listenFrom": "Ouvir a partir de {{name}}",
     "kindLabel": "Função",
     "kindNone": "Sem classificação",
     "kind": {
@@ -501,7 +504,14 @@
     "split": "Dividir",
     "merge": "Unir com a próxima",
     "remove": "Remover",
-    "bandValues": "Valores da banda: andamento, tom e compasso"
+    "bandValues": "Valores da banda: andamento, tom e compasso",
+    "listenSection": "Ouvir {{name}}",
+    "start": "Início",
+    "end": "Fim",
+    "earlier": "{{what}} de {{name}}: meio segundo antes",
+    "later": "{{what}} de {{name}}: meio segundo depois",
+    "setHere": "{{what}} de {{name}}: usar a posição atual",
+    "here": "aqui"
   },
   "views": {
     "heading": "Arranjo por instrumento",
@@ -522,5 +532,32 @@
       "keys": "Sem cifra ou partitura de teclado entre os materiais.",
       "vocals": "Sem letra entre os materiais. O BandSync só mostra letras que a banda adicionou com direito de uso."
     }
+  },
+  "player": {
+    "label": "Player da gravação",
+    "noSection": "Fora das seções",
+    "position": "Posição na gravação",
+    "previous": "Seção anterior",
+    "next": "Próxima seção",
+    "back": "Voltar {{seconds}} segundos",
+    "forward": "Avançar {{seconds}} segundos",
+    "play": "Tocar",
+    "pause": "Pausar",
+    "loop": "Repetir seção",
+    "carryOn": "Seguir para a próxima",
+    "volume": "Volume",
+    "failed": "Não foi possível tocar esta gravação neste aparelho.",
+    "seekStrip": "Ir para um ponto da gravação",
+    "fromFile": "Tocando o arquivo enviado: {{name}}.",
+    "fromFileHint": "Só integrantes da banda têm acesso a ele.",
+    "officialPlayer": "player oficial do YouTube"
+  },
+  "timeline": {
+    "legendSame": "Mesma cor e letra: o mesmo material que volta.",
+    "legendEvent": "evento dentro da seção",
+    "legendMaybe": "possível divisão (incerta)",
+    "boundary": "Limite entre {{before}} e {{after}}",
+    "bandHint": "Arranjo da banda sobre a gravação. Toque numa seção para ouvi-la; arraste a barra branca entre duas seções (ou use as setas do teclado) para corrigir o limite.",
+    "bandHintReadOnly": "Arranjo da banda sobre a gravação. Toque numa seção para ouvi-la."
   }
 }

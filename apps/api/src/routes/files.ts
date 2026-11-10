@@ -47,21 +47,63 @@ fileRoutes.post("/", requireRepertoireEditor, async (c) => {
   return c.json({ file: toFileDto(row) }, 201);
 });
 
-/** Streams a private file; access is verified through band membership on every request. */
+/** `bytes=a-b`, `bytes=a-` or `bytes=-n` against a file of `size` bytes; null when not satisfiable. */
+export function parseRange(
+  header: string | undefined,
+  size: number,
+): { offset: number; length: number } | null | "none" {
+  if (!header) return "none";
+  const m = /^bytes=(\d*)-(\d*)$/.exec(header.trim());
+  // Several ranges or another unit: answer with the whole file, as the standard allows.
+  if (!m) return "none";
+  const [, a, b] = m;
+  if (a === "" && b === "") return null;
+  if (a === "") {
+    const n = Number(b);
+    if (!(n > 0)) return null;
+    const length = Math.min(n, size);
+    return { offset: size - length, length };
+  }
+  const offset = Number(a);
+  if (offset >= size) return null;
+  const end = b === "" ? size - 1 : Math.min(Number(b), size - 1);
+  if (end < offset) return null;
+  return { offset, length: end - offset + 1 };
+}
+
+/**
+ * Streams a private file; access is verified through band membership on every request.
+ * Byte ranges are served (HTTP 206), so a player can jump to any moment of an audio file
+ * without downloading all of it; iOS requires this to play audio at all.
+ */
 fileRoutes.get("/:fileId", async (c) => {
   const bandId = p(c, "bandId");
   const row = await getFile(c.env.DB, bandId, p(c, "fileId"));
   if (!row) throw notFound("file");
-  const obj = await c.env.FILES.get(row.r2_key);
-  if (!obj) throw notFound("file");
   const headers = new Headers();
   headers.set("content-type", row.content_type);
-  headers.set("content-length", String(obj.size));
   headers.set("cache-control", "private, max-age=300");
   headers.set("content-disposition", `inline; filename*=UTF-8''${encodeURIComponent(row.name)}`);
   headers.set("x-content-type-options", "nosniff");
+  headers.set("accept-ranges", "bytes");
+  const range = parseRange(c.req.header("range"), row.size);
+  if (range === null) {
+    headers.set("content-range", `bytes */${row.size}`);
+    return new Response(null, { status: 416, headers });
+  }
+  const obj = await c.env.FILES.get(row.r2_key, range === "none" ? undefined : { range });
+  if (!obj) throw notFound("file");
   if (obj.httpEtag) headers.set("etag", obj.httpEtag);
-  return new Response(obj.body, { headers });
+  if (range === "none") {
+    headers.set("content-length", String(obj.size));
+    return new Response(obj.body, { headers });
+  }
+  headers.set("content-length", String(range.length));
+  headers.set(
+    "content-range",
+    `bytes ${range.offset}-${range.offset + range.length - 1}/${obj.size}`,
+  );
+  return new Response(obj.body, { status: 206, headers });
 });
 
 fileRoutes.delete("/:fileId", requireRepertoireEditor, async (c) => {

@@ -439,10 +439,14 @@
       "stop": "stop",
       "entry": "entry",
       "drop": "drop in intensity",
-      "texture": "instrumentation change"
+      "texture": "instrumentation change",
+      "maybe": "possible division"
     },
     "noChordsMarks": "No chords: marks do not analyse the audio.",
-    "honesty": "BandSync estimates from what it heard. Names such as “Chorus” only appear when a passage repeats; otherwise sections get letters. Check by ear before rehearsing."
+    "honesty": "BandSync estimates from what it heard. Names such as “Chorus” only appear when a passage repeats; otherwise sections get letters. Check by ear before rehearsing.",
+    "loop_one": "Harmonic loop of {{count}} bar",
+    "loop_other": "Harmonic loop of {{count}} bars",
+    "loopHint": "The harmony repeats every time round; sections were compared loop by loop, not bar by bar."
   },
   "editor": {
     "heading": "Band arrangement",
@@ -465,7 +469,6 @@
     "nameOf": "Name of section {{n}}",
     "barsOf": "Bars of section {{n}}",
     "barsShort": "bars",
-    "listenFrom": "Listen from {{name}}",
     "kindLabel": "Role",
     "kindNone": "Not classified",
     "kind": {
@@ -501,7 +504,14 @@
     "split": "Split",
     "merge": "Join with next",
     "remove": "Remove",
-    "bandValues": "Band values: tempo, key and time signature"
+    "bandValues": "Band values: tempo, key and time signature",
+    "listenSection": "Listen to {{name}}",
+    "start": "Start",
+    "end": "End",
+    "earlier": "{{what}} of {{name}}: half a second earlier",
+    "later": "{{what}} of {{name}}: half a second later",
+    "setHere": "{{what}} of {{name}}: use the current position",
+    "here": "here"
   },
   "views": {
     "heading": "Arrangement by instrument",
@@ -522,5 +532,32 @@
       "keys": "No keys chart or sheet music among the materials.",
       "vocals": "No lyrics among the materials. BandSync only shows lyrics the band added with the right to use them."
     }
+  },
+  "player": {
+    "label": "Recording player",
+    "noSection": "Outside the sections",
+    "position": "Position in the recording",
+    "previous": "Previous section",
+    "next": "Next section",
+    "back": "Back {{seconds}} seconds",
+    "forward": "Forward {{seconds}} seconds",
+    "play": "Play",
+    "pause": "Pause",
+    "loop": "Loop section",
+    "carryOn": "Carry on to the next",
+    "volume": "Volume",
+    "failed": "This recording could not be played on this device.",
+    "seekStrip": "Go to a moment of the recording",
+    "fromFile": "Playing the uploaded file: {{name}}.",
+    "fromFileHint": "Only members of the band can access it.",
+    "officialPlayer": "official YouTube player"
+  },
+  "timeline": {
+    "legendSame": "Same colour and letter: the same material coming back.",
+    "legendEvent": "event inside the section",
+    "legendMaybe": "possible division (uncertain)",
+    "boundary": "Limit between {{before}} and {{after}}",
+    "bandHint": "The band's arrangement over the recording. Tap a section to hear it; drag the white bar between two sections (or use the arrow keys) to correct the limit.",
+    "bandHintReadOnly": "The band's arrangement over the recording. Tap a section to hear it."
   }
 }

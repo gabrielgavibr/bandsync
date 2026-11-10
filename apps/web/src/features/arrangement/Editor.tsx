@@ -13,6 +13,7 @@ import {
   ArrowDown,
   ArrowUp,
   Copy,
+  Flag,
   GitMerge as Merge,
   Play,
   Plus,
@@ -41,12 +42,16 @@ import {
   remove,
   repeat,
   setBars,
+  setTimes,
   split,
+  splitAtTime,
   toSaved,
   totalBars,
   transposeChordLabel,
 } from "./model";
-import { letterColor } from "./Timeline";
+import { clockTenths } from "./PlayerBar";
+import { BandTimeline, letterColor } from "./Timeline";
+import type { Passage, SectionPlayback, Transport } from "./transport";
 
 const CUE_TYPES = ["stop", "entry", "convention", "note"] as const;
 
@@ -59,14 +64,19 @@ export function ArrangementEditor({
   song,
   pre,
   canEdit,
-  onListen,
+  transport,
+  playback,
+  onPassages,
 }: {
   bandId: string;
   song: SongDto;
   pre: RecordingArrangementDto | null;
   canEdit: boolean;
-  /** Plays the reference from a moment (seconds), when the official player is available. */
-  onListen?: (seconds: number) => void;
+  /** The recording being reviewed (uploaded file or official player), when there is one. */
+  transport: Transport | null;
+  playback: SectionPlayback | null;
+  /** Tells the page where the band's sections are in the recording, as they are edited. */
+  onPassages?: (list: Passage[]) => void;
 }) {
   const { t, i18n } = useTranslation(["autoarrange", "repertoire", "common"]);
   const { toast } = useToast();
@@ -74,7 +84,7 @@ export function ArrangementEditor({
   const nameFor = (kind: SectionKind | null, label: string, nth: number) =>
     kind
       ? `${t(`autoarrange:editor.kind.${kind}`)}${nth > 1 ? ` ${nth}` : ""}`
-      : t("autoarrange:pre.letter", { label });
+      : `${t("autoarrange:pre.letter", { label })}${nth > 1 ? ` (${nth})` : ""}`;
   const cueText = (type: "stop" | "entry") => t(`autoarrange:editor.cueType.${type}`);
 
   const [sections, setSections] = useState<EditableSection[]>(() => fromSaved(song.sections));
@@ -91,6 +101,33 @@ export function ArrangementEditor({
     setTranspose(song.version.arrangementTranspose);
     setBaseId(song.version.arrangementBaseId);
   }, [song.version.arrangementUpdatedAt, song.version.id]);
+
+  // Where each section is heard: the player follows the limits as they are edited.
+  const passages = useMemo<Passage[]>(
+    () =>
+      sections
+        .filter((x) => x.startMs !== null && x.endMs !== null)
+        .map((x) => ({
+          id: x.key,
+          startSec: x.startMs! / 1000,
+          endSec: x.endMs! / 1000,
+          name: x.name,
+        })),
+    [sections],
+  );
+  // biome-ignore lint/correctness/useExhaustiveDependencies: report only when the limits change
+  useEffect(() => onPassages?.(passages), [passages]);
+  const barSeconds = pre?.data.barSeconds ?? null;
+  const currentKey = playback?.current.band ?? null;
+  const listenTo = (x: EditableSection) => {
+    if (playback && x.startMs !== null && x.endMs !== null)
+      playback.playPassage({
+        id: x.key,
+        startSec: x.startMs / 1000,
+        endSec: x.endMs / 1000,
+        name: x.name,
+      });
+  };
 
   const baseKey = parseKey(pre?.data.key?.key ?? song.version.key ?? "");
   const shownKey = baseKey ? transposeKey(baseKey, transpose) : null;
@@ -190,6 +227,32 @@ export function ArrangementEditor({
         </div>
       ) : null}
 
+      {transport && passages.length > 0 ? (
+        <div>
+          <p className="mb-1.5 text-xs text-muted">
+            {canEdit
+              ? t("autoarrange:timeline.bandHint")
+              : t("autoarrange:timeline.bandHintReadOnly")}
+          </p>
+          <BandTimeline
+            sections={sections}
+            durationSec={transport.duration}
+            time={transport.time}
+            currentKey={currentKey}
+            onPlay={(i) => listenTo(sections[i]!)}
+            onSeek={(sec) => {
+              playback?.release();
+              transport.seek(sec);
+            }}
+            onMoveBoundary={
+              canEdit
+                ? (i, ms) => edit(setTimes(sections, i, { endMs: ms }, barSeconds))
+                : undefined
+            }
+          />
+        </div>
+      ) : null}
+
       {sections.length === 0 ? (
         <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">
           {pre ? t("autoarrange:editor.emptyWithPre") : t("autoarrange:editor.empty")}
@@ -208,13 +271,26 @@ export function ArrangementEditor({
               onBars={(n) => edit(setBars(sections, i, n))}
               onMove={(by) => edit(move(sections, i, by))}
               onRepeat={() => edit(repeat(sections, i))}
-              onSplit={() => edit(split(sections, i, Math.floor(s.bars / 2)))}
+              onSplit={() => {
+                // While listening: split where playback is. Otherwise: in half.
+                const at = transport ? Math.round(transport.now() * 1000) : -1;
+                const inside =
+                  s.startMs !== null && s.endMs !== null && at > s.startMs && at < s.endMs;
+                edit(
+                  inside
+                    ? splitAtTime(sections, i, at, barSeconds)
+                    : split(sections, i, Math.floor(s.bars / 2)),
+                );
+              }}
               onMerge={() => edit(mergeWithNext(sections, i))}
               onRemove={() => edit(remove(sections, i))}
               onCue={(c) => edit(addCue(sections, i, c))}
+              current={currentKey === s.key}
               onListen={
-                onListen && s.startMs !== null ? () => onListen(s.startMs! / 1000) : undefined
+                transport && s.startMs !== null && s.endMs !== null ? () => listenTo(s) : undefined
               }
+              now={transport ? () => Math.round(transport.now() * 1000) : undefined}
+              onTimes={(p) => edit(setTimes(sections, i, p, barSeconds))}
             />
           ))}
         </ol>
@@ -271,6 +347,9 @@ function SectionRow({
   onRemove,
   onCue,
   onListen,
+  current,
+  now,
+  onTimes,
 }: {
   index: number;
   count: number;
@@ -286,6 +365,11 @@ function SectionRow({
   onRemove: () => void;
   onCue: (c: SectionCue) => void;
   onListen?: () => void;
+  /** This section is the one sounding now. */
+  current: boolean;
+  /** Playback position in milliseconds, when a recording is loaded. */
+  now?: () => number;
+  onTimes: (p: { startMs?: number; endMs?: number }) => void;
 }) {
   const { t } = useTranslation(["autoarrange", "repertoire", "common"]);
   const [chordText, setChordText] = useState(s.chords.join(" "));
@@ -299,9 +383,13 @@ function SectionRow({
 
   return (
     <li
-      className="rounded-xl border border-line bg-elev/40 p-3"
+      className={cn(
+        "rounded-xl border bg-elev/40 p-3",
+        current ? "border-accent-500 ring-1 ring-accent-500" : "border-line",
+      )}
       data-testid="arrangement-section"
       data-name={s.name}
+      data-current={current}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -335,15 +423,70 @@ function SectionRow({
         {onListen ? (
           <button
             type="button"
-            className={iconBtn}
+            className={cn(iconBtn, "bg-accent-500/15 text-accent-600 dark:text-accent-300")}
             onClick={onListen}
-            aria-label={t("autoarrange:editor.listenFrom", { name: s.name })}
-            title={t("autoarrange:editor.listenFrom", { name: s.name })}
+            aria-label={t("autoarrange:editor.listenSection", { name: s.name })}
+            title={t("autoarrange:editor.listenSection", { name: s.name })}
           >
             <Play className="size-4" />
           </button>
         ) : null}
       </div>
+
+      {s.startMs !== null && s.endMs !== null ? (
+        <div
+          className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm"
+          data-testid="section-times"
+        >
+          {(["startMs", "endMs"] as const).map((edge) => {
+            const value = s[edge]!;
+            const label = t(
+              edge === "startMs" ? "autoarrange:editor.start" : "autoarrange:editor.end",
+            );
+            return (
+              <div key={edge} className="flex items-center gap-1" data-edge={edge}>
+                <span className="text-muted">{label}</span>
+                <span className="w-14 font-mono tabular-nums" data-testid={`time-${edge}`}>
+                  {clockTenths(value / 1000)}
+                </span>
+                {canEdit ? (
+                  <>
+                    <button
+                      type="button"
+                      className={iconBtn}
+                      onClick={() => onTimes({ [edge]: value - 500 })}
+                      aria-label={t("autoarrange:editor.earlier", { what: label, name: s.name })}
+                      title={t("autoarrange:editor.earlier", { what: label, name: s.name })}
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      className={iconBtn}
+                      onClick={() => onTimes({ [edge]: value + 500 })}
+                      aria-label={t("autoarrange:editor.later", { what: label, name: s.name })}
+                      title={t("autoarrange:editor.later", { what: label, name: s.name })}
+                    >
+                      +
+                    </button>
+                    {now ? (
+                      <button
+                        type="button"
+                        className={cn(iconBtn, "w-auto gap-1 px-2 text-xs")}
+                        onClick={() => onTimes({ [edge]: now() })}
+                        aria-label={t("autoarrange:editor.setHere", { what: label, name: s.name })}
+                        title={t("autoarrange:editor.setHere", { what: label, name: s.name })}
+                      >
+                        <Flag className="size-3.5" /> {t("autoarrange:editor.here")}
+                      </button>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
 
       <div className="mt-2 grid gap-2 sm:grid-cols-[12rem_1fr]">
         <Select

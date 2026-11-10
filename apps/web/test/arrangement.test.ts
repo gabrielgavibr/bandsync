@@ -11,7 +11,9 @@ import {
   remove,
   repeat,
   setBars,
+  setTimes,
   split,
+  splitAtTime,
   toSaved,
   totalBars,
   transposeChordLabel,
@@ -216,5 +218,71 @@ describe("pre-arrangement from a member's marks", () => {
     const base = { marks: [10], bpmOrigin: "user" as const, beatsPerBar: 4 };
     expect(prearrangementFromMarks({ ...base, durationSec: 0, bpm: 100 })).toBeNull();
     expect(prearrangementFromMarks({ ...base, durationSec: 60, bpm: 0 })).toBeNull();
+  });
+});
+
+describe("limits of a section in the recording, corrected while listening", () => {
+  const start = fromPrearrangement(pre, nameFor);
+  const times = (l: EditableSection[]) => l.map((s) => [s.startMs, s.endMs]);
+
+  it("moving an end moves the next section's start with it, and bars follow", () => {
+    const out = setTimes(start, 0, { endMs: 12_000 }, pre.data.barSeconds);
+    expect(times(out)).toEqual([
+      [0, 12_000],
+      [12_000, 24_000],
+      [24_000, 40_000],
+    ]);
+    // Two seconds a bar: six bars now, the harmony carried on in its own cycle; six left next door.
+    expect(out.map((s) => s.bars)).toEqual([6, 6, 8]);
+    expect(out[0]!.chords).toEqual(["Am", "Am", "F", "G", "Am", "Am"]);
+    expect(out[1]!.chords).toEqual(["C", "C", "G", "G", "Am", "Am"]);
+    expect(times(start)[0]).toEqual([0, 8000]); // the input list is untouched
+  });
+
+  it("moving a start moves the previous section's end", () => {
+    const out = setTimes(start, 1, { startMs: 6500 }, pre.data.barSeconds);
+    expect(times(out).slice(0, 2)).toEqual([
+      [0, 6500],
+      [6500, 24_000],
+    ]);
+  });
+
+  it("limits never cross: every section keeps at least half a second", () => {
+    expect(times(setTimes(start, 0, { endMs: 99_000 }, null))[0]).toEqual([0, 23_500]);
+    expect(times(setTimes(start, 1, { startMs: -5 }, null))[1]).toEqual([500, 24_000]);
+    expect(times(setTimes(start, 1, { endMs: 0 }, null))[1]).toEqual([8000, 8500]);
+  });
+
+  it("without a known bar length only the times change", () => {
+    const out = setTimes(start, 0, { endMs: 12_000 }, null);
+    expect(out.map((s) => s.bars)).toEqual([4, 8, 8]);
+  });
+
+  it("a section moved away from its neighbour no longer drags it", () => {
+    const apart = start.map((s, i) => (i === 1 ? { ...s, startMs: 9000 } : s));
+    const out = setTimes(apart, 0, { endMs: 7000 }, null);
+    expect(times(out).slice(0, 2)).toEqual([
+      [0, 7000],
+      [9000, 24_000],
+    ]);
+  });
+
+  it("splits at the moment playback is", () => {
+    const out = splitAtTime(start, 1, 14_000, pre.data.barSeconds);
+    expect(times(out)).toEqual([
+      [0, 8000],
+      [8000, 14_000],
+      [14_000, 24_000],
+      [24_000, 40_000],
+    ]);
+    expect(out.map((s) => s.bars)).toEqual([4, 3, 5, 8]);
+    expect(out[1]!.chords).toEqual(["C", "C", "G"]);
+    expect(out[2]!.chords).toEqual(["G", "Am", "Am", "F", "F"]);
+    // Too close to an edge: nothing happens.
+    expect(splitAtTime(start, 1, 8100, null)).toBe(start);
+    // Joining puts it back.
+    const joined = mergeWithNext(out, 1);
+    expect(times(joined)).toEqual(times(start));
+    expect(joined[1]!.chords).toEqual(start[1]!.chords);
   });
 });

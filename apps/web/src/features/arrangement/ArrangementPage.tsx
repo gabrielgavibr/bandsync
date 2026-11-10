@@ -9,7 +9,7 @@ import {
   RefreshCw,
   TriangleAlert,
 } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { Badge, Button, Card, ErrorBlock, LoadingBlock, PageHeader } from "../../components/ui";
@@ -26,8 +26,16 @@ import { useCurrentBand } from "../bands/BandLayout";
 import { ArrangementEditor } from "./Editor";
 import { GeneratePanel } from "./Generate";
 import { InstrumentViews } from "./InstrumentViews";
+import { PlayerBar } from "./PlayerBar";
 import { currentStage, hasPlayerDuration, type LocalWork, referenceFacts } from "./prep";
 import { letterColor, RecordingTimeline, sectionAt, useSectionTitle } from "./Timeline";
+import {
+  type Passage,
+  type Transport,
+  useFileTransport,
+  useSectionPlayback,
+  youTubeTransport,
+} from "./transport";
 import { type PlayerControls, useYouTubePlayer } from "./youtube";
 
 const STEPS: PreparationStage[] = [
@@ -93,6 +101,35 @@ function Workspace({
   const [regenerate, setRegenerate] = useState(false);
   const stage = currentStage(o, local);
   const pre = o.prearrangement;
+  const title = useSectionTitle();
+
+  // The clock of this page. A map made from an uploaded file is reviewed on that file (its
+  // times are the file's, and nothing depends on a platform); otherwise on the official player.
+  const asset =
+    pre?.source === "audio_file"
+      ? (o.audioAssets.find((a) => a.id === pre.audioAssetId) ?? null)
+      : null;
+  const file = useFileTransport(asset ? `/api/bands/${bandId}/files/${asset.fileId}` : null);
+  const transport: Transport | null = asset ? file : isYouTube ? youTubeTransport(yt) : null;
+  const [bandPassages, setBandPassages] = useState<Passage[]>([]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: titles only change with the language
+  const prePassages = useMemo<Passage[]>(
+    () =>
+      (pre?.data.sections ?? []).map((s, i) => ({
+        id: `pre:${i}`,
+        startSec: s.startSec,
+        endSec: s.endSec,
+        name: title(s),
+      })),
+    [pre],
+  );
+  const lists = useMemo(
+    () => ({ band: bandPassages, pre: prePassages }),
+    [bandPassages, prePassages],
+  );
+  const playback = useSectionPlayback(transport, lists);
+  const soundingId = playback.current.band ?? playback.current.pre;
+  const sounding = [...bandPassages, ...prePassages].find((p) => p.id === soundingId) ?? null;
 
   // The official player knows the video's duration: keep it once as a fact about the reference.
   const reportDuration = useReportPlayerDuration(bandId, song.id);
@@ -103,14 +140,6 @@ function Workspace({
     reported.current = true;
     reportDuration.mutate(yt.duration);
   }, [canEdit, yt.ready, yt.duration, o, reportDuration]);
-
-  const listen = player?.ready
-    ? (s: number) => {
-        player.seek(s);
-        player.play();
-        host.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    : undefined;
 
   return (
     <>
@@ -156,13 +185,34 @@ function Workspace({
         <StageList stage={stage} hasReference={!!reference} />
 
         {pre ? (
-          <PrearrangementView
-            pre={pre}
-            song={song}
-            durationSec={yt.duration || pre.data.sections[pre.data.sections.length - 1]!.endSec}
-            time={player?.time ?? 0}
-            onSeek={listen}
-          />
+          <>
+            {asset ? (
+              <p className="mb-3 text-sm" data-testid="file-source">
+                {t("autoarrange:player.fromFile", { name: asset.fileName })}{" "}
+                <span className="text-muted">{t("autoarrange:player.fromFileHint")}</span>
+              </p>
+            ) : null}
+            <PrearrangementView
+              pre={pre}
+              song={song}
+              durationSec={
+                transport?.duration || pre.data.sections[pre.data.sections.length - 1]!.endSec
+              }
+              time={transport?.time ?? 0}
+              activeIndex={
+                playback.current.pre ? Number(playback.current.pre.slice("pre:".length)) : null
+              }
+              onPlaySection={transport ? (i) => playback.playPassage(prePassages[i]!) : undefined}
+              onSeek={
+                transport
+                  ? (sec) => {
+                      playback.release();
+                      transport.seek(sec);
+                    }
+                  : undefined
+              }
+            />
+          </>
         ) : (
           <Unavailable overview={o} stage={stage} />
         )}
@@ -209,7 +259,9 @@ function Workspace({
           song={song}
           pre={pre}
           canEdit={canEdit}
-          onListen={listen}
+          transport={transport}
+          playback={playback}
+          onPassages={setBandPassages}
         />
         {canEdit ? (
           <details className="mt-5 border-t border-line pt-4">
@@ -224,6 +276,15 @@ function Workspace({
       </Card>
 
       {song.sections.length > 0 ? <InstrumentViews song={song} /> : null}
+
+      {transport && (pre || bandPassages.length > 0) ? (
+        <PlayerBar
+          transport={transport}
+          playback={playback}
+          currentName={sounding?.name ?? null}
+          sourceName={asset ? asset.fileName : t("autoarrange:player.officialPlayer")}
+        />
+      ) : null}
     </>
   );
 }
@@ -362,12 +423,16 @@ function PrearrangementView({
   song,
   durationSec,
   time,
+  activeIndex,
+  onPlaySection,
   onSeek,
 }: {
   pre: RecordingArrangementDto;
   song: SongDto;
   durationSec: number;
   time: number;
+  activeIndex: number | null;
+  onPlaySection?: (index: number) => void;
   onSeek?: (s: number) => void;
 }) {
   const { t, i18n } = useTranslation(["autoarrange", "common"]);
@@ -375,7 +440,7 @@ function PrearrangementView({
   const d = pre.data;
   const fmt = (n: number) =>
     new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 }).format(n);
-  const active = sectionAt(d.sections, time);
+  const active = activeIndex ?? sectionAt(d.sections, time);
   const reviewed = song.version.arrangementBaseId === pre.id && !!song.version.arrangementUpdatedAt;
   const fromAudio = pre.source !== "member_marks";
 
@@ -405,6 +470,14 @@ function PrearrangementView({
           ? ` · ${t("autoarrange:pre.analysed", { time: formatDuration(Math.round(d.analysedSeconds)) })}`
           : ""}
       </p>
+      {d.loopBars ? (
+        <p className="text-xs text-muted" data-testid="loop-info">
+          <span className="font-medium text-fg">
+            {t("autoarrange:pre.loop", { count: d.loopBars })}.
+          </span>{" "}
+          {t("autoarrange:pre.loopHint")}
+        </p>
+      ) : null}
       {d.bpm?.origin === "deezer" ? (
         <p className="text-xs text-muted">{t("autoarrange:pre.tempoFromDeezer")}</p>
       ) : null}
@@ -414,6 +487,7 @@ function PrearrangementView({
         durationSec={durationSec}
         time={time}
         onSeek={onSeek}
+        onPlaySection={onPlaySection}
         activeIndex={active >= 0 ? active : null}
       />
 
@@ -466,12 +540,12 @@ function PrearrangementView({
                   </span>
                 ) : null}
               </span>
-              {onSeek ? (
+              {onPlaySection ? (
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => onSeek(s.startSec)}
-                  aria-label={t("autoarrange:editor.listenFrom", { name: title(s) })}
+                  onClick={() => onPlaySection(i)}
+                  aria-label={t("autoarrange:editor.listenSection", { name: title(s) })}
                 >
                   ▶
                 </Button>
