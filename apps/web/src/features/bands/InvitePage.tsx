@@ -14,6 +14,7 @@ import {
 } from "../../components/ui";
 import { errorText } from "../../lib/errors";
 import { formatDateTime } from "../../lib/format";
+import { PersonalInvites } from "../agenda/PersonalInvites";
 import { useCurrentBand } from "./BandLayout";
 import { useCreateInvite, useInvites, useRevokeInvite } from "./queries";
 
@@ -72,6 +73,7 @@ export function InvitePage() {
         subtitle={t("band:invite.subtitle")}
         backTo={`/bands/${band.id}/members`}
       />
+      <PersonalInvites bandId={band.id} />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.1fr]">
         <Card>
           <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>

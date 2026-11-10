@@ -2,6 +2,7 @@ import { DEFAULT_LOCALE, LOCALES, type Locale } from "@bandsync/shared";
 import i18next from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
+import enAgenda from "../locales/en/agenda.json";
 import enAuth from "../locales/en/auth.json";
 import enAutoArrange from "../locales/en/autoarrange.json";
 import enBand from "../locales/en/band.json";
@@ -10,6 +11,7 @@ import enProfile from "../locales/en/profile.json";
 import enRehearsal from "../locales/en/rehearsal.json";
 import enRepertoire from "../locales/en/repertoire.json";
 import enTools from "../locales/en/tools.json";
+import ptAgenda from "../locales/pt-BR/agenda.json";
 import ptAuth from "../locales/pt-BR/auth.json";
 import ptAutoArrange from "../locales/pt-BR/autoarrange.json";
 import ptBand from "../locales/pt-BR/band.json";
@@ -28,6 +30,7 @@ export const NAMESPACES = [
   "tools",
   "profile",
   "autoarrange",
+  "agenda",
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
@@ -41,6 +44,7 @@ export const resources = {
     tools: enTools,
     profile: enProfile,
     autoarrange: enAutoArrange,
+    agenda: enAgenda,
   },
   "pt-BR": {
     common: ptCommon,
@@ -51,6 +55,7 @@ export const resources = {
     tools: ptTools,
     profile: ptProfile,
     autoarrange: ptAutoArrange,
+    agenda: ptAgenda,
   },
 } as const;
 

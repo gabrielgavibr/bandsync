@@ -1,6 +1,7 @@
 import { createRehearsalSchema } from "@bandsync/shared";
 import { Hono } from "hono";
 import { audit } from "../db/audit";
+import { currentOccurrenceId } from "../db/agenda";
 import { findActiveSession, getSession, insertSession, listSessions } from "../db/rehearsals";
 import { identityHeaders } from "../durable/RehearsalSessionDO";
 import type { AppEnv } from "../env";
@@ -36,6 +37,8 @@ rehearsalRoutes.post("/", async (c) => {
     title: input.title ?? null,
     repertoireId: input.repertoireId ?? null,
     createdBy: m.userId,
+    // Opened from the lobby during a rehearsal on the agenda: it is that rehearsal's session.
+    eventId: await currentOccurrenceId(c.env.DB, bandId),
   });
   const stub = c.env.REHEARSAL.get(c.env.REHEARSAL.idFromName(id));
   const res = await stub.fetch("https://do/init", {

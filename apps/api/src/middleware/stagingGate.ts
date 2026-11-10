@@ -1,4 +1,5 @@
 import type { MiddlewareHandler } from "hono";
+import { findPersonalInvite, personalStatus } from "../db/personalInvites";
 import type { AppEnv } from "../env";
 import { parseCookies } from "../lib/cookies";
 import { clientIp, enforceRateLimit } from "../lib/ratelimit";
@@ -30,6 +31,19 @@ async function accessToken(key: string): Promise<string> {
     new TextEncoder().encode("bandsync-staging-access-v1"),
   );
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+const INVITE_PATH = /^\/convite\/([A-Za-z0-9_-]{32,64})$/;
+
+function accessCookie(token: string, secure: boolean): string {
+  return [
+    `${ACCESS_COOKIE}=${token}`,
+    "Path=/",
+    "HttpOnly",
+    "SameSite=Lax",
+    `Max-Age=${COOKIE_MAX_AGE}`,
+    ...(secure ? ["Secure"] : []),
+  ].join("; ");
 }
 
 function safeEqual(a: string, b: string): boolean {
@@ -103,17 +117,9 @@ export const stagingGate: MiddlewareHandler<AppEnv> = async (c, next) => {
       const given = typeof form.key === "string" ? form.key.trim().toUpperCase() : "";
       const target = safeNext(typeof form.next === "string" ? form.next : null);
       if (given && safeEqual(await accessToken(given), expected)) {
-        const cookie = [
-          `${ACCESS_COOKIE}=${expected}`,
-          "Path=/",
-          "HttpOnly",
-          "SameSite=Lax",
-          `Max-Age=${COOKIE_MAX_AGE}`,
-          ...(secure ? ["Secure"] : []),
-        ].join("; ");
         return new Response(null, {
           status: 303,
-          headers: { location: target, "set-cookie": cookie },
+          headers: { location: target, "set-cookie": accessCookie(expected, secure) },
         });
       }
       return c.html(page(lang, target, true), 401);
@@ -123,6 +129,31 @@ export const stagingGate: MiddlewareHandler<AppEnv> = async (c, next) => {
 
   const presented = parseCookies(c.req.header("cookie"))[ACCESS_COOKIE] ?? "";
   if (presented && safeEqual(presented, expected)) return next();
+
+  // A personal invitation link is its own key: the invited musician opens it on their phone and
+  // reaches the sign-up page without knowing the shared key. Only links that exist, were not
+  // revoked and are still valid (or were already accepted, so the same person can come back on
+  // another device) open the gate; the gate then works as if the key had been typed. Data stays
+  // behind the normal login and band membership.
+  const invite = INVITE_PATH.exec(url.pathname);
+  if (invite && (c.req.method === "GET" || c.req.method === "HEAD")) {
+    if (c.env.RATE_LIMITS !== "off") {
+      await enforceRateLimit(c.env.DB, `staging-invite:${clientIp(c.req.raw)}`, 30, 15 * 60 * 1000);
+    }
+    const row = await findPersonalInvite(c.env.DB, invite[1]!);
+    const status = row ? personalStatus(row) : null;
+    if (status === "active" || status === "used") {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          location: url.pathname,
+          "set-cookie": accessCookie(expected, secure),
+          "cache-control": "no-store",
+          "referrer-policy": "no-referrer",
+        },
+      });
+    }
+  }
 
   if (url.pathname.startsWith("/api/")) {
     return c.json({ error: { code: "forbidden", message: "staging access required" } }, 403);

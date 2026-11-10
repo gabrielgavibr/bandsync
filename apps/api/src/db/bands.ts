@@ -357,7 +357,9 @@ export async function createInvite(
 
 export async function listInvites(db: D1Database, bandId: string): Promise<InviteDto[]> {
   const { results } = await db
-    .prepare("SELECT * FROM band_invitations WHERE band_id = ? ORDER BY created_at DESC LIMIT 100")
+    .prepare(
+      "SELECT * FROM band_invitations WHERE band_id = ? AND invitee_name IS NULL ORDER BY created_at DESC LIMIT 100",
+    )
     .bind(bandId)
     .all<InviteRow>();
   return results.map(toInviteDto);
@@ -368,9 +370,9 @@ export async function findInviteByCode(db: D1Database, code: string) {
     .prepare(
       `SELECT i.*, b.name AS band_name, b.image_url AS band_image_url, u.display_name AS inviter_name
        FROM band_invitations i JOIN bands b ON b.id = i.band_id JOIN users u ON u.id = i.created_by
-       WHERE i.code = ? AND b.deleted_at IS NULL`,
+       WHERE i.code = ? AND i.invitee_name IS NULL AND b.deleted_at IS NULL`,
     )
-    .bind(code.toUpperCase() === code ? code : code)
+    .bind(code)
     .first<
       InviteRow & { band_name: string; band_image_url: string | null; inviter_name: string }
     >();
@@ -379,7 +381,7 @@ export async function findInviteByCode(db: D1Database, code: string) {
 export async function revokeInvite(db: D1Database, bandId: string, inviteId: string) {
   const res = await db
     .prepare(
-      "UPDATE band_invitations SET revoked_at = ? WHERE id = ? AND band_id = ? AND revoked_at IS NULL",
+      "UPDATE band_invitations SET revoked_at = ? WHERE id = ? AND band_id = ? AND revoked_at IS NULL AND invitee_name IS NULL",
     )
     .bind(nowIso(), inviteId, bandId)
     .run();

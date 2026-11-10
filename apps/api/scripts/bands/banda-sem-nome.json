@@ -1,0 +1,29 @@
+{
+  "appUrl": "https://bandsync-staging.gabriel-gavinelli.workers.dev",
+  "setupUser": {
+    "email": "configuracao@bandsync.invalid",
+    "displayName": "Configuração BandSync"
+  },
+  "band": { "name": "BANDA SEM NOME" },
+  "schedule": {
+    "title": "Ensaio semanal",
+    "weekday": 2,
+    "time": "19:00",
+    "timezone": "America/Sao_Paulo",
+    "startDate": "2026-11-10",
+    "firstOccurrence": {
+      "title": "BANDA SEM NOME — Ensaio de 10/11/2026",
+      "startsAtUtc": "2026-11-10T22:00:00.000Z"
+    }
+  },
+  "inviteDays": 14,
+  "members": [
+    { "name": "Gabriel Gavi", "instrument": "drums", "role": "admin", "owner": true },
+    { "name": "Leonardo Morango", "instrument": "percussion", "secondary": ["vocals"], "role": "member" },
+    { "name": "Gabriel \"Gabis\"", "instrument": "guitar", "secondary": ["vocals"], "role": "member" },
+    { "name": "Jeffs", "instrument": "keys", "secondary": ["vocals"], "role": "member" },
+    { "name": "Renan Rosa", "instrument": "bass", "secondary": ["vocals"], "role": "member" },
+    { "name": "André Pézão", "instrument": "vocals", "role": "member" }
+  ],
+  "copySongsFrom": "demo-band"
+}

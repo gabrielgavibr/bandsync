@@ -173,6 +173,56 @@ export const createInviteSchema = z.object({
 
 export const acceptInviteSchema = z.object({ code: z.string().trim().min(6).max(64) });
 
+/* Personal invitations: one private link per musician, used once. */
+export const createPersonalInviteSchema = z.object({
+  inviteeName: displayNameSchema,
+  instrument: instrumentSchema.optional().nullable(),
+  secondaryInstruments: z.array(instrumentSchema).max(8).default([]),
+  role: roleSchema.default("member"),
+  expiresInHours: z
+    .number()
+    .int()
+    .min(1)
+    .max(24 * 30)
+    .default(24 * 7),
+});
+export type CreatePersonalInviteInput = z.infer<typeof createPersonalInviteSchema>;
+
+/** Accepting a personal invitation by creating the account in the same step. */
+export const registerByInviteSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  displayName: displayNameSchema.optional(),
+  instrument: instrumentSchema.optional().nullable(),
+  locale: localeSchema.optional(),
+});
+
+export type PersonalInviteStatus = "active" | "used" | "expired" | "revoked";
+
+export interface PersonalInviteDto {
+  id: string;
+  inviteeName: string;
+  instrument: string | null;
+  secondaryInstruments: string[];
+  role: "admin" | "member";
+  status: PersonalInviteStatus;
+  expiresAt: string;
+  createdAt: string;
+  acceptedAt: string | null;
+  acceptedByName: string | null;
+}
+
+/** What the invited person sees before accepting (no data about other members or bands). */
+export interface PersonalInvitePreviewDto {
+  status: PersonalInviteStatus;
+  inviteeName: string;
+  instrument: string | null;
+  secondaryInstruments: string[];
+  role: "admin" | "member";
+  band: { id: string; name: string; imageUrl: string | null };
+  expiresAt: string;
+}
+
 export interface BandDto {
   id: string;
   name: string;
@@ -513,6 +563,8 @@ export interface RehearsalSessionDto {
   title: string | null;
   status: string;
   repertoireId: string | null;
+  /** The rehearsal on the agenda this session belongs to (its board), when there is one. */
+  eventId: string | null;
   createdBy: string;
   createdAt: string;
   endedAt: string | null;
@@ -543,4 +595,114 @@ export interface FileDto {
   createdBy: string;
   createdAt: string;
   url: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Agenda: weekly rehearsals, attendance and the rehearsal board       */
+/* ------------------------------------------------------------------ */
+const localDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const localTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+const timeZoneSchema = z.string().trim().min(1).max(64);
+const optionalText = (max: number) => z.string().trim().max(max).optional().nullable();
+
+export const createScheduleSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  /** 0 = Sunday .. 6 = Saturday */
+  weekday: z.number().int().min(0).max(6),
+  time: localTimeSchema,
+  timezone: timeZoneSchema,
+  startDate: localDateSchema,
+  durationMinutes: z.number().int().min(15).max(1440).optional().nullable(),
+  location: optionalText(160),
+  address: optionalText(240),
+  notes: optionalText(2000),
+  repertoireId: idSchema.optional().nullable(),
+});
+export const updateScheduleSchema = createScheduleSchema.partial();
+
+/** One rehearsal changed on its own; the series keeps its rule. */
+export const updateOccurrenceSchema = z.object({
+  title: z.string().trim().min(1).max(120).optional(),
+  date: localDateSchema.optional(),
+  time: localTimeSchema.optional(),
+  durationMinutes: z.number().int().min(15).max(1440).optional().nullable(),
+  location: optionalText(160),
+  notes: optionalText(2000),
+  repertoireId: idSchema.optional().nullable(),
+  cancelled: z.boolean().optional(),
+});
+
+export const ATTENDANCE_STATUSES = ["pending", "confirmed", "declined"] as const;
+export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
+export const setAttendanceSchema = z.object({ status: z.enum(ATTENDANCE_STATUSES) });
+
+export const BOARD_COMMENT_MAX = 2000;
+export const boardCommentSchema = z.object({
+  body: z.string().trim().min(1).max(BOARD_COMMENT_MAX),
+  songId: idSchema.optional().nullable(),
+});
+
+export interface ScheduleDto {
+  id: string;
+  bandId: string;
+  title: string;
+  weekday: number;
+  time: string;
+  timezone: string;
+  startDate: string;
+  durationMinutes: number | null;
+  location: string | null;
+  address: string | null;
+  notes: string | null;
+  repertoireId: string | null;
+}
+
+export interface OccurrenceDto {
+  id: string;
+  bandId: string;
+  scheduleId: string | null;
+  title: string;
+  /** Instant in UTC (ISO 8601). */
+  startsAt: string;
+  endsAt: string | null;
+  timezone: string;
+  /** Date and time on the wall in `timezone`. */
+  localDate: string;
+  localTime: string;
+  location: string | null;
+  notes: string | null;
+  repertoireId: string | null;
+  cancelled: boolean;
+  /** Changed on its own: edits to the series leave it alone. */
+  detached: boolean;
+  /** The live session of this rehearsal, when one was opened. */
+  session: { id: string; status: string } | null;
+  attendance: { confirmed: number; declined: number; pending: number };
+  myAttendance: AttendanceStatus;
+  commentCount: number;
+}
+
+export interface AttendanceEntryDto {
+  userId: string;
+  displayName: string;
+  instrument: string | null;
+  status: AttendanceStatus;
+}
+
+export interface BoardCommentDto {
+  id: string;
+  eventId: string;
+  author: { id: string; displayName: string; avatarUrl: string | null };
+  body: string;
+  song: { id: string; title: string } | null;
+  createdAt: string;
+  editedAt: string | null;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export interface AgendaDto {
+  schedules: ScheduleDto[];
+  upcoming: OccurrenceDto[];
+  past: OccurrenceDto[];
 }

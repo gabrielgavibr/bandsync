@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { Avatar } from "../../app/AppShell";
 import { Badge, Button, RowList, rowClass } from "../../components/ui";
 import { formatDateTime } from "../../lib/format";
+import { NextRehearsals } from "../agenda/NextRehearsal";
 import { LiveEntryCard, useLiveEntry } from "../rehearsal/LiveEntry";
 import { useRepertoires, useSongs } from "../repertoire/queries";
 import { useCurrentBand } from "./BandLayout";
@@ -66,6 +67,7 @@ export function BandDashboardPage() {
       </header>
 
       <LiveEntryCard band={band} />
+      <NextRehearsals bandId={band.id} limit={1} />
 
       {current ? (
         <section aria-labelledby="dash-rep" data-testid="current-repertoire">

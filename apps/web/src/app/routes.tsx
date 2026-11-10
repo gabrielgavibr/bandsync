@@ -1,6 +1,8 @@
 import { lazy } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router";
 import { LoadingBlock } from "../components/ui/Misc";
+import { InviteLandingPage } from "../features/agenda/InviteLandingPage";
+import { OccurrencePage } from "../features/agenda/OccurrencePage";
 import { useAuth } from "../features/auth/AuthProvider";
 import {
   ForgotPasswordPage,
@@ -73,6 +75,8 @@ export function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {/* A personal invitation: public, the person may not have an account yet. */}
+      <Route path="/convite/:token" element={<InviteLandingPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />
@@ -95,6 +99,7 @@ export function AppRoutes() {
             <Route path="members" element={<MembersPage />} />
             <Route path="invite" element={<InvitePage />} />
             <Route path="rehearsal" element={<RehearsalLobbyPage />} />
+            <Route path="agenda/:eventId" element={<OccurrencePage />} />
             <Route path="tools" element={<ToolsPage />} />
           </Route>
         </Route>

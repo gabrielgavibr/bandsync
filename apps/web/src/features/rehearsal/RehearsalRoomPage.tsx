@@ -8,6 +8,7 @@ import {
   Headphones,
   LogOut,
   Maximize2,
+  MessageSquare,
   Minimize2,
   Play,
   Square,
@@ -28,6 +29,7 @@ import { audioEngine } from "../../lib/audio/AudioEngine";
 import { cn } from "../../lib/cn";
 import { resolvePreferredMaterial } from "../../lib/materials";
 import { useIsPhone } from "../../lib/useIsPhone";
+import { Board } from "../agenda/Board";
 import { InstrumentViews, viewFor } from "../arrangement/InstrumentViews";
 import { useAuth } from "../auth/AuthProvider";
 import { ReferenceListen, ReferenceSummaryView } from "../autoarrange/reference";
@@ -45,7 +47,7 @@ const KEYS = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
 export function RehearsalRoomPage() {
   const { bandId = "", sessionId = "" } = useParams();
-  const { t } = useTranslation(["rehearsal", "common"]);
+  const { t } = useTranslation(["rehearsal", "common", "agenda"]);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, preferences } = useAuth();
@@ -102,6 +104,18 @@ export function RehearsalRoomPage() {
     queryFn: () =>
       http.get<{ session: { status: string } }>(`/api/bands/${bandId}/rehearsals/${sessionId}`),
   });
+
+  // Which rehearsal on the agenda this session belongs to: its board opens from the room.
+  const sessionRow = useQuery({
+    queryKey: ["rehearsal-session", bandId, sessionId],
+    staleTime: 60_000,
+    queryFn: () =>
+      http.get<{ session: { eventId: string | null } }>(
+        `/api/bands/${bandId}/rehearsals/${sessionId}`,
+      ),
+  });
+  const eventId = sessionRow.data?.session.eventId ?? null;
+  const [showBoard, setShowBoard] = useState(false);
 
   const materials = songQ.data?.materials ?? [];
   const preferred = useMemo(
@@ -160,8 +174,17 @@ export function RehearsalRoomPage() {
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
         <h1 className="text-3xl font-semibold">{t("rehearsal:room.endedTitle")}</h1>
         <p className="text-muted">{t("rehearsal:room.endedBody")}</p>
+        {eventId ? (
+          <Link to={`/bands/${bandId}/agenda/${eventId}`} data-testid="ended-board">
+            <Button size="lg" icon={<MessageSquare className="size-5" />}>
+              {t("agenda:board.open")}
+            </Button>
+          </Link>
+        ) : null}
         <Link to={`/bands/${bandId}`}>
-          <Button size="lg">{t("rehearsal:room.backToBand")}</Button>
+          <Button size="lg" variant={eventId ? "ghost" : "primary"}>
+            {t("rehearsal:room.backToBand")}
+          </Button>
         </Link>
       </main>
     );
@@ -272,6 +295,18 @@ export function RehearsalRoomPage() {
             className="rounded-lg p-1.5 hover:bg-elev"
           >
             <Headphones className="size-5 text-accent-500" />
+          </button>
+        ) : null}
+        {eventId ? (
+          <button
+            type="button"
+            onClick={() => setShowBoard(true)}
+            aria-label={t("agenda:board.open")}
+            title={t("agenda:board.open")}
+            data-testid="board-open"
+            className="rounded-lg p-1.5 hover:bg-elev"
+          >
+            <MessageSquare className="size-5" />
           </button>
         ) : null}
         <button
@@ -922,6 +957,14 @@ export function RehearsalRoomPage() {
             <p className="text-xs text-muted">{t("rehearsal:room.referenceLocal")}</p>
           </div>
         ) : null}
+      </Dialog>
+
+      <Dialog
+        open={showBoard && !!eventId}
+        onClose={() => setShowBoard(false)}
+        title={t("agenda:board.title")}
+      >
+        {eventId && showBoard ? <Board bandId={bandId} eventId={eventId} compact /> : null}
       </Dialog>
 
       <Dialog open={showSync} onClose={() => setShowSync(false)} title={t("rehearsal:sync.title")}>

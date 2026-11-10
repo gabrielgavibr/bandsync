@@ -10,6 +10,7 @@ interface Row {
   created_by: string;
   created_at: string;
   ended_at: string | null;
+  event_id: string | null;
 }
 
 function toDto(r: Row): RehearsalSessionDto {
@@ -19,6 +20,7 @@ function toDto(r: Row): RehearsalSessionDto {
     title: r.title,
     status: r.status,
     repertoireId: r.repertoire_id,
+    eventId: r.event_id ?? null,
     createdBy: r.created_by,
     createdAt: r.created_at,
     endedAt: r.ended_at,
@@ -33,13 +35,30 @@ export async function insertSession(
     title: string | null;
     repertoireId: string | null;
     createdBy: string;
+    eventId?: string | null;
   },
 ) {
   await db
     .prepare(
-      "INSERT INTO rehearsal_sessions (id, band_id, title, status, repertoire_id, created_by, created_at) VALUES (?, ?, ?, 'created', ?, ?, ?)",
+      "INSERT INTO rehearsal_sessions (id, band_id, title, status, repertoire_id, created_by, created_at, event_id) VALUES (?, ?, ?, 'created', ?, ?, ?, ?)",
     )
-    .bind(input.id, input.bandId, input.title, input.repertoireId, input.createdBy, nowIso())
+    .bind(
+      input.id,
+      input.bandId,
+      input.title,
+      input.repertoireId,
+      input.createdBy,
+      nowIso(),
+      input.eventId ?? null,
+    )
+    .run();
+}
+
+/** Ties a session that was opened on its own to the rehearsal on the agenda it belongs to. */
+export async function linkSessionToEvent(db: D1Database, sessionId: string, eventId: string) {
+  await db
+    .prepare("UPDATE rehearsal_sessions SET event_id = ? WHERE id = ? AND event_id IS NULL")
+    .bind(eventId, sessionId)
     .run();
 }
 

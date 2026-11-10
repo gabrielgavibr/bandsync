@@ -17,13 +17,16 @@ import { http } from "../../lib/api";
 import { cn } from "../../lib/cn";
 import { errorText } from "../../lib/errors";
 import { formatDateTime } from "../../lib/format";
+import { NextRehearsals, PastRehearsals } from "../agenda/NextRehearsal";
+import { useAgenda } from "../agenda/queries";
+import { ScheduleForm } from "../agenda/ScheduleForm";
 import { useAuth } from "../auth/AuthProvider";
 import { useCurrentBand } from "../bands/BandLayout";
 import { bandKeys, useRehearsals } from "../bands/queries";
 import { useRepertoires } from "../repertoire/queries";
 
 export function RehearsalLobbyPage() {
-  const { t, i18n } = useTranslation(["rehearsal", "common"]);
+  const { t, i18n } = useTranslation(["rehearsal", "common", "agenda"]);
   const band = useCurrentBand();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -35,6 +38,9 @@ export function RehearsalLobbyPage() {
   const [busy, setBusy] = useState(false);
   const canControl = band.myPermissions.canControlRehearsal;
   const { user } = useAuth();
+  const agenda = useAgenda(band.id);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const canManage = band.myPermissions.canManageEvents;
 
   const start = async () => {
     setBusy(true);
@@ -136,6 +142,25 @@ export function RehearsalLobbyPage() {
           </div>
         )}
       </div>
+      <NextRehearsals bandId={band.id} limit={4} />
+      {canManage && agenda.data && agenda.data.schedules.length === 0 ? (
+        <section className="mt-4">
+          {showSchedule ? (
+            <div className="rounded-2xl border border-line bg-elev p-3 sm:p-5">
+              <h2 className="mb-3 font-semibold">{t("agenda:schedule.create")}</h2>
+              <ScheduleForm bandId={band.id} onDone={() => setShowSchedule(false)} />
+            </div>
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={() => setShowSchedule(true)}
+              data-testid="schedule-create"
+            >
+              {t("agenda:schedule.create")}
+            </Button>
+          )}
+        </section>
+      ) : null}
       {!active && lastEnded ? (
         <p className="mt-2 text-sm text-muted" data-testid="last-ended">
           {t("rehearsal:entry.lastEnded", {
@@ -143,6 +168,7 @@ export function RehearsalLobbyPage() {
           })}
         </p>
       ) : null}
+      <PastRehearsals bandId={band.id} />
       {rehearsals.data.recent.length > 0 ? (
         <section className="mt-6">
           <h2 className="mb-2 text-sm font-medium text-muted">{t("rehearsal:lobby.recent")}</h2>

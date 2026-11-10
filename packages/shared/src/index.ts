@@ -15,3 +15,4 @@ export * from "./music/timeSignature";
 export * from "./protocol/rehearsal";
 export * from "./sync/clock";
 export * from "./sync/metronome";
+export * from "./time/zoned";
