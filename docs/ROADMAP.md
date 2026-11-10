@@ -81,16 +81,16 @@ Planned:
 - Production deployment on Cloudflare with custom domain; e-mail provider; monitoring.
 - LGPD: data export and account deletion endpoints.
 
-## AutoArrange — **Stage A done**
+## AutoArrange — **AutoArrange 3.0 (pre-arrangement) done**
 
 Detailed in `AUTOARRANGE.md`.
 
 - **A — Identification and sources — Done.** Add-song wizard (search by title/artist, one result per recording, release choice, YouTube link validated and played in the official player), source registry with what each site allows, preparation jobs on a Durable Object (states, retry, cancel, dedupe, cost budget), results stored with origin/method/review state, human confirmation of the band's tempo, key and meter with who and when, song-sheet panel, live session using the confirmed values.
 - **Reference recording by link — Done.** Songs are added by pasting a YouTube, YouTube Music or Spotify link; one main reference per song, shown on the song page, song list, repertoire and live room; replacement asks first and keeps history; the song page has two blocks (reference recording, band arrangement) with sources under "Technical details"; authorised audio can be uploaded and tied to the reference. See `REFERENCE_RECORDING.md`.
-- **B — Audio analysis — Partial.** On-device engine: tempo, beats, meter and key from the microphone (while the reference plays) or from an authorised file, stored as estimates to review and offered as suggestions in the band review. Not yet: chords, sections, calibration on real recordings.
-- **C — Arrangement-map editor — Not implemented.** Section timing and cue columns exist.
-- **D — Per-instrument materials — Not implemented.** Harmony table exists; pending workspaces per instrument are created today.
-- **E — Live integration and homologation — Partial.** The live room uses the band's confirmed tempo and meter; it does not follow an arrangement map yet.
+- **B — Audio analysis — Done (first version).** On-device engine: tempo, beats, meter, key, chords per bar, section boundaries, repetitions and cues, from an authorised file or the whole recording through the microphone; published tempo from Deezer for the exact recording. Measured on real public-domain / CC recordings (`AUTOARRANGE_3.md` §4). Next: calibration on reggae/MPB recordings the band may process.
+- **C — Arrangement-map editor — Done.** Recording pre-arrangement (immutable) and the band's own arrangement with a timeline, editing operations and history (`AUTOARRANGE_3.md`).
+- **D — Per-instrument views — Done (from the arrangement).** Drums, bass (harmonic map), guitar, keys, vocals; tabs and lyrics only from the band's materials. No instrumental transcription.
+- **E — Live integration and homologation — Partial.** The live room shows the arrangement per instrument; it does not follow the playing position bar by bar yet.
 
 ## Next recommended step
 

@@ -324,3 +324,7 @@ confidence is not calibrated and every value needs review. Expected weak points:
 (both readings are always shown — the band chooses, which matters for reggae), relative
 major/minor, compound meters such as 6/8, songs without a steady pulse, quiet or noisy rooms.
 Chords and section boundaries are the next part of stage B.
+
+## 17. AutoArrange 3.0
+
+The recording's pre-arrangement, the band arrangement editor, the per-instrument views and the technical investigation matrix are in `AUTOARRANGE_3.md`.
