@@ -1,0 +1,87 @@
+{
+ "data": [
+  {
+   "id": 1802312637,
+   "readable": true,
+   "title": "O Segundo Sol",
+   "title_short": "O Segundo Sol",
+   "title_version": "",
+   "isrc": "BRUM72102153",
+   "link": "https://www.deezer.com/track/1802312637",
+   "duration": 258,
+   "rank": 269335,
+   "explicit_lyrics": false,
+   "explicit_content_lyrics": 0,
+   "explicit_content_cover": 0,
+   "preview": "",
+   "md5_image": "d28be655147ad321c147fa3aefd34a50",
+   "artist": {
+    "id": 2077,
+    "name": "Gilberto Gil",
+    "link": "https://www.deezer.com/artist/2077",
+    "picture": "https://api.deezer.com/artist/2077/image",
+    "picture_small": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/56x56-000000-80-0-0.jpg",
+    "picture_medium": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/250x250-000000-80-0-0.jpg",
+    "picture_big": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/500x500-000000-80-0-0.jpg",
+    "picture_xl": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/1000x1000-000000-80-0-0.jpg",
+    "tracklist": "https://api.deezer.com/artist/2077/top?limit=50",
+    "type": "artist"
+   },
+   "album": {
+    "id": 330154867,
+    "title": "Cássia Reggae (Vol. 1)",
+    "cover": "https://api.deezer.com/album/330154867/image",
+    "cover_small": "https://cdn-images.dzcdn.net/images/cover/d28be655147ad321c147fa3aefd34a50/56x56-000000-80-0-0.jpg",
+    "cover_medium": "https://cdn-images.dzcdn.net/images/cover/d28be655147ad321c147fa3aefd34a50/250x250-000000-80-0-0.jpg",
+    "cover_big": "https://cdn-images.dzcdn.net/images/cover/d28be655147ad321c147fa3aefd34a50/500x500-000000-80-0-0.jpg",
+    "cover_xl": "https://cdn-images.dzcdn.net/images/cover/d28be655147ad321c147fa3aefd34a50/1000x1000-000000-80-0-0.jpg",
+    "md5_image": "d28be655147ad321c147fa3aefd34a50",
+    "tracklist": "https://api.deezer.com/album/330154867/tracks",
+    "type": "album"
+   },
+   "type": "track"
+  },
+  {
+   "id": 4244901101,
+   "readable": true,
+   "title": "O Segundo Sol (Ao Vivo)",
+   "title_short": "O Segundo Sol (Ao Vivo)",
+   "title_version": "",
+   "isrc": "BRGPG1800048",
+   "link": "https://www.deezer.com/track/4244901101",
+   "duration": 229,
+   "rank": 69120,
+   "explicit_lyrics": false,
+   "explicit_content_lyrics": 0,
+   "explicit_content_cover": 0,
+   "preview": "",
+   "md5_image": "8f3a893d417adddcd25aa57abb1f3c59",
+   "artist": {
+    "id": 2077,
+    "name": "Gilberto Gil",
+    "link": "https://www.deezer.com/artist/2077",
+    "picture": "https://api.deezer.com/artist/2077/image",
+    "picture_small": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/56x56-000000-80-0-0.jpg",
+    "picture_medium": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/250x250-000000-80-0-0.jpg",
+    "picture_big": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/500x500-000000-80-0-0.jpg",
+    "picture_xl": "https://cdn-images.dzcdn.net/images/artist/1155049990857b7e5260f2f99a2d48dd/1000x1000-000000-80-0-0.jpg",
+    "tracklist": "https://api.deezer.com/artist/2077/top?limit=50",
+    "type": "artist"
+   },
+   "album": {
+    "id": 1062644261,
+    "title": "Trinca de Ases (Ao Vivo)",
+    "cover": "https://api.deezer.com/album/1062644261/image",
+    "cover_small": "https://cdn-images.dzcdn.net/images/cover/8f3a893d417adddcd25aa57abb1f3c59/56x56-000000-80-0-0.jpg",
+    "cover_medium": "https://cdn-images.dzcdn.net/images/cover/8f3a893d417adddcd25aa57abb1f3c59/250x250-000000-80-0-0.jpg",
+    "cover_big": "https://cdn-images.dzcdn.net/images/cover/8f3a893d417adddcd25aa57abb1f3c59/500x500-000000-80-0-0.jpg",
+    "cover_xl": "https://cdn-images.dzcdn.net/images/cover/8f3a893d417adddcd25aa57abb1f3c59/1000x1000-000000-80-0-0.jpg",
+    "md5_image": "8f3a893d417adddcd25aa57abb1f3c59",
+    "tracklist": "https://api.deezer.com/album/1062644261/tracks",
+    "type": "album"
+   },
+   "type": "track"
+  }
+ ],
+ "total": 2
+}

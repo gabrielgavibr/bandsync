@@ -19,6 +19,7 @@ export interface Env {
   MUSICBRAINZ_CONTACT?: string;
   YOUTUBE_OEMBED_BASE?: string;
   SPOTIFY_OEMBED_BASE?: string;
+  DEEZER_API_BASE?: string;
   /** "on" (default) or "off". Only turn off for local development. */
   RATE_LIMITS?: string;
   MAIL_PROVIDER?: string;

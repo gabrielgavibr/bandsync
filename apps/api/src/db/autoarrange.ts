@@ -10,6 +10,7 @@ import {
   type JobStepRecord,
   jobProgress,
   type ParsedReferenceLink,
+  type RecordingArrangementDto,
   type RecordingLink,
   type RecordingReferenceLink,
   type RecordingWork,
@@ -1003,4 +1004,101 @@ export async function listReviewEvents(db: D1Database, songId: string): Promise<
     .bind(songId)
     .all<ReviewRow>();
   return results.map(toReviewDto);
+}
+
+/* ------------------------------------------------------------------ */
+/* Pre-arrangement of the recording (immutable rows)                   */
+/* ------------------------------------------------------------------ */
+
+interface ArrangementRow {
+  id: string;
+  song_id: string;
+  recording_id: string | null;
+  source: RecordingArrangementDto["source"];
+  audio_asset_id: string | null;
+  engine: string;
+  version: string;
+  data: string;
+  created_by: string;
+  created_by_name: string | null;
+  created_at: string;
+}
+
+const toArrangementDto = (r: ArrangementRow): RecordingArrangementDto => ({
+  id: r.id,
+  songId: r.song_id,
+  recordingId: r.recording_id,
+  source: r.source,
+  audioAssetId: r.audio_asset_id,
+  engine: r.engine,
+  version: r.version,
+  data: parse<RecordingArrangementDto["data"]>(r.data, {} as RecordingArrangementDto["data"]),
+  createdBy: r.created_by,
+  createdByName: r.created_by_name,
+  createdAt: r.created_at,
+});
+
+const ARRANGEMENT_SELECT = `SELECT a.*, u.display_name AS created_by_name FROM recording_arrangements a
+  LEFT JOIN users u ON u.id = a.created_by`;
+
+export async function insertRecordingArrangement(
+  db: D1Database,
+  input: {
+    bandId: string;
+    songId: string;
+    recordingId: string | null;
+    source: RecordingArrangementDto["source"];
+    audioAssetId: string | null;
+    engine: string;
+    version: string;
+    data: RecordingArrangementDto["data"];
+    userId: string;
+  },
+): Promise<string> {
+  const id = newId();
+  await db
+    .prepare(
+      `INSERT INTO recording_arrangements (id, band_id, song_id, recording_id, source, audio_asset_id, engine, version, data,
+         created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      id,
+      input.bandId,
+      input.songId,
+      input.recordingId,
+      input.source,
+      input.audioAssetId,
+      input.engine,
+      input.version,
+      JSON.stringify(input.data),
+      input.userId,
+      nowIso(),
+    )
+    .run();
+  return id;
+}
+
+/** Newest first. */
+export async function listRecordingArrangements(
+  db: D1Database,
+  songId: string,
+  limit = 10,
+): Promise<RecordingArrangementDto[]> {
+  const { results } = await db
+    .prepare(`${ARRANGEMENT_SELECT} WHERE a.song_id = ? ORDER BY a.created_at DESC LIMIT ?`)
+    .bind(songId, limit)
+    .all<ArrangementRow>();
+  return results.map(toArrangementDto);
+}
+
+export async function getRecordingArrangement(
+  db: D1Database,
+  songId: string,
+  id: string,
+): Promise<RecordingArrangementDto | null> {
+  const row = await db
+    .prepare(`${ARRANGEMENT_SELECT} WHERE a.song_id = ? AND a.id = ?`)
+    .bind(songId, id)
+    .first<ArrangementRow>();
+  return row ? toArrangementDto(row) : null;
 }

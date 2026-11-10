@@ -41,12 +41,16 @@ interface SongRow {
   notes: string | null;
   reference_url: string | null;
   meter_confirmed: number;
+  arrangement_transpose: number | null;
+  arrangement_base_id: string | null;
+  arrangement_updated_at: string | null;
 }
 
 const SONG_SELECT = `SELECT s.id, s.band_id, s.title, s.artist, s.album, s.external_id, s.duration_seconds, s.original_bpm,
   s.original_key, s.composer, s.work_mbid, s.reference_recording, s.reference_year, s.original_time_signature, s.original_bpm_status,
   s.original_key_status, s.metadata_sources, s.created_at, s.updated_at, v.id AS version_id, v.bpm, v.key, v.beats_per_bar,
-  v.beat_unit, v.notes, v.reference_url, v.meter_confirmed
+  v.beat_unit, v.notes, v.reference_url, v.meter_confirmed, v.arrangement_transpose, v.arrangement_base_id,
+  v.arrangement_updated_at
   FROM songs s JOIN song_versions v ON v.song_id = s.id AND v.is_current = 1`;
 
 function parseSources(text: string | null): MetadataSource[] {
@@ -92,6 +96,9 @@ function toSongDto(
       notes: r.notes,
       referenceUrl: r.reference_url,
       meterConfirmed: r.meter_confirmed !== 0,
+      arrangementTranspose: r.arrangement_transpose ?? 0,
+      arrangementBaseId: r.arrangement_base_id,
+      arrangementUpdatedAt: r.arrangement_updated_at,
     },
     sections,
     materialSummary: summary,
@@ -192,12 +199,14 @@ interface SectionRow {
   end_ms: number | null;
   cues: string;
   origin: string;
+  label: string | null;
+  chords: string | null;
 }
 
 async function listSections(db: D1Database, versionId: string): Promise<SongSectionDto[]> {
   const { results } = await db
     .prepare(
-      "SELECT id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin FROM song_sections WHERE version_id = ? ORDER BY position",
+      "SELECT id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin, label, chords FROM song_sections WHERE version_id = ? ORDER BY position",
     )
     .bind(versionId)
     .all<SectionRow>();
@@ -220,6 +229,15 @@ async function listSections(db: D1Database, versionId: string): Promise<SongSect
       endMs: r.end_ms,
       cues,
       origin: r.origin ?? "band",
+      label: r.label,
+      chords: (() => {
+        try {
+          const v = JSON.parse(r.chords ?? "[]");
+          return Array.isArray(v) ? (v as string[]) : [];
+        } catch {
+          return [];
+        }
+      })(),
     };
   });
 }
@@ -229,8 +247,8 @@ type SectionInput = NonNullable<SongInput["sections"]>[number];
 function insertSection(db: D1Database, versionId: string, s: SectionInput, position: number) {
   return db
     .prepare(
-      `INSERT INTO song_sections (id, version_id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'band')`,
+      `INSERT INTO song_sections (id, version_id, name, position, bars, notes, kind, start_ms, end_ms, cues, origin, label, chords)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'band', ?, ?)`,
     )
     .bind(
       newId(),
@@ -243,6 +261,8 @@ function insertSection(db: D1Database, versionId: string, s: SectionInput, posit
       s.startMs ?? null,
       s.endMs ?? null,
       JSON.stringify(s.cues ?? []),
+      s.label ?? null,
+      JSON.stringify(s.chords ?? []),
     );
 }
 
@@ -289,6 +309,8 @@ export interface SongInput {
     startMs?: number | null;
     endMs?: number | null;
     cues?: SectionCue[];
+    label?: string | null;
+    chords?: string[];
   }[];
 }
 
@@ -725,4 +747,45 @@ export async function deleteReference(
     .bind(songId, referenceId)
     .run();
   return (res.meta.changes ?? 0) > 0;
+}
+
+/**
+ * Replaces the band's arrangement (sections in playing order) of the current version. The
+ * recording's pre-arrangement it started from is untouched: it lives in recording_arrangements.
+ */
+export async function saveBandArrangement(
+  db: D1Database,
+  bandId: string,
+  songId: string,
+  userId: string,
+  input: {
+    baseId: string | null;
+    transpose: number;
+    sections: NonNullable<SongInput["sections"]>;
+  },
+): Promise<boolean> {
+  const current = await db
+    .prepare(
+      `SELECT v.id AS version_id FROM songs s JOIN song_versions v ON v.song_id = s.id AND v.is_current = 1
+       WHERE s.band_id = ? AND s.id = ? AND s.deleted_at IS NULL`,
+    )
+    .bind(bandId, songId)
+    .first<{ version_id: string }>();
+  if (!current) return false;
+  const ts = nowIso();
+  const stmts: D1PreparedStatement[] = [
+    db.prepare("DELETE FROM song_sections WHERE version_id = ?").bind(current.version_id),
+    db
+      .prepare(
+        `UPDATE song_versions SET arrangement_base_id = ?, arrangement_transpose = ?, arrangement_updated_by = ?,
+           arrangement_updated_at = ?, updated_at = ? WHERE id = ?`,
+      )
+      .bind(input.baseId, input.transpose, userId, ts, ts, current.version_id),
+    db.prepare("UPDATE songs SET updated_at = ? WHERE id = ?").bind(ts, songId),
+  ];
+  input.sections.forEach((s, i) => {
+    stmts.push(insertSection(db, current.version_id, s, i));
+  });
+  await db.batch(stmts);
+  return true;
 }

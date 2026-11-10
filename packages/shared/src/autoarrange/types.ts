@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { httpUrlSchema, idSchema } from "../api/schemas";
+import { httpUrlSchema, idSchema, songSectionSchema } from "../api/schemas";
 import type { ReferencePlatform } from "./reference";
 
 /* ------------------------------------------------------------------ */
@@ -202,7 +202,7 @@ export const RESULT_KINDS = [
 export type ResultKind = (typeof RESULT_KINDS)[number];
 
 /** Where a value came from. */
-export const RESULT_ORIGINS = ["musicbrainz", "youtube", "audio_analysis", "user"] as const;
+export const RESULT_ORIGINS = ["musicbrainz", "deezer", "youtube", "audio_analysis", "user"] as const;
 export type ResultOrigin = (typeof RESULT_ORIGINS)[number];
 
 /**
@@ -258,6 +258,8 @@ export function initialReviewStatus(
   calibrated: boolean,
 ): ReviewStatus {
   if (origin === "user") return "confirmed";
+  // Deezer's tempo is its own automatic estimate: as much in need of review as ours.
+  if (origin === "deezer") return "needs_review";
   if (origin === "audio_analysis") {
     return calibrated && confidence !== null && confidence >= REVIEW_CONFIDENCE_THRESHOLD
       ? "unreviewed"
@@ -563,3 +565,84 @@ export const submitAnalysisSchema = z
     message: "an audio file analysis names the file",
   });
 export type SubmitAnalysisInput = z.infer<typeof submitAnalysisSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Pre-arrangement of the recording and the band's arrangement         */
+/* ------------------------------------------------------------------ */
+
+const preSectionSchema = z.object({
+  label: z.string().regex(/^[A-Z]$/),
+  kind: z.enum(["intro", "verse", "chorus", "bridge", "outro", "unknown"]),
+  kindConfidence: z.enum(["medium", "low"]),
+  startSec: finite(0, 3600),
+  endSec: finite(0, 3600),
+  startBar: z.number().int().min(0).max(5000),
+  bars: z.number().int().min(1).max(1000),
+  chords: z.array(z.string().regex(/^(N|[A-G][#b]?m?)$/)).max(1000),
+  loudnessDb: finite(-120, 120),
+  cues: z
+    .array(
+      z.object({
+        bar: z.number().int().min(0).max(1000),
+        type: z.enum(["stop", "entry", "drop", "texture"]),
+      }),
+    )
+    .max(64),
+});
+export type PreSectionInput = z.infer<typeof preSectionSchema>;
+
+/** What a member's device sends after building a pre-arrangement (summary of PreArrangement). */
+export const submitPrearrangementSchema = z
+  .object({
+    source: z.enum(["audio_file", "microphone", "member_marks"]),
+    audioAssetId: idSchema.optional().nullable(),
+    engine: z.string().trim().min(1).max(40),
+    version: z.string().trim().min(1).max(40),
+    analysedSeconds: finite(0, 3600),
+    bpm: z
+      .object({
+        value: finite(20, 400),
+        ambiguous: z.boolean(),
+        alternatives: z.array(finite(20, 400)).max(6),
+        origin: z.enum(["audio_analysis", "deezer", "user"]),
+      })
+      .nullable(),
+    beatsPerBar: z.number().int().min(2).max(12),
+    key: z.object({ key: keyLabel, alternatives: z.array(keyLabel).max(4) }).nullable(),
+    firstDownbeatSec: finite(0, 3600),
+    barSeconds: finite(0.2, 30),
+    bars: z.number().int().min(1).max(5000),
+    sections: z.array(preSectionSchema).min(1).max(200),
+  })
+  .refine((v) => v.source !== "audio_file" || !!v.audioAssetId, {
+    message: "an audio file pre-arrangement names the file",
+  })
+  .refine((v) => v.sections.every((s) => s.endSec > s.startSec), {
+    message: "sections end after they start",
+  });
+export type SubmitPrearrangementInput = z.infer<typeof submitPrearrangementSchema>;
+
+export interface RecordingArrangementDto {
+  id: string;
+  songId: string;
+  recordingId: string | null;
+  source: "audio_file" | "microphone" | "member_marks";
+  audioAssetId: string | null;
+  engine: string;
+  version: string;
+  data: Omit<SubmitPrearrangementInput, "source" | "audioAssetId" | "engine" | "version">;
+  createdBy: string;
+  createdByName: string | null;
+  createdAt: string;
+}
+
+/** The band's own arrangement: sections in playing order, independent from the recording's. */
+export const saveArrangementSchema = z.object({
+  baseId: idSchema.optional().nullable(),
+  transpose: z.number().int().min(-11).max(11),
+  sections: z.array(songSectionSchema).max(120),
+});
+export type SaveArrangementInput = z.infer<typeof saveArrangementSchema>;
+
+/** Duration reported by the official player in the member's browser. */
+export const playerDurationSchema = z.object({ seconds: finite(1, 4 * 3600) });

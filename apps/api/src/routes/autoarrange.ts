@@ -12,6 +12,7 @@ import {
   type PreparationState,
   parseReferenceLink,
   pickDefaultRelease,
+  playerDurationSchema,
   prepareSongSchema,
   type RecordingDetails,
   type ReferenceLinkInfo,
@@ -21,9 +22,11 @@ import {
   reviewSchema,
   type SongDto,
   type SongRecordingDto,
+  saveArrangementSchema,
   searchRecordingsSchema,
   setReferenceLinkSchema,
   submitAnalysisSchema,
+  submitPrearrangementSchema,
   workAuthors,
   youtubeLookupSchema,
 } from "@bandsync/shared";
@@ -40,13 +43,16 @@ import {
   getAudioAsset,
   getJobForBand,
   getRecording,
+  getRecordingArrangement,
   getReferenceRecording,
   getResult,
   insertJob,
+  insertRecordingArrangement,
   insertResult,
   insertReviewEvent,
   listAudioAssets,
   listJobs,
+  listRecordingArrangements,
   listRecordings,
   listResults,
   listReviewEvents,
@@ -60,7 +66,7 @@ import {
   upsertReferenceRecording,
 } from "../db/autoarrange";
 import { getFile } from "../db/files";
-import { createSong, getSong, updateSong } from "../db/songs";
+import { createSong, getSong, saveBandArrangement, updateSong } from "../db/songs";
 import type { AppEnv } from "../env";
 import { ApiError, notFound } from "../lib/errors";
 import { p } from "../lib/params";
@@ -545,14 +551,16 @@ autoArrangeRoutes.post("/jobs/:jobId/complete", requireRepertoireEditor, async (
 
 async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
   const db = c.env.DB;
-  const [song, recordings, jobs, results, reviews, audioAssets] = await Promise.all([
-    getSong(db, bandId, songId),
-    listRecordings(db, songId),
-    listJobs(db, songId),
-    listResults(db, songId),
-    listReviewEvents(db, songId),
-    listAudioAssets(db, songId),
-  ]);
+  const [song, recordings, jobs, results, reviews, audioAssets, prearrangements] =
+    await Promise.all([
+      getSong(db, bandId, songId),
+      listRecordings(db, songId),
+      listJobs(db, songId),
+      listResults(db, songId),
+      listReviewEvents(db, songId),
+      listAudioAssets(db, songId),
+      listRecordingArrangements(db, songId),
+    ]);
   const reference = recordings.find((r) => r.isReference) ?? null;
   const since = reference?.referenceSince ?? null;
   const latest = (target: string) => {
@@ -596,6 +604,9 @@ async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
           ? "ready_for_review"
           : "not_started",
   };
+  // The pre-arrangement shown is the newest one made for the current reference recording.
+  const prearrangement =
+    prearrangements.find((a) => !reference || a.recordingId === reference.id) ?? null;
   return {
     song,
     recordings,
@@ -603,6 +614,15 @@ async function overview(c: Context<AppEnv>, bandId: string, songId: string) {
     results,
     reviews,
     audioAssets,
+    prearrangement,
+    prearrangements: prearrangements.map((a) => ({
+      id: a.id,
+      source: a.source,
+      recordingId: a.recordingId,
+      createdAt: a.createdAt,
+      createdByName: a.createdByName,
+      sections: a.data.sections?.length ?? 0,
+    })),
     preparation,
     dependents:
       reference && song
@@ -866,4 +886,161 @@ autoArrangeRoutes.post("/songs/:songId/analysis", requireRepertoireEditor, async
     metadata: { input: input.input, seconds: input.analysedSeconds, kinds: stored },
   });
   return c.json(await overview(c, bandId, song.id), 201);
+});
+
+/* ---------------- pre-arrangement of the recording ---------------- */
+
+/**
+ * Stores the pre-arrangement a member's device built ("Pré-arranjo da gravação"): from an
+ * authorised file, from the microphone, or from section marks the member made while listening
+ * through the official player. Immutable: a new one is added, the old ones stay.
+ */
+autoArrangeRoutes.post("/songs/:songId/prearrangement", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const user = c.get("user");
+  const db = c.env.DB;
+  const song = await getSong(db, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  await limitExternal(c, "analysis", 20);
+  const input = await parseBody(c, submitPrearrangementSchema);
+  let recording = await getReferenceRecording(db, song.id);
+  if (input.source === "audio_file") {
+    const asset = await getAudioAsset(db, song.id, input.audioAssetId!);
+    if (!asset) throw notFound("audio asset");
+    if (asset.recordingId) recording = await getRecording(db, song.id, asset.recordingId);
+  }
+  if (!recording)
+    throw new ApiError("not_found", "the song has no reference recording", {
+      reason: "no_reference",
+    });
+  const { source, audioAssetId, engine, version, ...data } = input;
+  const id = await insertRecordingArrangement(db, {
+    bandId,
+    songId: song.id,
+    recordingId: recording.id,
+    source,
+    audioAssetId: source === "audio_file" ? audioAssetId! : null,
+    engine,
+    version,
+    data,
+    userId: user.id,
+  });
+  // What was computed from audio also becomes reviewable results (marks are a person's work).
+  if (source !== "member_marks") {
+    const common = {
+      bandId,
+      songId: song.id,
+      recordingId: recording.id,
+      jobId: null,
+      origin: "audio_analysis" as const,
+      method: `${engine}.${source}`,
+      methodVersion: version,
+      confidence: null,
+      confidenceCalibrated: false,
+      input: source,
+      audioAssetId: source === "audio_file" ? audioAssetId! : null,
+      analysedSeconds: data.analysedSeconds,
+      createdBy: user.id,
+    };
+    if (data.bpm && data.bpm.origin === "audio_analysis")
+      await insertResult(db, {
+        ...common,
+        kind: "bpm",
+        value: {
+          bpm: data.bpm.value,
+          ambiguous: data.bpm.ambiguous,
+          candidates: [data.bpm.value, ...data.bpm.alternatives].map((b) => ({ bpm: b, score: 1 })),
+        },
+      });
+    if (data.key)
+      await insertResult(db, {
+        ...common,
+        kind: "key",
+        value: {
+          key: data.key.key,
+          candidates: [data.key.key, ...data.key.alternatives].map((k) => ({ key: k })),
+        },
+      });
+    await insertResult(db, {
+      ...common,
+      kind: "time_signature",
+      value: { beatsPerBar: data.beatsPerBar, beatUnit: 4 },
+    });
+    await insertResult(db, {
+      ...common,
+      kind: "sections",
+      value: {
+        prearrangementId: id,
+        count: data.sections.length,
+        labels: data.sections.map((s) => s.label).join(""),
+        bars: data.bars,
+      },
+    });
+  }
+  await audit(db, {
+    bandId,
+    actorUserId: user.id,
+    action: "prearrangement.created",
+    targetType: "song",
+    targetId: song.id,
+    metadata: { id, source, sections: data.sections.length },
+  });
+  return c.json(await overview(c, bandId, song.id), 201);
+});
+
+/**
+ * Saves the band's own arrangement (sections in playing order, chords, cues, transposition).
+ * The recording's pre-arrangement is never changed by this; the change is kept in the history.
+ */
+autoArrangeRoutes.put("/songs/:songId/arrangement", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const user = c.get("user");
+  const db = c.env.DB;
+  const song = await getSong(db, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const input = await parseBody(c, saveArrangementSchema);
+  if (input.baseId && !(await getRecordingArrangement(db, song.id, input.baseId)))
+    throw notFound("pre-arrangement");
+  const summary = (secs: { name: string; bars: number }[]) =>
+    secs.map((s) => `${s.name} (${s.bars})`).join(" · ");
+  await saveBandArrangement(db, bandId, song.id, user.id, {
+    baseId: input.baseId ?? null,
+    transpose: input.transpose,
+    sections: input.sections,
+  });
+  await insertReviewEvent(db, {
+    bandId,
+    songId: song.id,
+    target: "band_arrangement",
+    action: "edit",
+    before: { sections: summary(song.sections), transpose: song.version.arrangementTranspose },
+    after: { sections: summary(input.sections), transpose: input.transpose },
+    resultId: null,
+    userId: user.id,
+  });
+  return c.json(await overview(c, bandId, song.id));
+});
+
+/** Duration of the reference video, as the official YouTube player reports it in the browser. */
+autoArrangeRoutes.post("/songs/:songId/reference/duration", requireRepertoireEditor, async (c) => {
+  const bandId = p(c, "bandId");
+  const song = await getSong(c.env.DB, bandId, p(c, "songId"));
+  if (!song) throw notFound("song");
+  const reference = await getReferenceRecording(c.env.DB, song.id);
+  if (!reference?.link || reference.link.platform === "spotify")
+    throw new ApiError("conflict", "the reference is not a YouTube video");
+  const { seconds } = await parseBody(c, playerDurationSchema);
+  await insertResult(c.env.DB, {
+    bandId,
+    songId: song.id,
+    recordingId: reference.id,
+    jobId: null,
+    kind: "duration",
+    value: { seconds: Math.round(seconds * 10) / 10, ms: Math.round(seconds * 1000) },
+    method: "youtube.iframe_player.getDuration",
+    origin: "youtube",
+    sourceUrl: reference.link.url,
+    createdBy: c.get("user").id,
+  });
+  return c.json(await overview(c, bandId, song.id));
 });

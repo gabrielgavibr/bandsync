@@ -221,6 +221,13 @@ export const SECTION_KINDS = [
 ] as const;
 export type SectionKind = (typeof SECTION_KINDS)[number];
 
+/** A chord symbol as the band writes it: root, accidental, quality and extensions ("N" = none). */
+export const chordLabelSchema = z
+  .string()
+  .trim()
+  .max(16)
+  .regex(/^(N|[A-G][#b]?[a-z0-9+#°ø()/A-G-]*)$/);
+
 /** Something the band must remember at a point of a section: a convention, an entry, a stop. */
 export const sectionCueSchema = z.object({
   type: z.enum(["convention", "entry", "stop", "note"]),
@@ -241,6 +248,15 @@ export const songSectionSchema = z.object({
   startMs: z.number().int().min(0).max(36_000_000).optional().nullable(),
   endMs: z.number().int().min(0).max(36_000_000).optional().nullable(),
   cues: z.array(sectionCueSchema).max(30).optional(),
+  /** Repetition letter carried over from the pre-arrangement (A, B…), when kept. */
+  label: z
+    .string()
+    .trim()
+    .regex(/^[A-Z][0-9]?$/)
+    .optional()
+    .nullable(),
+  /** One chord per bar, as written by the band ("N" = no chord). */
+  chords: z.array(chordLabelSchema).max(256).optional(),
 });
 
 export const FACT_STATUSES = ["unknown", "estimated", "confirmed"] as const;
@@ -366,6 +382,8 @@ export interface SongSectionDto {
   cues: SectionCue[];
   /** "band": written by the band; "detected": copied from an analysis and not yet edited. */
   origin: string;
+  label: string | null;
+  chords: string[];
 }
 
 export interface SongMaterialDto {
@@ -416,6 +434,11 @@ export interface SongDto {
     notes: string | null;
     referenceUrl: string | null;
     meterConfirmed: boolean;
+    /** Semitones the band transposes the written chords by (0 = as written). */
+    arrangementTranspose: number;
+    /** The recording's pre-arrangement the band's arrangement started from, if any. */
+    arrangementBaseId: string | null;
+    arrangementUpdatedAt: string | null;
   };
   sections: SongSectionDto[];
   materialSummary: {

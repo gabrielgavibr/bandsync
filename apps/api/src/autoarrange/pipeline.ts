@@ -1,6 +1,8 @@
 import {
+  type DeezerTrack,
   type JobStep,
   type MetadataSource,
+  pickDeezerMatch,
   recordingPageUrl,
   type SkipReason,
   type SongRecordingDto,
@@ -16,7 +18,7 @@ import {
 } from "../db/autoarrange";
 import { createMaterial, getSong, listMaterials, updateSong } from "../db/songs";
 import type { Env } from "../env";
-import type { MusicBrainzClient } from "./clients";
+import { deezer, type MusicBrainzClient } from "./clients";
 
 export interface StepResult {
   outcome: StepOutcome;
@@ -170,13 +172,94 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
     }
   }
 
+  // Published analyses of this exact recording (Deezer: BPM and duration). Optional: if the
+  // service is down or the recording cannot be told apart from other versions, nothing is stored.
+  let deezerFound = false;
+  if (recording) {
+    try {
+      const found = await discoverOnDeezer(ctx, song.title, recording);
+      if (found) {
+        deezerFound = true;
+        const common = {
+          bandId: ctx.job.band_id,
+          songId: song.id,
+          recordingId: recording.id,
+          jobId: ctx.job.id,
+          origin: "deezer" as const,
+          sourceUrl: found.link,
+        };
+        if (found.bpm) {
+          const r = await insertResult(ctx.db, {
+            ...common,
+            kind: "bpm",
+            value: { bpm: found.bpm, deezerTrackId: found.id, match: found.match },
+            method: "deezer.track.bpm",
+          });
+          if (r.created) results += 1;
+        }
+        const fresh = await getRecording(ctx.db, song.id, recording.id);
+        if (found.durationSec && !fresh?.durationMs) {
+          const r = await insertResult(ctx.db, {
+            ...common,
+            kind: "duration",
+            value: { seconds: found.durationSec, ms: found.durationSec * 1000 },
+            method: "deezer.track.duration",
+          });
+          if (r.created) results += 1;
+        }
+      }
+    } catch (err) {
+      if (err instanceof PermanentStepError) throw err;
+      // An unavailable optional source is not a failed preparation.
+    }
+  }
+
   // Nothing is added to the song's visible links: what identifies the recording (catalogue page,
   // work, platform link) stays on the recording row, for provenance and audit.
   return {
     outcome: "done",
-    reason: recording?.mbid ? null : "no_recording_identifier",
-    detail: { identified, resultsAdded: results },
+    reason: recording?.mbid || deezerFound ? null : "no_recording_identifier",
+    detail: { identified, resultsAdded: results, deezer: deezerFound },
   };
+}
+
+/**
+ * The Deezer track that is this recording: by ISRC when the catalogue gave one (and the length
+ * agrees), otherwise by title + artist + length. Returns null when it cannot be told apart.
+ */
+async function discoverOnDeezer(
+  ctx: StepContext,
+  songTitle: string,
+  recording: SongRecordingDto,
+): Promise<(DeezerTrack & { match: "isrc" | "title_duration" }) | null> {
+  const dz = deezer(ctx.env);
+  // Length known from the catalogue, or reported by the official player.
+  let durationSec = recording.durationMs ? recording.durationMs / 1000 : null;
+  if (durationSec === null) {
+    const row = await ctx.db
+      .prepare(
+        "SELECT value FROM analysis_results WHERE song_id = ? AND recording_id = ? AND kind = 'duration' AND origin = 'youtube' ORDER BY created_at DESC LIMIT 1",
+      )
+      .bind(recording.songId, recording.id)
+      .first<{ value: string }>();
+    if (row) durationSec = Number((JSON.parse(row.value) as { seconds?: number }).seconds) || null;
+  }
+  for (const isrc of recording.isrcs.slice(0, 2)) {
+    ctx.spend();
+    const t = await dz.byIsrc(isrc);
+    if (t && (durationSec === null || !t.durationSec || Math.abs(t.durationSec - durationSec) <= 3))
+      return { ...t, match: "isrc" };
+  }
+  // Without a length a title search cannot tell the versions apart: do not spend the call.
+  if (durationSec === null) return null;
+  ctx.spend();
+  const candidates = await dz.search(recording.artistCredit, songTitle);
+  const pick = pickDeezerMatch(candidates, { title: songTitle, durationSec });
+  if (!pick) return null;
+  // Search results do not carry the BPM: read the track itself.
+  ctx.spend();
+  const full = await dz.track(pick.id);
+  return full ? { ...full, match: "title_duration" } : null;
 }
 
 /* ------------------------------------------------------------------ */

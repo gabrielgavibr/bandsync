@@ -247,15 +247,21 @@ describe("preparing a song", () => {
       ["preparing_materials", "done", null],
     ]);
     expect(job.steps[3]!.detail.slotsCreated).toBe(5);
-    expect(job.costUnits).toBe(1);
+    // One MusicBrainz lookup and one Deezer lookup by ISRC.
+    expect(job.costUnits).toBe(2);
 
     const o = await json(
       await api("GET", `${aa(bandId)}/songs/${body.song.id}`, undefined, ana.cookie),
     );
     expect(o.engines.audioAnalysis).toBe("not_configured");
-    const kinds = o.results.map((r: { kind: string }) => r.kind).sort();
-    expect(kinds).toEqual(["composer", "duration"]); // no bpm, key, chords or sections: nothing analysed them
-    for (const r of o.results) {
+    // Deezer's published tempo is kept apart, as an estimate to review.
+    const deezer = o.results.filter((r: { origin: string }) => r.origin === "deezer");
+    expect(deezer.map((r: { kind: string }) => r.kind)).toEqual(["bpm"]);
+    expect(deezer[0].reviewStatus).toBe("needs_review");
+    const fromCatalogue = o.results.filter((r: { origin: string }) => r.origin !== "deezer");
+    const kinds = fromCatalogue.map((r: { kind: string }) => r.kind).sort();
+    expect(kinds).toEqual(["composer", "duration"]); // no key, chords or sections: nothing analysed them
+    for (const r of fromCatalogue) {
       expect(r.origin).toBe("musicbrainz");
       expect(r.reviewStatus).toBe("unreviewed");
       expect(r.confidence).toBeNull();
@@ -328,7 +334,8 @@ describe("preparing a song", () => {
     const o = await json(
       await api("GET", `${aa(bandId)}/songs/${first.song.id}`, undefined, ana.cookie),
     );
-    expect(o.results).toHaveLength(2);
+    // Composer and duration from MusicBrainz, BPM from Deezer: each stored once.
+    expect(o.results).toHaveLength(3);
     expect(o.recordings).toHaveLength(1);
     expect(o.jobs).toHaveLength(2);
     expect(o.jobs.find((j: { id: string }) => j.id === first.job.id).status).toBe("completed");
@@ -363,7 +370,11 @@ describe("preparing a song", () => {
     expect(job.steps[3]!.detail.fieldsFilled).toBe(3);
     const o = await json(await api("GET", `${aa(bandId)}/songs/${songId}`, undefined, ana.cookie));
     // MusicBrainz links no work to this recording, so there is no composer result.
-    expect(o.results.map((r: { kind: string }) => r.kind)).toEqual(["duration"]);
+    expect(
+      o.results
+        .filter((r: { origin: string }) => r.origin === "musicbrainz")
+        .map((r: { kind: string }) => r.kind),
+    ).toEqual(["duration"]);
     expect(song.workMbid).toBeNull();
 
     // New song from the same recording: composer stays empty rather than guessed.

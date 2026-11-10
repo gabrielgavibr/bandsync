@@ -13,14 +13,18 @@ const PORT = Number(process.env.MUSIC_STUB_PORT ?? 8790);
 createServer(async (req, res) => {
   const path = req.url ?? "/";
   // Both platforms use /oembed; the recording they are asked about tells them apart.
-  const host = !path.startsWith("/oembed")
-    ? "musicbrainz.org"
-    : decodeURIComponent(path).includes("open.spotify.com")
-      ? "open.spotify.com"
-      : "www.youtube.com";
+  // Deezer requests come under /deezer.
+  const host = path.startsWith("/deezer")
+    ? "api.deezer.com"
+    : !path.startsWith("/oembed")
+      ? "musicbrainz.org"
+      : decodeURIComponent(path).includes("open.spotify.com")
+        ? "open.spotify.com"
+        : "www.youtube.com";
+  const upstreamPath = path.startsWith("/deezer") ? path.slice("/deezer".length) || "/" : path;
   const headers = new Headers();
   for (const [k, v] of Object.entries(req.headers)) if (typeof v === "string") headers.set(k, v);
-  const out = await outboundService(new Request(`https://${host}${path}`, { headers }));
+  const out = await outboundService(new Request(`https://${host}${upstreamPath}`, { headers }));
   res.writeHead(out.status, { "content-type": out.headers.get("content-type") ?? "text/plain" });
   res.end(await out.text());
 }).listen(PORT, () => console.log(`music service stub on http://localhost:${PORT}`));

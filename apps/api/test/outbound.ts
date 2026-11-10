@@ -36,6 +36,8 @@ export const RESTRICTED_VIDEO_ID = "RESTRICTED1";
 export const SPOTIFY_TRACK_ID = "4cOdK2wGLETKBW3PvgPWqT";
 
 let failNext = 0;
+/** Simulates Deezer being down (set through https://api.deezer.com/__test/down?on=1). */
+let failDeezer = false;
 let calls = 0;
 
 const json = (body: string, status = 200) =>
@@ -81,6 +83,28 @@ export async function outboundService(request: Request): Promise<Response> {
     // YouTube answers 401 for a video that exists but is private or not embeddable.
     if (target.includes(RESTRICTED_VIDEO_ID)) return new Response("Unauthorized", { status: 401 });
     return new Response("Not Found", { status: 404 });
+  }
+
+  if (url.hostname === "api.deezer.com" && url.pathname === "/__test/down") {
+    failDeezer = url.searchParams.get("on") === "1";
+    return json(JSON.stringify({ failDeezer }));
+  }
+  if (url.hostname === "api.deezer.com") {
+    if (failDeezer) return json('{"error":"down"}', 503);
+    if (url.pathname === "/track/isrc:BR4W41200009")
+      return json(read("deezer-isrc-perola-negra.json"));
+    if (url.pathname.startsWith("/track/isrc:"))
+      return json('{"error":{"type":"DataException","message":"no data","code":800}}');
+    if (url.pathname === "/track/876104442")
+      return json(read("deezer-track-esoterico-um-banda-um.json"));
+    if (url.pathname === "/track/1802312637") return json(read("deezer-track-o-segundo-sol.json"));
+    if (url.pathname === "/search") {
+      const q = (url.searchParams.get("q") ?? "").toLowerCase();
+      if (q.includes("esot")) return json(read("deezer-search-esoterico.json"));
+      if (q.includes("segundo sol")) return json(read("deezer-search-o-segundo-sol.json"));
+      return json('{"data":[],"total":0}');
+    }
+    return json('{"error":{"type":"DataException","message":"no data","code":800}}');
   }
 
   if (url.hostname === "open.spotify.com" && url.pathname === "/oembed") {

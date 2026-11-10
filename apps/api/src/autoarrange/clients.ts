@@ -1,5 +1,11 @@
 import {
+  DEEZER_API_BASE,
+  deezerIsrcUrl,
+  deezerSearchUrl,
+  deezerTrackUrl,
   MUSICBRAINZ_BASE_URL,
+  normalizeDeezerSearch,
+  normalizeDeezerTrack,
   normalizeOEmbed,
   normalizeRecordingLookup,
   normalizeSearchResponse,
@@ -135,4 +141,28 @@ export async function identifyReferenceLink(
   }
   if (!res.ok) throw new ApiError("upstream_unavailable", `${name} answered ${res.status}`);
   return normalizeOEmbed(link, await res.json().catch(() => null));
+}
+
+/** Deezer's public API: find the exact recording and read the BPM and duration it publishes. */
+export function deezer(env: Env) {
+  const base = env.DEEZER_API_BASE || DEEZER_API_BASE;
+  async function get(url: string): Promise<unknown> {
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch {
+      throw new ApiError("upstream_unavailable", "Deezer did not answer");
+    }
+    if (!res.ok) throw new ApiError("upstream_unavailable", `Deezer answered ${res.status}`);
+    return res.json().catch(() => null);
+  }
+  return {
+    byIsrc: async (isrc: string) => normalizeDeezerTrack(await get(deezerIsrcUrl(base, isrc))),
+    search: async (artist: string | null, title: string) =>
+      normalizeDeezerSearch(await get(deezerSearchUrl(base, artist, title))),
+    track: async (id: number) => normalizeDeezerTrack(await get(deezerTrackUrl(base, id))),
+  };
 }
