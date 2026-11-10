@@ -67,7 +67,10 @@ describe("which version a link is, before any length is known (real answers)", (
       linkTitle: YT_PEROLA,
       linkAuthor: "NatirutsVEVO",
     });
-    expect(m).toMatchObject({ track: { id: 429918992, durationSec: 212 }, evidence: "only_version" });
+    expect(m).toMatchObject({
+      track: { id: 429918992, durationSec: 212 },
+      evidence: "only_version",
+    });
     expect(m!.words).toEqual(expect.arrayContaining(["rio", "janeiro"]));
   });
 
@@ -120,11 +123,21 @@ describe("which version a link is, before any length is known (real answers)", (
   it("needs the link to be about this song and this artist", () => {
     // A video of another song (the mistake of pointing a song at the wrong link).
     expect(
-      pickDeezerVersion(esoterico, { title: "Esotérico", artist: "Gilberto Gil", linkTitle: YT_PEROLA }),
+      pickDeezerVersion(esoterico, {
+        title: "Esotérico",
+        artist: "Gilberto Gil",
+        linkTitle: YT_PEROLA,
+      }),
     ).toBeNull();
     expect(
-      pickDeezerVersion(perola, { title: "Pérola Negra", artist: "Outra Banda", linkTitle: "Outra Banda - Pérola Negra (Acústico Ao Vivo)" }),
+      pickDeezerVersion(perola, {
+        title: "Pérola Negra",
+        artist: "Outra Banda",
+        linkTitle: "Outra Banda - Pérola Negra (Acústico Ao Vivo)",
+      }),
     ).toBeNull();
-    expect(pickDeezerVersion(perola, { title: "Pérola Negra", artist: null, linkTitle: null })).toBeNull();
+    expect(
+      pickDeezerVersion(perola, { title: "Pérola Negra", artist: null, linkTitle: null }),
+    ).toBeNull();
   });
 });

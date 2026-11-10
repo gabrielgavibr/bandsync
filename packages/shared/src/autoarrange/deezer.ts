@@ -103,7 +103,12 @@ const plain = (t: string) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
-const words = (t: string) => new Set(plain(t).split(" ").filter((w) => w.length >= 2));
+const words = (t: string) =>
+  new Set(
+    plain(t)
+      .split(" ")
+      .filter((w) => w.length >= 2),
+  );
 
 /** Words that say nothing about which version a recording is. */
 const FILLER = new Set(
@@ -124,7 +129,10 @@ function qualifiers(trackTitle: string): string[] {
   return parts
     .filter((p) => !/^\s*(feat|ft|part)\b/i.test(plain(p)))
     .flatMap((p) => [...words(p)])
-    .filter((w) => !FILLER.has(w) && !["ao", "vivo", "live", "acustico", "acustica", "acoustic"].includes(w));
+    .filter(
+      (w) =>
+        !FILLER.has(w) && !["ao", "vivo", "live", "acustico", "acustica", "acoustic"].includes(w),
+    );
 }
 
 export interface DeezerVersionMatch {
@@ -145,18 +153,30 @@ export interface DeezerVersionMatch {
  */
 export function pickDeezerVersion(
   tracks: DeezerTrack[],
-  want: { title: string; artist: string | null; linkTitle: string | null; linkAuthor?: string | null },
+  want: {
+    title: string;
+    artist: string | null;
+    linkTitle: string | null;
+    linkAuthor?: string | null;
+  },
 ): DeezerVersionMatch | null {
   if (!want.linkTitle) return null;
   const song = comparableTitle(want.title);
   const link = plain(want.linkTitle);
   if (!song || !` ${link} `.includes(` ${song} `)) return null;
   const linkWords = words(want.linkTitle);
-  const known = new Set([...words(want.artist ?? ""), ...linkWords, ...words(want.linkAuthor ?? "")]);
+  const known = new Set([
+    ...words(want.artist ?? ""),
+    ...linkWords,
+    ...words(want.linkAuthor ?? ""),
+  ]);
   const same = tracks.filter((t) => {
     if (comparableTitle(t.title) !== song) return false;
     const artist = [...words(t.artist ?? "")].filter((w) => w.length >= 3);
-    return artist.length === 0 || artist.some((w) => known.has(w) || [...known].some((k) => k.startsWith(w)));
+    return (
+      artist.length === 0 ||
+      artist.some((w) => known.has(w) || [...known].some((k) => k.startsWith(w)))
+    );
   });
   // The same recording appears on several albums: one version per length (within 3 s) and kind.
   const eligible = same.filter((t) => {
@@ -185,9 +205,15 @@ export function pickDeezerVersion(
   if (versions.length === 1) {
     // The only version Deezer has must be the only one at all it lists under this title.
     const others = same.length - eligible.length;
-    const best = versions[0]!.map((t) => ({ t, w: pointing(t) })).sort((a, b) => b.w.length - a.w.length)[0]!;
+    const best = versions[0]!
+      .map((t) => ({ t, w: pointing(t) }))
+      .sort((a, b) => b.w.length - a.w.length)[0]!;
     if (others === 0 || best.w.length >= 1)
-      return { track: best.t, evidence: others === 0 ? "only_version" : "version_words", words: best.w };
+      return {
+        track: best.t,
+        evidence: others === 0 ? "only_version" : "version_words",
+        words: best.w,
+      };
     return null;
   }
   const scored = versions
