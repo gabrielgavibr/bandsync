@@ -231,12 +231,13 @@ describe("adding a song from a link", () => {
 
     const job = await waitForJob(ana, bandId, body.job.id);
     expect(job.steps.map((s) => [s.step, s.outcome, s.reason])).toEqual([
-      ["searching_references", "done", "no_recording_identifier"],
+      // The video's own title names the version (live, acoustic, in Rio): Deezer has exactly it.
+      ["searching_references", "done", null],
       ["analyzing_audio", "skipped", "no_authorized_audio"],
       ["detecting_structure", "skipped", "no_authorized_audio"],
       ["preparing_materials", "done", null],
     ]);
-    expect(job.costUnits).toBe(0); // no catalogue was consulted
+    expect(job.costUnits).toBe(2); // one search and one track read on Deezer
 
     const o = await overview(ana, bandId, body.song.id);
     // A known link is neither audio to process nor an analysis.
@@ -248,7 +249,33 @@ describe("adding a song from a link", () => {
       analysisFrom: null,
       arrangement: "ready_for_review",
     });
-    expect(o.results).toEqual([]);
+    // Catalogue facts about this recording, each with its source, to be reviewed: not an analysis.
+    expect(
+      o.results.map((r: { kind: string; origin: string; method: string; reviewStatus: string }) => [
+        r.kind,
+        r.origin,
+        r.method,
+        r.reviewStatus,
+      ]),
+    ).toEqual(
+      expect.arrayContaining([
+        ["bpm", "deezer", "deezer.track.bpm", "needs_review"],
+        ["duration", "deezer", "deezer.track.duration", "needs_review"],
+      ]),
+    );
+    expect(o.results).toHaveLength(2);
+    const bpm = o.results.find((r: { kind: string }) => r.kind === "bpm");
+    expect(bpm.value).toMatchObject({
+      bpm: 130,
+      deezerTrackId: 429918992,
+      match: "title_version",
+      isrc: "BR4W41200009",
+      album: "Natiruts Acústico no Rio de Janeiro (Ao Vivo)",
+    });
+    expect(bpm.sourceUrl).toBe("https://www.deezer.com/track/429918992");
+    // Nothing is filled in on the song from it.
+    expect(o.song.version.bpm).toBeNull();
+    expect(o.song.originalBpm).toBeNull();
     expect(o.song.references).toEqual([]);
     expect(o.reviews[0]).toMatchObject({
       target: "reference",

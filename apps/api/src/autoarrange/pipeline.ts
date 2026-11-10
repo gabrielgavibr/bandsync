@@ -3,6 +3,7 @@ import {
   type JobStep,
   type MetadataSource,
   pickDeezerMatch,
+  pickDeezerVersion,
   recordingPageUrl,
   type SkipReason,
   type SongRecordingDto,
@@ -192,7 +193,7 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
           const r = await insertResult(ctx.db, {
             ...common,
             kind: "bpm",
-            value: { bpm: found.bpm, deezerTrackId: found.id, match: found.match },
+            value: deezerValue(found, { bpm: found.bpm }),
             method: "deezer.track.bpm",
           });
           if (r.created) results += 1;
@@ -202,7 +203,10 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
           const r = await insertResult(ctx.db, {
             ...common,
             kind: "duration",
-            value: { seconds: found.durationSec, ms: found.durationSec * 1000 },
+            value: deezerValue(found, {
+              seconds: found.durationSec,
+              ms: found.durationSec * 1000,
+            }),
             method: "deezer.track.duration",
           });
           if (r.created) results += 1;
@@ -227,11 +231,29 @@ async function searchingReferences(ctx: StepContext): Promise<StepResult> {
  * The Deezer track that is this recording: by ISRC when the catalogue gave one (and the length
  * agrees), otherwise by title + artist + length. Returns null when it cannot be told apart.
  */
+/** What is kept with a value read from Deezer: which track, how it was matched, its ISRC. */
+function deezerValue(
+  found: DeezerTrack & { match: DeezerMatch; evidence?: string[] },
+  value: Record<string, unknown>,
+): Record<string, unknown> {
+  return {
+    ...value,
+    deezerTrackId: found.id,
+    match: found.match,
+    ...(found.evidence?.length ? { evidence: found.evidence } : {}),
+    ...(found.isrc ? { isrc: found.isrc } : {}),
+    ...(found.album ? { album: found.album } : {}),
+  };
+}
+
+/** How a Deezer track was tied to the band's recording. */
+type DeezerMatch = "isrc" | "title_duration" | "title_version";
+
 export async function discoverOnDeezer(
   ctx: Pick<StepContext, "env" | "db" | "spend">,
   songTitle: string,
   recording: SongRecordingDto,
-): Promise<(DeezerTrack & { match: "isrc" | "title_duration" }) | null> {
+): Promise<(DeezerTrack & { match: DeezerMatch; evidence?: string[] }) | null> {
   const dz = deezer(ctx.env);
   // Length known from the catalogue, or reported by the official player.
   let durationSec = recording.durationMs ? recording.durationMs / 1000 : null;
@@ -250,16 +272,34 @@ export async function discoverOnDeezer(
     if (t && (durationSec === null || !t.durationSec || Math.abs(t.durationSec - durationSec) <= 3))
       return { ...t, match: "isrc" };
   }
-  // Without a length a title search cannot tell the versions apart: do not spend the call.
-  if (durationSec === null) return null;
+  // Neither a length nor a link title to tell versions apart: do not spend the call.
+  if (durationSec === null && !recording.link?.title) return null;
   ctx.spend();
   const candidates = await dz.search(recording.artistCredit, songTitle);
-  const pick = pickDeezerMatch(candidates, { title: songTitle, durationSec });
+  let pick: DeezerTrack | null = null;
+  let match: DeezerMatch = "title_duration";
+  let evidence: string[] | undefined;
+  if (durationSec !== null) pick = pickDeezerMatch(candidates, { title: songTitle, durationSec });
+  else {
+    // No length yet (a link was just pasted): the link's own title may still say which version
+    // this is ("... Acústico Ao Vivo no Rio de Janeiro"). Anything less than clear finds nothing.
+    const byTitle = pickDeezerVersion(candidates, {
+      title: songTitle,
+      artist: recording.artistCredit,
+      linkTitle: recording.link?.title ?? null,
+      linkAuthor: recording.link?.author ?? null,
+    });
+    if (byTitle) {
+      pick = byTitle.track;
+      match = "title_version";
+      evidence = byTitle.words;
+    }
+  }
   if (!pick) return null;
   // Search results do not carry the BPM: read the track itself.
   ctx.spend();
   const full = await dz.track(pick.id);
-  return full ? { ...full, match: "title_duration" } : null;
+  return full ? { ...full, match, evidence } : null;
 }
 
 /**
@@ -295,7 +335,7 @@ export async function discoverPublishedTempo(
       origin: "deezer",
       sourceUrl: found.link,
       kind: "bpm",
-      value: { bpm: found.bpm, deezerTrackId: found.id, match: found.match },
+      value: deezerValue(found, { bpm: found.bpm }),
       method: "deezer.track.bpm",
       createdBy: input.userId,
     });

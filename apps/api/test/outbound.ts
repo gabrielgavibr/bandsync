@@ -95,11 +95,13 @@ export async function outboundService(request: Request): Promise<Response> {
       return json(read("deezer-isrc-perola-negra.json"));
     if (url.pathname.startsWith("/track/isrc:"))
       return json('{"error":{"type":"DataException","message":"no data","code":800}}');
+    if (url.pathname === "/track/429918992") return json(read("deezer-isrc-perola-negra.json"));
     if (url.pathname === "/track/876104442")
       return json(read("deezer-track-esoterico-um-banda-um.json"));
     if (url.pathname === "/track/1802312637") return json(read("deezer-track-o-segundo-sol.json"));
     if (url.pathname === "/search") {
       const q = (url.searchParams.get("q") ?? "").toLowerCase();
+      if (q.includes("rola negra")) return json(read("deezer-search-perola-negra.json"));
       if (q.includes("esot")) return json(read("deezer-search-esoterico.json"));
       if (q.includes("segundo sol")) return json(read("deezer-search-o-segundo-sol.json"));
       return json('{"data":[],"total":0}');

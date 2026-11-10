@@ -1,0 +1,43 @@
+{
+ "data": [
+  {
+   "id": 429918992,
+   "readable": true,
+   "title": "Pérola Negra (feat. Luiz Melodia)",
+   "title_short": "Pérola Negra (feat. Luiz Melodia)",
+   "title_version": "",
+   "isrc": "BR4W41200009",
+   "link": "https://www.deezer.com/track/429918992",
+   "duration": 212,
+   "rank": 576556,
+   "explicit_lyrics": false,
+   "explicit_content_lyrics": 0,
+   "explicit_content_cover": 2,
+   "artist": {
+    "id": 16124,
+    "name": "Natiruts",
+    "link": "https://www.deezer.com/artist/16124",
+    "picture": "https://api.deezer.com/artist/16124/image",
+    "picture_small": "https://cdn-images.dzcdn.net/images/artist/302b31cfcd8892378409bd6e04575032/56x56-000000-80-0-0.jpg",
+    "picture_medium": "https://cdn-images.dzcdn.net/images/artist/302b31cfcd8892378409bd6e04575032/250x250-000000-80-0-0.jpg",
+    "picture_big": "https://cdn-images.dzcdn.net/images/artist/302b31cfcd8892378409bd6e04575032/500x500-000000-80-0-0.jpg",
+    "picture_xl": "https://cdn-images.dzcdn.net/images/artist/302b31cfcd8892378409bd6e04575032/1000x1000-000000-80-0-0.jpg",
+    "tracklist": "https://api.deezer.com/artist/16124/top?limit=50",
+    "type": "artist"
+   },
+   "album": {
+    "id": 51821432,
+    "title": "Natiruts Acústico no Rio de Janeiro (Ao Vivo)",
+    "cover": "https://api.deezer.com/album/51821432/image",
+    "cover_small": "https://cdn-images.dzcdn.net/images/cover/29427c053a8d0175221738d1546b5335/56x56-000000-80-0-0.jpg",
+    "cover_medium": "https://cdn-images.dzcdn.net/images/cover/29427c053a8d0175221738d1546b5335/250x250-000000-80-0-0.jpg",
+    "cover_big": "https://cdn-images.dzcdn.net/images/cover/29427c053a8d0175221738d1546b5335/500x500-000000-80-0-0.jpg",
+    "cover_xl": "https://cdn-images.dzcdn.net/images/cover/29427c053a8d0175221738d1546b5335/1000x1000-000000-80-0-0.jpg",
+    "tracklist": "https://api.deezer.com/album/51821432/tracks",
+    "type": "album"
+   },
+   "type": "track"
+  }
+ ],
+ "total": 1
+}

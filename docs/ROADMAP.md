@@ -81,7 +81,9 @@ Planned:
 - Production deployment on Cloudflare with custom domain; e-mail provider; monitoring.
 - LGPD: data export and account deletion endpoints.
 
-## AutoArrange — **AutoArrange 3.0 (pre-arrangement) done**
+## AutoArrange — **3.1 done (structure v2, section player, limits while listening)**
+
+See `AUTOARRANGE_3_1.md` for the diagnosis of over-segmentation, the v1/v2 comparison, the player and what is still open (verse/chorus with identical harmony, tempo octave).
 
 Detailed in `AUTOARRANGE.md`.
 

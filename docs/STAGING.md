@@ -69,13 +69,20 @@ access gate, with the same single-page-app fallback. Production keeps the regula
 STAGING_URL=https://bandsync-staging.<subdomain>.workers.dev pnpm test:staging
 ```
 
-The check passes the gate, refuses a wrong key, confirms the public demo password is blocked, logs in as
-two accounts (desktop and iPhone-sized viewports), switches the language, opens band pages, runs a live
-rehearsal across both devices and saves screenshots to `test-results/staging/`.
-A second scenario checks reference recordings against the real platforms: the confirmed YouTube
-reference of Pérola Negra and its player, the pending links of Esotérico and O Segundo Sol, and the
-identification of real YouTube, YouTube Music and Spotify links in the add-song flow. It confirms
-nothing and creates no song.
+The checks are split so that the band people use is never changed by automation:
+
+- `e2e/staging/sala3-readonly.staging.ts` — **Sala 3, read only**: gate, blocked demo password, the
+  real songs, and the arrangement page of a song mapped from an uploaded file (section player
+  present), on desktop and phone sizes. It enters no live session, toggles nothing, and fails if it
+  makes any API request other than a GET (apart from logging in).
+- `e2e/staging/qa-band.staging.ts` — **everything that writes**, in a band of its own
+  ("QA automático (testes)") owned by a QA account created on first use (random password kept in
+  the git-ignored `apps/api/.staging/qa-account.json`): link research against the real services, a
+  pre-arrangement from a recording that may be processed, the section player, limits edited while
+  listening, range requests and their permissions, the live room. Songs, files and the repertoire
+  created by a run are removed at its end.
+
+Screenshots go to `test-results/staging/`.
 
 ## Reference recordings on staging
 

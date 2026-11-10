@@ -91,3 +91,109 @@ export function pickDeezerMatch(
     return null;
   return close[0]!;
 }
+
+/* ------------------------------------------------------------------ */
+/* Which version, when no length is known yet                          */
+/* ------------------------------------------------------------------ */
+
+const plain = (t: string) =>
+  t
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+const words = (t: string) => new Set(plain(t).split(" ").filter((w) => w.length >= 2));
+
+/** Words that say nothing about which version a recording is. */
+const FILLER = new Set(
+  "de da do das dos no na nos nas em ao aos com the of in at on and feat ft part official oficial video clipe clip audio lyric lyrics letra hd hq 4k vevo music musica full album".split(
+    " ",
+  ),
+);
+
+const isLive = (t: string) => /\b(ao vivo|live|en vivo|unplugged)\b/.test(plain(t));
+const isAcoustic = (t: string) => /\b(acustic[oa]|acoustic|unplugged)\b/.test(plain(t));
+
+/** What a track's own title adds to the song's name ("Primeira versão", "Regravação Take 01"). */
+function qualifiers(trackTitle: string): string[] {
+  const parts: string[] = [];
+  for (const m of trackTitle.matchAll(/[([]([^)\]]*)[)\]]/g)) parts.push(m[1]!);
+  const dash = /\s-\s(.*)$/.exec(trackTitle.replace(/[([][^)\]]*[)\]]/g, " "));
+  if (dash) parts.push(dash[1]!);
+  return parts
+    .filter((p) => !/^\s*(feat|ft|part)\b/i.test(plain(p)))
+    .flatMap((p) => [...words(p)])
+    .filter((w) => !FILLER.has(w) && !["ao", "vivo", "live", "acustico", "acustica", "acoustic"].includes(w));
+}
+
+export interface DeezerVersionMatch {
+  track: DeezerTrack;
+  /** only_version: Deezer has one version and it agrees; version_words: told apart by the link's own words. */
+  evidence: "only_version" | "version_words";
+  /** The words of the link's title that point at this version's album or title. */
+  words: string[];
+}
+
+/**
+ * The Deezer track that is the recording behind a link, decided from what the platform's own
+ * title says ("... (Acústico Ao Vivo no Rio de Janeiro)"), for when no length is known yet.
+ * Returns null whenever that is not clear: the link's title does not name the song; a candidate
+ * is live / acoustic / a "first version" and the link does not say so (or the other way round);
+ * or several versions remain and the title's words do not single one out. Data of another
+ * version is never taken.
+ */
+export function pickDeezerVersion(
+  tracks: DeezerTrack[],
+  want: { title: string; artist: string | null; linkTitle: string | null; linkAuthor?: string | null },
+): DeezerVersionMatch | null {
+  if (!want.linkTitle) return null;
+  const song = comparableTitle(want.title);
+  const link = plain(want.linkTitle);
+  if (!song || !` ${link} `.includes(` ${song} `)) return null;
+  const linkWords = words(want.linkTitle);
+  const known = new Set([...words(want.artist ?? ""), ...linkWords, ...words(want.linkAuthor ?? "")]);
+  const same = tracks.filter((t) => {
+    if (comparableTitle(t.title) !== song) return false;
+    const artist = [...words(t.artist ?? "")].filter((w) => w.length >= 3);
+    return artist.length === 0 || artist.some((w) => known.has(w) || [...known].some((k) => k.startsWith(w)));
+  });
+  // The same recording appears on several albums: one version per length (within 3 s) and kind.
+  const eligible = same.filter((t) => {
+    const about = `${t.title} ${t.album ?? ""}`;
+    if (isLive(about) !== isLive(want.linkTitle!)) return false;
+    if (isAcoustic(about) !== isAcoustic(want.linkTitle!)) return false;
+    return qualifiers(t.title).every((w) => linkWords.has(w));
+  });
+  if (eligible.length === 0) return null;
+  const versions: DeezerTrack[][] = [];
+  for (const t of eligible) {
+    const group = versions.find(
+      (g) =>
+        g[0]!.durationSec !== null &&
+        t.durationSec !== null &&
+        Math.abs(g[0]!.durationSec - t.durationSec) <= 3,
+    );
+    if (group) group.push(t);
+    else versions.push([t]);
+  }
+  const songWords = new Set([...words(want.title), ...words(want.artist ?? "")]);
+  const pointing = (t: DeezerTrack) =>
+    [...words(`${t.album ?? ""} ${t.title}`)].filter(
+      (w) => linkWords.has(w) && !songWords.has(w) && !FILLER.has(w),
+    );
+  if (versions.length === 1) {
+    // The only version Deezer has must be the only one at all it lists under this title.
+    const others = same.length - eligible.length;
+    const best = versions[0]!.map((t) => ({ t, w: pointing(t) })).sort((a, b) => b.w.length - a.w.length)[0]!;
+    if (others === 0 || best.w.length >= 1)
+      return { track: best.t, evidence: others === 0 ? "only_version" : "version_words", words: best.w };
+    return null;
+  }
+  const scored = versions
+    .map((g) => g.map((t) => ({ t, w: pointing(t) })).sort((a, b) => b.w.length - a.w.length)[0]!)
+    .sort((a, b) => b.w.length - a.w.length);
+  if (scored[0]!.w.length >= 2 && scored[0]!.w.length - scored[1]!.w.length >= 2)
+    return { track: scored[0]!.t, evidence: "version_words", words: scored[0]!.w };
+  return null;
+}

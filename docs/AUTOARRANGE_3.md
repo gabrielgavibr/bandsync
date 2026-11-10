@@ -1,5 +1,7 @@
 # AutoArrange 3.0 — Reference link and the recording's pre-arrangement
 
+> Continued in `AUTOARRANGE_3_1.md`: structure analysis v2, section player, limits edited while listening.
+
 The YouTube link is the band's main reference. From it BandSync builds a **pre-arrangement of the
 recording** (a map of the whole recording: sections, bars, chords, cues) that the band reviews and
 turns into **its own arrangement**, which is what the song page and the live room show.

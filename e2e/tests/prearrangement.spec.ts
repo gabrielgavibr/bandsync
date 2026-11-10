@@ -261,8 +261,18 @@ test("authorised real recording: whole-recording map on the device, editing, ori
   // The returning passage (A) is recognised as the same letter.
   expect(labels.filter((l) => l === labels[0]).length).toBeGreaterThanOrEqual(2);
   await expect(pre.getByTestId("recording-timeline")).toBeVisible();
+  // On the phone: the player of the uploaded file stays within reach; a tap plays a section.
+  const bar = page.getByTestId("player-bar");
+  await expect(bar).toHaveAttribute("data-kind", "file");
+  await expect(bar).toBeInViewport();
+  await pre.getByTestId("recording-timeline").locator("button[data-label]").nth(1).tap();
+  await expect(bar).toHaveAttribute("data-playing", "true");
+  await expect(bar.getByTestId("player-section")).toContainText("Seção");
+  await bar.getByRole("button", { name: "Pausar" }).tap();
+  await expect(bar).toHaveAttribute("data-playing", "false");
+  await expect(bar.getByRole("button", { name: "Repetir seção" })).toBeVisible();
   expect(await noHorizontalScroll(page)).toBe(true);
-  await page.screenshot({ path: "test-results/pre-03-file-mobile.png", fullPage: true });
+  await page.screenshot({ path: "test-results/pre-03-file-mobile.png" });
 
   const before = await (
     await ana.api.get(`/api/bands/${bandId}/autoarrange/songs/${songId}`)

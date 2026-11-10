@@ -6,6 +6,7 @@ import {
   normalizeDeezerSearch,
   normalizeDeezerTrack,
   pickDeezerMatch,
+  pickDeezerVersion,
 } from "../src/autoarrange/deezer";
 
 const fixture = (name: string) =>
@@ -50,5 +51,80 @@ describe("Deezer (real answers)", () => {
     expect(comparableTitle("Pérola Negra (feat. Luiz Melodia)")).toBe("perola negra");
     expect(comparableTitle("Esotérico - Regravação Take 01")).toBe("esoterico");
     expect(comparableTitle("O Segundo Sol (Ao Vivo)")).toBe("o segundo sol");
+  });
+});
+
+describe("which version a link is, before any length is known (real answers)", () => {
+  const perola = normalizeDeezerSearch(fixture("deezer-search-perola-negra.json"));
+  const esoterico = normalizeDeezerSearch(fixture("deezer-search-esoterico.json"));
+  const YT_PEROLA =
+    "Natiruts - Pérola Negra (Natiruts Acústico Ao Vivo no Rio de Janeiro) ft. Luiz Melodia";
+
+  it("takes Pérola Negra from the video's own title: live, acoustic, in Rio", () => {
+    const m = pickDeezerVersion(perola, {
+      title: "Pérola Negra",
+      artist: "Natiruts feat. Luiz Melodia",
+      linkTitle: YT_PEROLA,
+      linkAuthor: "NatirutsVEVO",
+    });
+    expect(m).toMatchObject({ track: { id: 429918992, durationSec: 212 }, evidence: "only_version" });
+    expect(m!.words).toEqual(expect.arrayContaining(["rio", "janeiro"]));
+  });
+
+  it("does not take a live recording for a link that does not say it is live", () => {
+    expect(
+      pickDeezerVersion(perola, {
+        title: "Pérola Negra",
+        artist: "Natiruts",
+        linkTitle: "Natiruts - Pérola Negra",
+      }),
+    ).toBeNull();
+  });
+
+  it("does not guess among the versions of Esotérico from a bare title", () => {
+    expect(
+      pickDeezerVersion(esoterico, {
+        title: "Esotérico",
+        artist: "Gilberto Gil",
+        linkTitle: "Gilberto Gil - Esotérico",
+      }),
+    ).toBeNull();
+    // Live versions exist on three albums: "ao vivo" alone does not say which.
+    expect(
+      pickDeezerVersion(esoterico, {
+        title: "Esotérico",
+        artist: "Gilberto Gil",
+        linkTitle: "Gilberto Gil - Esotérico (Ao Vivo)",
+      }),
+    ).toBeNull();
+  });
+
+  it("uses the album named in the link, and leaves out versions the link does not name", () => {
+    // "Um banda um" also holds a first version and a re-recording: only the plain one fits.
+    expect(
+      pickDeezerVersion(esoterico, {
+        title: "Esotérico",
+        artist: "Gilberto Gil",
+        linkTitle: "Gilberto Gil - Esotérico (Um Banda Um, 1982)",
+      }),
+    ).toMatchObject({ track: { id: 876104442 }, evidence: "version_words" });
+    expect(
+      pickDeezerVersion(esoterico, {
+        title: "Esotérico",
+        artist: "Gilberto Gil",
+        linkTitle: "Gilberto Gil - Esotérico (Ao Vivo) - Trinca de Ases",
+      }),
+    ).toMatchObject({ track: { id: 4244900941 } });
+  });
+
+  it("needs the link to be about this song and this artist", () => {
+    // A video of another song (the mistake of pointing a song at the wrong link).
+    expect(
+      pickDeezerVersion(esoterico, { title: "Esotérico", artist: "Gilberto Gil", linkTitle: YT_PEROLA }),
+    ).toBeNull();
+    expect(
+      pickDeezerVersion(perola, { title: "Pérola Negra", artist: "Outra Banda", linkTitle: "Outra Banda - Pérola Negra (Acústico Ao Vivo)" }),
+    ).toBeNull();
+    expect(pickDeezerVersion(perola, { title: "Pérola Negra", artist: null, linkTitle: null })).toBeNull();
   });
 });
