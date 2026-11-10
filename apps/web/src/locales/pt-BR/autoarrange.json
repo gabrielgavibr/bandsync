@@ -446,7 +446,9 @@
     "honesty": "Estimativas do BandSync a partir do que foi ouvido. Classificações como “Refrão” só aparecem quando um trecho se repete; senão, as seções levam letras. Confira de ouvido antes de ensaiar.",
     "loop_one": "Laço harmônico de {{count}} compasso",
     "loop_other": "Laço harmônico de {{count}} compassos",
-    "loopHint": "A harmonia se repete a cada volta; as seções foram comparadas volta a volta, não compasso a compasso."
+    "loopHint": "A harmonia se repete a cada volta; as seções foram comparadas volta a volta, não compasso a compasso.",
+    "rounds_one": "× {{count}} volta",
+    "rounds_other": "× {{count}} voltas"
   },
   "editor": {
     "heading": "Arranjo da banda",

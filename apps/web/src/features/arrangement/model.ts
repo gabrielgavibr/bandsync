@@ -331,3 +331,34 @@ export function splitAtTime(
   };
   return [...list.slice(0, i), first, second, ...list.slice(i + 1)];
 }
+
+/**
+ * A section that is the same loop played several times: the loop's progression and how many
+ * times it goes round. Null when the chords are not a whole number of equal loops.
+ */
+export function loopSummary(
+  chords: string[],
+  loopBars: number | null | undefined,
+): { chords: string[]; times: number } | null {
+  if (!loopBars || chords.length < 2 * loopBars || chords.length % loopBars !== 0) return null;
+  const rounds: string[] = [];
+  for (let i = 0; i < chords.length; i += loopBars)
+    rounds.push(progression(chords.slice(i, i + loopBars)).join(" "));
+  // Unclear bars ("N") may hide a chord in one round: the most common reading is the loop.
+  const counts = new Map<string, number>();
+  for (const r of rounds) counts.set(r, (counts.get(r) ?? 0) + 1);
+  const [best, n] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]!;
+  if (!best || n < Math.ceil(rounds.length * 0.6)) return null;
+  // Every round must be that reading, or the same reading with chords missing.
+  const full = best.split(" ");
+  const fits = (r: string) => {
+    let k = 0;
+    for (const c of r.split(" ").filter(Boolean)) {
+      k = full.indexOf(c, k);
+      if (k < 0) return false;
+      k += 1;
+    }
+    return true;
+  };
+  return rounds.every(fits) ? { chords: full, times: rounds.length } : null;
+}

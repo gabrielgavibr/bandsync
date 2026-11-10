@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { fits, QA_BAND, qaSession, SHOTS, throughGate } from "./support";
+import { api, fits, QA_BAND, qaSession, SHOTS, throughGate } from "./support";
 
 /**
  * Everything that writes, in the QA band only: link research against the real services,
@@ -48,37 +48,34 @@ test("QA band: link research, map from an uploaded recording, section player, ed
   test.setTimeout(240_000);
   const { context, page } = await throughGate(browser);
   const { bandId } = await qaSession(page);
-  const api = `/api/bands/${bandId}`;
+  const base = `/api/bands/${bandId}`;
   const created: string[] = [];
   const files: string[] = [];
   try {
     // 1. A pasted link is researched without waiting for the player: the video's own title
     //    names the version, and Deezer's data for exactly that recording is kept as an estimate.
-    const prep = await page.request.post(`${api}/autoarrange/prepare`, {
-      data: {
-        newSong: { title: "Pérola Negra" },
-        recording: {
-          source: "link",
-          title: "Pérola Negra",
-          artistCredit: "Natiruts feat. Luiz Melodia",
-        },
-        referenceUrl: YT,
+    const prep = await api(page, "POST", `${base}/autoarrange/prepare`, {
+      newSong: { title: "Pérola Negra" },
+      recording: {
+        source: "link",
+        title: "Pérola Negra",
+        artistCredit: "Natiruts feat. Luiz Melodia",
       },
+      referenceUrl: YT,
     });
-    expect(prep.status(), await prep.text()).toBe(201);
-    const linkSong = (await prep.json()).song.id as string;
+    expect(prep.status, prep.text).toBe(201);
+    const linkSong = prep.json.song.id as string;
     created.push(linkSong);
-    const jobId = (await prep.json()).job.id as string;
+    const jobId = prep.json.job.id as string;
     await expect
       .poll(
-        async () =>
-          (await (await page.request.get(`${api}/autoarrange/jobs/${jobId}`)).json()).job.status,
+        async () => (await api(page, "GET", `${base}/autoarrange/jobs/${jobId}`)).json.job.status,
         {
           timeout: 60_000,
         },
       )
       .toBe("awaiting_review");
-    const o = await (await page.request.get(`${api}/autoarrange/songs/${linkSong}`)).json();
+    const o = (await api(page, "GET", `${base}/autoarrange/songs/${linkSong}`)).json;
     const deezer = o.results.filter((r: { origin: string }) => r.origin === "deezer");
     console.log(
       JSON.stringify({
@@ -101,10 +98,10 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await page.screenshot({ path: `${SHOTS}/40-qa-link.png`, fullPage: true });
 
     // 2. A recording that may be processed: mapped on the device, heard section by section.
-    const song = await page.request.post(`${api}/songs`, {
-      data: { title: "Montagem CC (teste automático)" },
+    const song = await api(page, "POST", `${base}/songs`, {
+      title: "Montagem CC (teste automático)",
     });
-    const songId = (await song.json()).song.id as string;
+    const songId = song.json.song.id as string;
     created.push(songId);
     await page.goto(`/bands/${bandId}/songs/${songId}/arrangement`);
     const panel = page.getByTestId("generate-panel");
@@ -114,7 +111,7 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await panel.getByRole("button", { name: "Enviar e gerar pré-arranjo" }).click();
     const pre = page.getByTestId("prearrangement");
     await expect(pre).toHaveAttribute("data-source", "audio_file", { timeout: 90_000 });
-    const o2 = await (await page.request.get(`${api}/autoarrange/songs/${songId}`)).json();
+    const o2 = (await api(page, "GET", `${base}/autoarrange/songs/${songId}`)).json;
     files.push(...o2.audioAssets.map((a: { fileId: string }) => a.fileId));
     expect(o2.prearrangement.version).toBe("prearrange-v2");
     const n = o2.prearrangement.data.sections.length as number;
@@ -135,13 +132,14 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await bar.getByRole("button", { name: "Pausar" }).click();
     await expect(bar).toHaveAttribute("data-playing", "false");
     // The file is served in ranges, to members only.
-    const fileUrl = `${api}/files/${files[0]}`;
-    const range = await page.request.get(fileUrl, { headers: { range: "bytes=0-1" } });
-    expect(range.status()).toBe(206);
+    const fileUrl = `${base}/files/${files[0]}`;
+    const range = await api(page, "GET", fileUrl, undefined, { range: "bytes=0-1" });
+    expect(range.status).toBe(206);
+    // Someone who is not logged in (and has not even passed the gate) gets nothing.
     const anon = await browser.newContext();
-    expect((await anon.request.get(new URL(fileUrl, page.url()).toString())).status()).not.toBe(
-      200,
-    );
+    const stranger = await anon.newPage();
+    const answer = await stranger.goto(new URL(fileUrl, page.url()).toString());
+    expect(answer?.headers()["content-type"] ?? "").not.toContain("audio");
     await anon.close();
 
     // 3. The band's version, corrected while listening, saved.
@@ -161,11 +159,12 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await page.setViewportSize({ width: 1280, height: 800 });
 
     // 4. Live rehearsal of the QA band shows the revised map.
-    const rep = await page.request.post(`${api}/repertoires`, {
-      data: { name: `QA ${Date.now()}`, kind: "rehearsal" },
+    const rep = await api(page, "POST", `${base}/repertoires`, {
+      name: `QA ${Date.now()}`,
+      kind: "rehearsal",
     });
-    const repId = (await rep.json()).repertoire.id as string;
-    await page.request.post(`${api}/repertoires/${repId}/items`, { data: { songId } });
+    const repId = rep.json.repertoire.id as string;
+    await api(page, "POST", `${base}/repertoires/${repId}/items`, { songId });
     await page.goto(`/bands/${bandId}/rehearsal`);
     await page.getByLabel("Repertório desta sessão").selectOption(repId);
     await page.getByRole("button", { name: "Iniciar sessão" }).click();
@@ -180,13 +179,13 @@ test("QA band: link research, map from an uploaded recording, section player, ed
       .catch(() => undefined);
     await page.getByRole("button", { name: "Encerrar sessão" }).click();
     await page.getByRole("button", { name: "Confirmar" }).click();
-    await page.request.delete(`${api}/repertoires/${repId}`);
+    await api(page, "DELETE", `${base}/repertoires/${repId}`);
   } finally {
     // Leave the QA band as it was found.
-    for (const id of created) await page.request.delete(`${api}/songs/${id}`);
-    for (const id of files) await page.request.delete(`${api}/files/${id}`);
+    for (const id of created) await api(page, "DELETE", `${base}/songs/${id}`);
+    for (const id of files) await api(page, "DELETE", `${base}/files/${id}`);
   }
-  const left = (await (await page.request.get(`${api}/songs`)).json()).songs as unknown[];
+  const left = (await api(page, "GET", `${base}/songs`)).json.songs as unknown[];
   console.log(JSON.stringify({ band: QA_BAND, songsLeft: left.length }));
   await context.close();
 });

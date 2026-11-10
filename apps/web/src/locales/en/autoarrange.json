@@ -446,7 +446,9 @@
     "honesty": "BandSync estimates from what it heard. Names such as “Chorus” only appear when a passage repeats; otherwise sections get letters. Check by ear before rehearsing.",
     "loop_one": "Harmonic loop of {{count}} bar",
     "loop_other": "Harmonic loop of {{count}} bars",
-    "loopHint": "The harmony repeats every time round; sections were compared loop by loop, not bar by bar."
+    "loopHint": "The harmony repeats every time round; sections were compared loop by loop, not bar by bar.",
+    "rounds_one": "× {{count}} time",
+    "rounds_other": "× {{count}} times"
   },
   "editor": {
     "heading": "Band arrangement",

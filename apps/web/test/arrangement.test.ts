@@ -4,6 +4,7 @@ import {
   type EditableSection,
   fromPrearrangement,
   fromSaved,
+  loopSummary,
   mergeWithNext,
   move,
   parseChordLine,
@@ -284,5 +285,28 @@ describe("limits of a section in the recording, corrected while listening", () =
     const joined = mergeWithNext(out, 1);
     expect(times(joined)).toEqual(times(start));
     expect(joined[1]!.chords).toEqual(start[1]!.chords);
+  });
+});
+
+describe("a section that is one loop played several times", () => {
+  const LOOP = ["Gm", "Gm", "Dm", "Dm", "Eb", "Eb", "Bb", "F"];
+  it("is summarised as the loop and how many times it goes round", () => {
+    expect(loopSummary([...LOOP, ...LOOP, ...LOOP, ...LOOP], 8)).toEqual({
+      chords: ["Gm", "Dm", "Eb", "Bb", "F"],
+      times: 4,
+    });
+  });
+  it("tolerates unclear bars in some rounds", () => {
+    const thin = ["Gm", "N", "Dm", "Dm", "Eb", "N", "Bb", "N"];
+    expect(loopSummary([...LOOP, ...thin, ...LOOP], 8)).toEqual({
+      chords: ["Gm", "Dm", "Eb", "Bb", "F"],
+      times: 3,
+    });
+  });
+  it("is not claimed for one round, a partial round or rounds that differ", () => {
+    expect(loopSummary(LOOP, 8)).toBeNull();
+    expect(loopSummary([...LOOP, ...LOOP.slice(0, 4)], 8)).toBeNull();
+    expect(loopSummary([...LOOP, "C", "C", "F", "F", "G", "G", "C", "C"], 8)).toBeNull();
+    expect(loopSummary([...LOOP, ...LOOP], null)).toBeNull();
   });
 });

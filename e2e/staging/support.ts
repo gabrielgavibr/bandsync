@@ -33,6 +33,41 @@ export async function throughGate(
   return { context, page };
 }
 
+/**
+ * An API call made by the page itself (same origin, same cookies). The Node-side request
+ * helper of Playwright is not used: it does not go through the browser's network path.
+ */
+export async function api(
+  page: Page,
+  method: string,
+  path: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+): Promise<{ status: number; json: any; text: string }> {
+  return page.evaluate(
+    async ({ method, path, body, headers }) => {
+      const r = await fetch(path, {
+        method,
+        credentials: "same-origin",
+        headers: {
+          ...(body === undefined ? {} : { "content-type": "application/json" }),
+          ...headers,
+        },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      const text = method === "GET" && headers.range ? "" : await r.text();
+      let json: unknown = null;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        /* not JSON */
+      }
+      return { status: r.status, json, text: text.slice(0, 300) };
+    },
+    { method, path, body, headers },
+  );
+}
+
 export async function login(page: Page, email: string, password: string) {
   await page.locator("input[name=email]").fill(email);
   await page.locator("input[name=password]").fill(password);
@@ -53,33 +88,28 @@ export async function qaSession(page: Page): Promise<{ bandId: string }> {
   let account: { email: string; password: string };
   if (existsSync(file)) {
     account = JSON.parse(readFileSync(file, "utf8"));
-    const res = await page.request.post("/api/auth/login", { data: account });
-    expect(res.status(), await res.text()).toBe(200);
+    const res = await api(page, "POST", "/api/auth/login", account);
+    expect(res.status, res.text).toBe(200);
   } else {
     account = {
       email: `qa-auto-${randomBytes(4).toString("hex")}@bandsync.test`,
       password: randomBytes(18).toString("base64url"),
     };
-    const res = await page.request.post("/api/auth/register", {
-      data: {
-        ...account,
-        displayName: "QA automático",
-        primaryInstrument: "keys",
-        locale: "pt-BR",
-      },
+    const res = await api(page, "POST", "/api/auth/register", {
+      ...account,
+      displayName: "QA automático",
+      primaryInstrument: "keys",
+      locale: "pt-BR",
     });
-    expect(res.status(), await res.text()).toBe(201);
+    expect(res.status, res.text).toBe(201);
     writeFileSync(file, JSON.stringify(account, null, 1), { mode: 0o600 });
   }
-  const bands = (await (await page.request.get("/api/bands")).json()).bands as {
-    id: string;
-    name: string;
-  }[];
+  const bands = (await api(page, "GET", "/api/bands")).json.bands as { id: string; name: string }[];
   let band = bands.find((b) => b.name === QA_BAND);
   if (!band) {
-    const res = await page.request.post("/api/bands", { data: { name: QA_BAND } });
-    expect(res.status(), await res.text()).toBe(201);
-    band = (await res.json()).band as { id: string; name: string };
+    const res = await api(page, "POST", "/api/bands", { name: QA_BAND });
+    expect(res.status, res.text).toBe(201);
+    band = res.json.band as { id: string; name: string };
   }
   // The QA account must never be a member of the band people use.
   expect(bands.some((b) => b.name === "Sala 3")).toBe(false);

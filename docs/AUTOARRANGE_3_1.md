@@ -137,7 +137,7 @@ nothing is filled in on the song. Deezer publishes no key; none is shown.
 - Shared (99): engine v1/v2 comparison, loop song, flat song, real recordings, Deezer version
   matching on real answers.
 - API (96): range requests and their permissions, link research by title, existing suites.
-- Web (41): time-editing model (shared limits, clamping, split at a moment, join back).
+- Web (44): time-editing model (shared limits, clamping, split at a moment, join back).
 - E2E (15): section player on a real recording (play a section, pause, loop, stop at the end,
   next), limits moved by keyboard on the band timeline, "start here", split at the playhead,
   save, pre-arrangement unchanged, audio released on leaving; mobile, pt-BR and en.

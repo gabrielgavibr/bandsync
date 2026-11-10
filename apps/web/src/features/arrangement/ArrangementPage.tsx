@@ -26,6 +26,7 @@ import { useCurrentBand } from "../bands/BandLayout";
 import { ArrangementEditor } from "./Editor";
 import { GeneratePanel } from "./Generate";
 import { InstrumentViews } from "./InstrumentViews";
+import { loopSummary } from "./model";
 import { PlayerBar } from "./PlayerBar";
 import { currentStage, hasPlayerDuration, type LocalWork, referenceFacts } from "./prep";
 import { letterColor, RecordingTimeline, sectionAt, useSectionTitle } from "./Timeline";
@@ -494,6 +495,7 @@ function PrearrangementView({
       <ol className="flex flex-col gap-1.5" data-testid="pre-sections">
         {d.sections.map((s, i) => {
           const prog = s.chords.filter((c, k) => c !== "N" && c !== s.chords[k - 1]);
+          const round = loopSummary(s.chords, d.loopBars);
           return (
             <li
               // biome-ignore lint/suspicious/noArrayIndexKey: sections have no id
@@ -522,7 +524,14 @@ function PrearrangementView({
                     ? ` · ${t(`autoarrange:pre.confidence.${s.kindConfidence}`)}`
                     : ""}
                 </span>
-                {prog.length ? (
+                {round ? (
+                  <span className="block font-mono text-xs" data-testid="loop-progression">
+                    {round.chords.join(" → ")}{" "}
+                    <span className="font-sans text-muted">
+                      {t("autoarrange:pre.rounds", { count: round.times })}
+                    </span>
+                  </span>
+                ) : prog.length ? (
                   <span className="block font-mono text-xs">{prog.join(" → ")}</span>
                 ) : fromAudio ? null : (
                   <span className="block text-xs text-muted">

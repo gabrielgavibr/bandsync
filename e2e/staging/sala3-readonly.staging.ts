@@ -1,5 +1,5 @@
 import { devices, expect, test } from "@playwright/test";
-import { credentials, fits, login, SHOTS, throughGate } from "./support";
+import { api, credentials, fits, login, SHOTS, throughGate } from "./support";
 
 /**
  * The band people use, READ ONLY. No live session is entered, no setting is toggled, no page
@@ -17,10 +17,11 @@ for (const mobile of [false, true]) {
         writes.push(`${r.method()} ${path}`);
     });
     // The well-known local demo password must not work here.
-    const bad = await page.request.post("/api/auth/login", {
-      data: { email: "ana@bandsync.demo", password: "bandsync-demo" },
+    const bad = await api(page, "POST", "/api/auth/login", {
+      email: "ana@bandsync.demo",
+      password: "bandsync-demo",
     });
-    expect(bad.status()).toBe(401);
+    expect(bad.status).toBe(401);
     await login(page, "ana@bandsync.demo", credentials().ana);
     await page
       .getByRole("link", { name: /Sala 3/ })
