@@ -196,6 +196,32 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await page.getByRole("button", { name: "Encerrar sessão" }).click();
     await page.getByRole("button", { name: "Confirmar" }).click();
     await api(page, "DELETE", `${base}/repertoires/${repId}`);
+
+    // 5. The app on a phone: home, one bottom bar, tools; the tuner's settings are per person.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await expect(page.getByTestId("bottom-nav")).toHaveAttribute("data-context", "app");
+    await expect(page.getByTestId("bottom-nav").getByRole("link")).toHaveCount(4);
+    await expect(page.getByTestId("band-row").first()).toBeVisible();
+    expect(await fits(page)).toBe(true);
+    await page.screenshot({ path: `${SHOTS}/46-qa-inicio-celular.png` });
+    await page.goto(`/bands/${bandId}`);
+    await expect(page.getByTestId("bottom-nav")).toHaveAttribute("data-context", "band");
+    await expect(page.getByTestId("live-entry")).toHaveAttribute("data-kind", "start");
+    expect(await fits(page)).toBe(true);
+    await page.screenshot({ path: `${SHOTS}/47-qa-banda-celular.png` });
+    await page.goto("/tools?tool=tuner");
+    await expect(page.getByTestId("tuner")).toHaveAttribute("data-state", "idle");
+    await page.getByRole("radio", { name: "Alta" }).click();
+    await expect
+      .poll(async () => (await api(page, "GET", "/api/me")).json.preferences.tunerSensitivity)
+      .toBe(80);
+    await page.reload();
+    await expect(page.getByRole("radio", { name: "Alta" })).toHaveAttribute("aria-checked", "true");
+    expect(await fits(page)).toBe(true);
+    await page.screenshot({ path: `${SHOTS}/48-qa-afinador-celular.png` });
+    await api(page, "PATCH", "/api/me/preferences", { tunerSensitivity: 50 });
+    await page.setViewportSize({ width: 1280, height: 800 });
   } finally {
     // Leave the QA band as it was found.
     for (const id of created) await api(page, "DELETE", `${base}/songs/${id}`);
