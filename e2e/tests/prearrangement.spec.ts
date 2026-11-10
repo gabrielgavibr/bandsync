@@ -68,8 +68,12 @@ test.beforeAll(() => {
   writeFileSync(MONTAGE, encodeWav(concat(A, B, A, C, A), SR));
 });
 
+/** The page fits the phone: the layout viewport was not widened by content, and nothing scrolls sideways. */
 const noHorizontalScroll = (page: Page) =>
-  page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+  page.evaluate(
+    (w) => window.innerWidth <= w + 1 && document.documentElement.scrollWidth <= w + 1,
+    page.viewportSize()!.width,
+  );
 
 test("YouTube link: identify, generate, analysis unavailable, map by listening, band version, live room", async ({
   browser,
@@ -309,6 +313,18 @@ test("authorised real recording: whole-recording map on the device, editing, ori
   expect(after.song.sections[0].cues[0]).toMatchObject({ type: "stop" });
   expect(await noHorizontalScroll(page)).toBe(true);
 
+  // Materials of every part (long names) must not widen the phone layout.
+  for (const [type, instrument, title] of [
+    ["chords", "guitar", "Cifra (guitarra/violão) com nome comprido"],
+    ["chords", "keys", "Cifra / mapa harmônico (teclado)"],
+    ["lyrics", "vocals", "Letra e observações (voz)"],
+    ["bass_tab", "bass", "Linha de baixo autorizada pela banda"],
+  ] as const) {
+    const r = await ana.api.post(`/api/bands/${bandId}/songs/${songId}/materials`, {
+      data: { type, title, instrument, body: "—" },
+    });
+    expect(r.status(), await r.text()).toBe(201);
+  }
   // The song page shows it per instrument; the bass view never passes chords off as the bass line.
   await page.goto(`/bands/${bandId}/songs/${songId}`);
   const views = page.getByTestId("instrument-views");

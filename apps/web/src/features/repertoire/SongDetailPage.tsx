@@ -98,7 +98,7 @@ export function SongDetailPage() {
             />
           ) : null}
         </div>
-        <Card className="flex min-h-[50vh] flex-col p-0">
+        <Card className="flex min-h-[50vh] min-w-0 flex-col p-0">
           <div className="flex flex-wrap items-center gap-2 border-b border-line p-3">
             <h2 className="mr-auto font-semibold">{t("repertoire:materials.title")}</h2>
             {canEdit ? (
