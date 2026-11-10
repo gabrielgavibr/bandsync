@@ -20,7 +20,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -219,7 +219,7 @@ if (cfg.copySongsFrom) {
     for (const x of t) map(x.id);
   copy("files", files, (r, row) => {
     const key = `bands/${bandId}/${row.id}`;
-    r2Copies.push({ from: r.r2_key, to: key, type: r.content_type });
+    r2Copies.push({ from: r.r2_key, to: key, type: r.content_type, size: r.size });
     return { r2_key: key };
   });
   copy("songs", songs);
@@ -257,7 +257,21 @@ if (DRY) process.exit(0);
 // 5. Files first (so no row points at a missing object), then all rows in one batch.
 for (const f of r2Copies) {
   const tmp = join(work, "obj");
-  wrangler(["r2", "object", "get", `${BUCKET}/${f.from}`, "--file", tmp, LOCAL ? "--local" : "--remote"]);
+  try {
+    wrangler([
+      "r2",
+      "object",
+      "get",
+      `${BUCKET}/${f.from}`,
+      "--file",
+      tmp,
+      LOCAL ? "--local" : "--remote",
+    ]);
+  } catch (err) {
+    // Through some proxies wrangler reports an error after "Download complete"; the size decides.
+    if (!existsSync(tmp) || statSync(tmp).size !== f.size) throw err;
+  }
+  if (statSync(tmp).size !== f.size) throw new Error(`incomplete download of ${f.from}`);
   wrangler([
     "r2",
     "object",
@@ -278,5 +292,8 @@ rmSync(sqlFile);
 
 const slug = cfg.band.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 const out = join(root, ".staging", `${LOCAL ? "local-" : ""}${slug}-invites.json`);
-writeFileSync(out, `${JSON.stringify({ bandId, createdAt: now, expiresAt: expires, links }, null, 2)}\n`);
+writeFileSync(
+  out,
+  `${JSON.stringify({ bandId, createdAt: now, expiresAt: expires, links }, null, 2)}\n`,
+);
 console.log(`band id ${bandId}; links written to ${out}`);

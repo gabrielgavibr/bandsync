@@ -47,7 +47,7 @@
     "declined": "Can't make it",
     "pending": "Pending",
     "mine": "Your answer",
-    "summary": "{{confirmed}} confirmed · {{declined}} can't make it · {{pending}} pending"
+    "summary": "Confirmed: {{confirmed}} · Can't make it: {{declined}} · Pending: {{pending}}"
   },
   "schedule": {
     "create": "Create weekly rehearsal",

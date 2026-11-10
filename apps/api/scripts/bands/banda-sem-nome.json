@@ -19,8 +19,18 @@
   "inviteDays": 14,
   "members": [
     { "name": "Gabriel Gavi", "instrument": "drums", "role": "admin", "owner": true },
-    { "name": "Leonardo Morango", "instrument": "percussion", "secondary": ["vocals"], "role": "member" },
-    { "name": "Gabriel \"Gabis\"", "instrument": "guitar", "secondary": ["vocals"], "role": "member" },
+    {
+      "name": "Leonardo Morango",
+      "instrument": "percussion",
+      "secondary": ["vocals"],
+      "role": "member"
+    },
+    {
+      "name": "Gabriel \"Gabis\"",
+      "instrument": "guitar",
+      "secondary": ["vocals"],
+      "role": "member"
+    },
     { "name": "Jeffs", "instrument": "keys", "secondary": ["vocals"], "role": "member" },
     { "name": "Renan Rosa", "instrument": "bass", "secondary": ["vocals"], "role": "member" },
     { "name": "André Pézão", "instrument": "vocals", "role": "member" }

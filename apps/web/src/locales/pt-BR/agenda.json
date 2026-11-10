@@ -47,7 +47,7 @@
     "declined": "Não vou",
     "pending": "Pendente",
     "mine": "Sua resposta",
-    "summary": "{{confirmed}} confirmados · {{declined}} não vão · {{pending}} pendentes"
+    "summary": "Confirmados: {{confirmed}} · Não vão: {{declined}} · Pendentes: {{pending}}"
   },
   "schedule": {
     "create": "Criar ensaio semanal",

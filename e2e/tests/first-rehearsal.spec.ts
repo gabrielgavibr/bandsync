@@ -10,26 +10,34 @@ const IPHONE = devices["iPhone 13"];
 const ANDROID = devices["Pixel 5"];
 
 const fits = (page: Page) =>
-  page.evaluate(
-    (w) => document.documentElement.scrollWidth <= w + 1,
-    page.viewportSize()!.width,
-  );
+  page.evaluate((w) => document.documentElement.scrollWidth <= w + 1, page.viewportSize()!.width);
 
 function todayInSaoPaulo() {
   const now = new Date();
   const date = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(now);
-  const wd = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short" }).format(now);
+  const wd = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo",
+    weekday: "short",
+  }).format(now);
   return { date, weekday: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(wd) };
 }
 
-test("personal invitations, weekly rehearsal, attendance and the rehearsal board", async ({ browser }) => {
+test("personal invitations, weekly rehearsal, attendance and the rehearsal board", async ({
+  browser,
+}) => {
   test.setTimeout(150_000);
   const admin = await registerUser("Gavi Admin", "drums", "pt-BR");
   const bandId = await createBand(admin, `Banda QA ${Date.now()}`);
   await createSong(admin, bandId, "Meu Velho QA", 92, []);
   const { date, weekday } = todayInSaoPaulo();
   const sched = await admin.api.post(`/api/bands/${bandId}/agenda/schedules`, {
-    data: { title: "Ensaio semanal", weekday, time: "23:59", timezone: "America/Sao_Paulo", startDate: date },
+    data: {
+      title: "Ensaio semanal",
+      weekday,
+      time: "23:59",
+      timezone: "America/Sao_Paulo",
+      startDate: date,
+    },
   });
   expect(sched.status(), await sched.text()).toBe(201);
   const invite = async (inviteeName: string, instrument: string) => {
@@ -65,9 +73,14 @@ test("personal invitations, weekly rehearsal, attendance and the rehearsal board
   await expect(leo.getByTestId("occurrence-when")).toContainText("23:59");
   await expect(leo.getByText("Hoje").first()).toBeVisible();
   await leo.getByRole("radio", { name: "Confirmado" }).tap();
-  await expect(leo.getByRole("radio", { name: "Confirmado" })).toHaveAttribute("aria-checked", "true");
-  await expect(leo.getByTestId("attendance-summary")).toContainText("1 confirmados");
-  await leo.getByRole("textbox", { name: "Novo comentário" }).fill("Chego às 19h10, começem sem mim");
+  await expect(leo.getByRole("radio", { name: "Confirmado" })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
+  await expect(leo.getByTestId("attendance-summary")).toContainText("Confirmados: 1");
+  await leo
+    .getByRole("textbox", { name: "Novo comentário" })
+    .fill("Chego às 19h10, começem sem mim");
   await leo.getByRole("button", { name: "Enviar" }).tap();
   await expect(leo.getByTestId("board-comment")).toHaveCount(1);
   expect(await fits(leo)).toBe(true);
@@ -111,13 +124,17 @@ test("personal invitations, weekly rehearsal, attendance and the rehearsal board
   // 6. Real time: the musician's open page shows the new comment without reloading.
   await expect(leo.getByTestId("board-comment")).toHaveCount(2, { timeout: 15_000 });
   // The musician joins the same live session from the rehearsal page.
-  await expect(leo.getByTestId("occurrence-live")).toContainText("Entrar no Ensaio Live", { timeout: 20_000 });
+  await expect(leo.getByTestId("occurrence-live")).toContainText("Entrar no Ensaio Live", {
+    timeout: 20_000,
+  });
   await leo.getByTestId("occurrence-live").tap();
   await expect(leo).toHaveURL(roomUrl.replace(API, ""));
   // Others cannot remove someone else's comment: the button is not even offered.
   await leo.getByTestId("board-open").tap();
   const leoDialog = leo.getByRole("dialog");
-  await expect(leoDialog.getByTestId("board-comment").nth(1).getByRole("button", { name: "Remover" })).toHaveCount(0);
+  await expect(
+    leoDialog.getByTestId("board-comment").nth(1).getByRole("button", { name: "Remover" }),
+  ).toHaveCount(0);
   await leoDialog.getByRole("button", { name: "Fechar" }).tap();
 
   // 7. After: the conductor ends the session; the board stays open.
