@@ -590,7 +590,7 @@ const preSectionSchema = z.object({
     .array(
       z.object({
         bar: z.number().int().min(0).max(1000),
-        type: z.enum(["stop", "entry", "drop", "texture"]),
+        type: z.enum(["stop", "entry", "drop", "texture", "maybe"]),
       }),
     )
     .max(64),
@@ -618,6 +618,8 @@ export const submitPrearrangementSchema = z
     firstDownbeatSec: finite(0, 3600),
     barSeconds: finite(0.2, 30),
     bars: z.number().int().min(1).max(5000),
+    /** Length in bars of the harmonic loop the recording is built on, when it has one. */
+    loopBars: z.number().int().min(2).max(64).optional().nullable(),
     sections: z.array(preSectionSchema).min(1).max(200),
   })
   .refine((v) => v.source !== "audio_file" || !!v.audioAssetId, {

@@ -239,6 +239,7 @@ export function toSubmission(
     firstDownbeatSec: pre.firstDownbeatSec,
     barSeconds: pre.barSeconds,
     bars: pre.bars,
+    loopBars: pre.loopBars ?? null,
     sections: pre.sections,
   };
 }

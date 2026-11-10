@@ -119,6 +119,9 @@ export const CHORDS = {
   Em: [64, 67, 71],
   Fsm: [66, 69, 73],
   B: [59, 63, 66],
+  Gm: [55, 58, 62],
+  Eb: [63, 67, 70],
+  Bb: [58, 62, 65],
 };
 
 export interface SynthPart {
@@ -130,6 +133,8 @@ export interface SynthPart {
   energy: number;
   /** Adds an arpeggiated lead line (a different timbre). */
   lead?: boolean;
+  /** A drum fill (sixteenth-note noise bursts) in every Nth bar of the part: an event, not a section. */
+  fillEvery?: number;
 }
 
 /** A song with known sections: returns the audio and where each section really starts. */
@@ -192,6 +197,9 @@ export function synthSong(o: {
         }
         return (pad * env * s) / notes.length;
       });
+      if (part.fillEvery && (b + 1) % part.fillEvery === 0)
+        for (let k = 0; k < o.beatsPerBar * 4; k += 1)
+          add(t0 + (k * beat) / 4, 0.06, (u) => 0.35 * rnd() * Math.exp(-u * 60));
       if (part.lead) {
         // Eighth-note arpeggio an octave up, with a brighter (square-ish) tone.
         for (let k = 0; k < o.beatsPerBar * 2; k += 1) {
