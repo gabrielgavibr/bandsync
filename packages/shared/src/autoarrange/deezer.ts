@@ -87,6 +87,7 @@ export function pickDeezerMatch(
     );
   if (close.length === 0) return null;
   // Two different versions with the same length: do not guess.
-  if (close.length > 1 && Math.abs(close[0]!.durationSec! - close[1]!.durationSec!) < 1) return null;
+  if (close.length > 1 && Math.abs(close[0]!.durationSec! - close[1]!.durationSec!) < 1)
+    return null;
   return close[0]!;
 }

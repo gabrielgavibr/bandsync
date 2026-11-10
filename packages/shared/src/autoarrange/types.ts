@@ -202,7 +202,13 @@ export const RESULT_KINDS = [
 export type ResultKind = (typeof RESULT_KINDS)[number];
 
 /** Where a value came from. */
-export const RESULT_ORIGINS = ["musicbrainz", "deezer", "youtube", "audio_analysis", "user"] as const;
+export const RESULT_ORIGINS = [
+  "musicbrainz",
+  "deezer",
+  "youtube",
+  "audio_analysis",
+  "user",
+] as const;
 export type ResultOrigin = (typeof RESULT_ORIGINS)[number];
 
 /**
