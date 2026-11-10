@@ -78,6 +78,9 @@ export function AppShell() {
       </header>
       <main id="content" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:pb-10">
         <Outlet />
+        <p className="mt-10 text-center text-[11px] text-muted/80" data-testid="credit">
+          {t("credit")}
+        </p>
       </main>
       <nav
         className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 backdrop-blur safe-bottom sm:hidden"

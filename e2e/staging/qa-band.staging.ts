@@ -173,6 +173,22 @@ test("QA band: link research, map from an uploaded recording, section player, ed
     await page.getByRole("button", { name: /Montagem CC/ }).click();
     await expect(page.getByTestId("live-arrangement")).toContainText("Abertura");
     await page.screenshot({ path: `${SHOTS}/43-qa-ensaio.png` });
+    // The same room at phone size: controls in a sheet, one row; the material can go full screen.
+    await page.setViewportSize({ width: 390, height: 844 });
+    const sheet = page.getByTestId("control-sheet");
+    await expect(sheet).toHaveAttribute("data-level", "mini");
+    const share =
+      (await page.getByTestId("room-material").boundingBox())!.height / page.viewportSize()!.height;
+    console.log(JSON.stringify({ phoneMaterialShare: Math.round(share * 100) }));
+    expect(share).toBeGreaterThan(0.72);
+    expect(await fits(page)).toBe(true);
+    await page.screenshot({ path: `${SHOTS}/44-qa-ensaio-celular.png` });
+    await page.getByTestId("focus-enter").click();
+    await expect(sheet).toHaveCount(0);
+    await page.screenshot({ path: `${SHOTS}/45-qa-ensaio-tela-cheia.png` });
+    await page.getByTestId("focus-handle").click();
+    await expect(sheet).toHaveAttribute("data-level", "mini");
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page
       .getByRole("button", { name: "Controles do regente" })
       .click({ timeout: 3000 })

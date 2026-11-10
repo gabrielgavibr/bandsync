@@ -43,7 +43,21 @@ test.describe("live rehearsal", () => {
 
     await bassist.page.goto(sessionUrl);
     await bassist.page.getByRole("button", { name: "Enable sound" }).click();
-    await expect(bassist.page.getByText("Conductor: Ana Drums")).toBeVisible();
+    // On the phone the controls are a sheet: one row until opened.
+    const sheet = bassist.page.getByTestId("control-sheet");
+    const openSheet = async () => {
+      while ((await sheet.getAttribute("data-level")) !== "full")
+        await bassist.page.getByTestId("sheet-toggle").click();
+    };
+    const closeSheet = async () => {
+      if ((await sheet.getAttribute("data-level")) !== "mini")
+        await bassist.page.getByTestId("sheet-backdrop").click({ position: { x: 20, y: 70 } });
+      await expect(sheet).toHaveAttribute("data-level", "mini");
+    };
+    await expect(sheet).toHaveAttribute("data-level", "mini");
+    await openSheet();
+    await expect(sheet).toContainText("Conductor: Ana Drums");
+    await closeSheet();
     await expect(bassist.page.getByRole("main").getByText("No song selected")).toBeVisible();
     // Both show two connected musicians.
     await expect(conductor.page.getByRole("button", { name: "Musicians" })).toHaveText(/2/);
@@ -55,7 +69,7 @@ test.describe("live rehearsal", () => {
     await expect(bassist.page.getByText("Song Alpha").first()).toBeVisible();
     // BPM and meter come from the band version.
     await expect(conductor.page.getByText("100", { exact: true }).first()).toBeVisible();
-    await expect(bassist.page.getByText("100", { exact: true }).first()).toBeVisible();
+    await expect(bassist.page.getByTestId("sheet-bpm")).toHaveText("100 BPM");
     // Each musician sees the material for their own instrument.
     await expect(conductor.page.getByText("DRUMS: kick on 1 and 3")).toBeVisible();
     await expect(bassist.page.getByText("BASS: G|---3---|")).toBeVisible();
@@ -94,7 +108,7 @@ test.describe("live rehearsal", () => {
     // Next song: new tempo propagates, metronome stops because the song changed.
     await conductor.page.getByRole("button", { name: "Next song" }).click();
     await expect(bassist.page.getByText("Song Beta").first()).toBeVisible();
-    await expect(bassist.page.getByText("140", { exact: true }).first()).toBeVisible();
+    await expect(bassist.page.getByTestId("sheet-bpm")).toHaveText("140 BPM");
     await expect(conductor.page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
     await conductor.page.screenshot({ path: "test-results/conductor-desktop.png" });
 
@@ -112,6 +126,7 @@ test.describe("live rehearsal", () => {
     await expect(bassist.page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
 
     // End the session: new visitors see the ended screen.
+    await openSheet();
     await bassist.page.getByRole("button", { name: "Conductor controls" }).click();
     await bassist.page.getByRole("button", { name: "End session" }).click();
     await bassist.page.getByRole("button", { name: "Confirm" }).click();

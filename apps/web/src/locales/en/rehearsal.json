@@ -156,5 +156,14 @@
     "countIn": "Count-in",
     "bar": "Bar {{bar}}",
     "ofBars": "{{bar}}/{{total}}"
+  },
+  "sheet": {
+    "expand": "Show more controls",
+    "collapse": "Collapse controls"
+  },
+  "focus": {
+    "enter": "Full screen",
+    "exit": "Leave full screen",
+    "showControls": "Show controls"
   }
 }

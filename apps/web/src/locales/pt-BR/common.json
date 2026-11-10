@@ -155,5 +155,6 @@
   "update": {
     "body": "Há uma nova versão do BandSync. Atualize para usar a versão mais recente.",
     "reload": "Atualizar"
-  }
+  },
+  "credit": "Desenvolvido por Gabriel Gavinelli"
 }

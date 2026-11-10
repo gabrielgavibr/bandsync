@@ -74,6 +74,7 @@ Planned:
 ## Phase 5 — Optimisation and distribution — **Planned**
 
 - Run the real-device calibration procedure; decide on output-latency compensation and manual per-device offset.
+- **Done:** phone layout of the live room — controls in a collapsible bottom sheet (three states, draggable), focus mode for the material, credit line in the app footer.
 - Screen wake-lock during a session; background-resume hardening.
 - PWA offline polish (cached song materials for the active repertoire).
 - Route-level code splitting (room and tools are currently in the main bundle).

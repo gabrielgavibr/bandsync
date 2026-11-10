@@ -155,7 +155,7 @@ test("real repertoire: idempotent import, song sheet, pending material per instr
   // Conductor sets a tempo by ear and starts the click.
   const bpm = page.getByRole("spinbutton", { name: "BPM" });
   await bpm.fill("70");
-  await expect(member.page.getByText("70", { exact: true }).first()).toBeVisible();
+  await expect(member.page.getByTestId("sheet-bpm")).toHaveText("70 BPM");
   await expect(member.page.getByTestId("tempo-source")).toContainText("Tempo set by the conductor");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(member.page.getByText("Playing").first()).toBeVisible({ timeout: 15_000 });

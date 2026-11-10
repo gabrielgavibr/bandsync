@@ -219,7 +219,8 @@ test("add a song by pasting a link; every member finds the same reference, also 
   await page.getByRole("button", { name: "Choose song" }).click();
   await page.getByRole("button", { name: /Pérola Negra/ }).click();
   await expect(member.page.getByText("Pérola Negra").first()).toBeVisible();
-  await expect(member.page.getByText("72", { exact: true }).first()).toBeVisible();
+  // The member is on a phone: tempo and meter are in the bottom sheet's row.
+  await expect(member.page.getByTestId("sheet-bpm")).toHaveText("72 BPM");
   await expect(member.page.getByTestId("tempo-source")).toHaveCount(0); // confirmed by the band
   await expect(member.page.getByText("Bass tab · Bass").first()).toBeVisible();
   await member.page.getByTestId("room-reference").click();

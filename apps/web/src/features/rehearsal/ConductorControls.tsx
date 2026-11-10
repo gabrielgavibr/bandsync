@@ -12,15 +12,31 @@ import { useTranslation } from "react-i18next";
 import { Button, Dialog, Segmented, Select } from "../../components/ui";
 import { cn } from "../../lib/cn";
 
+export type ConductorPart = "transport" | "tempo" | "admin";
+
 interface Props {
   state: SessionState;
   songs: SongDto[];
   repertoires: RepertoireDto[];
   send: (msg: ClientMessage) => boolean;
   onEnd: () => void;
+  /** Which rows to show (all by default); the phone's bottom sheet shows them in stages. */
+  parts?: ConductorPart[];
+  /** Smaller controls, for the phone's bottom sheet. */
+  compact?: boolean;
 }
 
-export function ConductorControls({ state, songs, repertoires, send, onEnd }: Props) {
+const ALL_PARTS: ConductorPart[] = ["transport", "tempo", "admin"];
+
+export function ConductorControls({
+  state,
+  songs,
+  repertoires,
+  send,
+  onEnd,
+  parts = ALL_PARTS,
+  compact = false,
+}: Props) {
   const { t } = useTranslation(["rehearsal", "common"]);
   const m = state.metronome;
   const [songPicker, setSongPicker] = useState(false);
@@ -60,9 +76,14 @@ export function ConductorControls({ state, songs, repertoires, send, onEnd }: Pr
     idx !== -1 ? idx < state.repertoireSongIds.length - 1 : state.repertoireSongIds.length > 0;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn("flex flex-col", compact ? "gap-2" : "gap-3")}>
       {/* Transport row: the most important controls, oversized for stage use. */}
-      <div className="grid grid-cols-[1fr_2fr_1fr] gap-2">
+      <div
+        className={cn(
+          "grid grid-cols-[1fr_2fr_1fr] gap-2",
+          !parts.includes("transport") && "hidden",
+        )}
+      >
         <Button
           size="lg"
           variant="secondary"
@@ -73,18 +94,18 @@ export function ConductorControls({ state, songs, repertoires, send, onEnd }: Pr
         />
         {m.running ? (
           <Button
-            size="xl"
+            size={compact ? "lg" : "xl"}
             variant="danger"
             onClick={() => send({ type: "stop" })}
-            icon={<Square className="size-7 fill-current" />}
+            icon={<Square className={cn("fill-current", compact ? "size-5" : "size-7")} />}
           >
             {t("rehearsal:controls.stop")}
           </Button>
         ) : (
           <Button
-            size="xl"
+            size={compact ? "lg" : "xl"}
             onClick={() => send({ type: "start" })}
-            icon={<Play className="size-7 fill-current" />}
+            icon={<Play className={cn("fill-current", compact ? "size-5" : "size-7")} />}
           >
             {t("rehearsal:controls.start")}
           </Button>
@@ -99,7 +120,7 @@ export function ConductorControls({ state, songs, repertoires, send, onEnd }: Pr
         />
       </div>
       {/* Tempo row */}
-      <div className="flex items-center gap-2">
+      <div className={cn("flex items-center gap-2", !parts.includes("tempo") && "hidden")}>
         <Button
           variant="secondary"
           size="lg"
@@ -112,7 +133,10 @@ export function ConductorControls({ state, songs, repertoires, send, onEnd }: Pr
             type="number"
             inputMode="numeric"
             aria-label={t("rehearsal:controls.bpm")}
-            className="w-28 bg-transparent text-center text-3xl font-semibold tabular-nums outline-none"
+            className={cn(
+              "w-28 bg-transparent text-center font-semibold tabular-nums outline-none",
+              compact ? "text-2xl" : "text-3xl",
+            )}
             value={bpmDraft}
             min={LIMITS.bpmMin}
             max={LIMITS.bpmMax}
@@ -133,10 +157,10 @@ export function ConductorControls({ state, songs, repertoires, send, onEnd }: Pr
           {t("rehearsal:controls.tap")}
         </Button>
       </div>
-      {m.running ? (
+      {m.running && parts.includes("tempo") ? (
         <p className="text-center text-xs text-muted">{t("rehearsal:controls.tempoChangeNote")}</p>
       ) : null}
-      <div className="grid grid-cols-2 gap-2">
+      <div className={cn("grid grid-cols-2 gap-2", !parts.includes("admin") && "hidden")}>
         <Button
           variant="secondary"
           size="lg"

@@ -34,6 +34,9 @@ function AuthFrame({
           <div className="mt-6">{children}</div>
         </div>
         {footer ? <div className="mt-6 text-center text-sm text-muted">{footer}</div> : null}
+        <p className="mt-8 text-center text-[11px] text-muted/80" data-testid="credit">
+          {t("credit")}
+        </p>
       </div>
     </main>
   );

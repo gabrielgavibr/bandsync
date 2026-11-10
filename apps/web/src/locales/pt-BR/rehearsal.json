@@ -156,5 +156,14 @@
     "countIn": "Contagem",
     "bar": "Compasso {{bar}}",
     "ofBars": "{{bar}}/{{total}}"
+  },
+  "sheet": {
+    "expand": "Mostrar mais controles",
+    "collapse": "Recolher controles"
+  },
+  "focus": {
+    "enter": "Tela cheia",
+    "exit": "Sair da tela cheia",
+    "showControls": "Mostrar controles"
   }
 }
