@@ -284,7 +284,9 @@ export function prearrangeMono(x: Float32Array): PreArrangement {
     for (let ph = 0; ph < m; ph += 1) {
       const on: number[] = [];
       const off: number[] = [];
-      strength.forEach((v, i) => ((i - ph) % m === 0 ? on : off).push(v));
+      strength.forEach((v, i) => {
+        ((i - ph) % m === 0 ? on : off).push(v);
+      });
       const c = mean(on) - mean(off);
       if (c > best.contrast) best = { phase: ph, contrast: c };
     }
