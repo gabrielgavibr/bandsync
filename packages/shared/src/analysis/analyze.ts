@@ -20,8 +20,8 @@
 export const ANALYSIS_ENGINE = "bandsync-browser";
 export const ANALYSIS_ENGINE_VERSION = "listen-v1";
 export const ANALYSIS_SAMPLE_RATE = 11_025;
-const FRAME = 1024;
-const HOP = 256;
+export const FRAME = 1024;
+export const HOP = 256;
 const MIN_BPM = 40;
 const MAX_BPM = 240;
 const MIN_SECONDS = 8;
@@ -139,16 +139,20 @@ function makeFft(n: number) {
   };
 }
 
-interface Features {
+export interface Features {
   frameRate: number;
   frames: number;
   onset: Float32Array;
   lowOnset: Float32Array;
   energy: Float32Array;
   chroma: Float32Array; // frames * 12
+  /** Log energy in 12 log-spaced bands (60 Hz – 5 kHz): a coarse timbre / instrumentation profile. */
+  bands: Float32Array; // frames * 12
 }
 
-function extractFeatures(x: Float32Array): Features {
+export const BAND_COUNT = 12;
+
+export function extractFeatures(x: Float32Array): Features {
   const sr = ANALYSIS_SAMPLE_RATE;
   const frames = Math.max(0, Math.floor((x.length - FRAME) / HOP) + 1);
   const fft = makeFft(FRAME);
@@ -165,10 +169,18 @@ function extractFeatures(x: Float32Array): Features {
     pc[k] = ((Math.round(midi) % 12) + 12) % 12;
   }
   const lowLimit = Math.ceil(180 / binHz);
+  // Bin -> timbre band (log-spaced edges between 60 Hz and 5 kHz).
+  const band = new Int8Array(bins).fill(-1);
+  for (let k = 1; k < bins; k += 1) {
+    const f = k * binHz;
+    if (f < 60 || f >= 5000) continue;
+    band[k] = Math.min(11, Math.floor((12 * Math.log(f / 60)) / Math.log(5000 / 60)));
+  }
   const onset = new Float32Array(frames);
   const lowOnset = new Float32Array(frames);
   const energy = new Float32Array(frames);
   const chroma = new Float32Array(frames * 12);
+  const bandsOut = new Float32Array(frames * 12);
   const frame = new Float32Array(FRAME);
   const mags = new Float32Array(bins);
   let prev = new Float32Array(bins);
@@ -191,17 +203,99 @@ function extractFeatures(x: Float32Array): Features {
       }
       const p = pc[k]!;
       if (p >= 0) chroma[f * 12 + p]! += m;
+      const b = band[k]!;
+      if (b >= 0) bandsOut[f * 12 + b]! += m * m;
     }
+    for (let b = 0; b < 12; b += 1)
+      bandsOut[f * 12 + b] = Math.log10(1e-10 + bandsOut[f * 12 + b]!);
     onset[f] = f === 0 ? 0 : flux;
     lowOnset[f] = f === 0 ? 0 : lowFlux;
     energy[f] = e;
     [prev, cur] = [cur, prev];
   }
-  return { frameRate: sr / HOP, frames, onset, lowOnset, energy, chroma };
+  // Harmony needs finer frequency resolution than onsets: a 4× longer window (2.7 Hz bins)
+  // separates the low notes, and the recording's tuning is measured so that a band tuned a
+  // little sharp or flat is not read a semitone off.
+  chromaHighRes(x, frames, chroma);
+  return { frameRate: sr / HOP, frames, onset, lowOnset, energy, chroma, bands: bandsOut };
+}
+
+const HR_FRAME = 4096;
+const HR_HOP = 1024;
+
+/**
+ * Fills `chroma` (frames × 12, on the onset frame grid) from a 4096-point analysis:
+ *  1. estimates the tuning from the spectral peaks (offset from A = 440 Hz, in semitones);
+ *  2. maps each bin between 65 Hz and 2.1 kHz to its pitch class with a weight that falls off
+ *     away from the semitone centre, so one bin does not smear over two notes.
+ */
+function chromaHighRes(x: Float32Array, frames: number, chroma: Float32Array): void {
+  const sr = ANALYSIS_SAMPLE_RATE;
+  const hrFrames = Math.max(0, Math.floor((x.length - HR_FRAME) / HR_HOP) + 1);
+  chroma.fill(0);
+  if (hrFrames === 0) return;
+  const fft = makeFft(HR_FRAME);
+  const win = new Float32Array(HR_FRAME);
+  for (let i = 0; i < HR_FRAME; i += 1) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / HR_FRAME);
+  const bins = HR_FRAME / 2 + 1;
+  const binHz = sr / HR_FRAME;
+  const lo = Math.ceil(65 / binHz);
+  const hi = Math.min(bins - 2, Math.floor(2100 / binHz));
+  const frame = new Float32Array(HR_FRAME);
+  const mags: Float32Array[] = [];
+  // Pass 1: spectra and tuning (circular mean of the peaks' deviation from equal temperament).
+  let sx = 0;
+  let sy = 0;
+  for (let f = 0; f < hrFrames; f += 1) {
+    const off = f * HR_HOP;
+    for (let i = 0; i < HR_FRAME; i += 1) frame[i] = x[off + i]! * win[i]!;
+    const m = new Float32Array(bins);
+    fft(frame, m);
+    mags.push(m);
+    let max = 0;
+    for (let k = lo; k <= hi; k += 1) max = Math.max(max, m[k]!);
+    for (let k = lo + 1; k < hi; k += 1) {
+      const y1 = m[k]!;
+      if (y1 < 0.1 * max || y1 < m[k - 1]! || y1 < m[k + 1]!) continue;
+      const y0 = m[k - 1]!;
+      const y2 = m[k + 1]!;
+      const d = y0 - 2 * y1 + y2;
+      const kk = d !== 0 ? k + (0.5 * (y0 - y2)) / d : k;
+      const semis = 12 * Math.log2((kk * binHz) / 440);
+      const dev = semis - Math.round(semis); // -0.5..0.5
+      sx += y1 * Math.cos(2 * Math.PI * dev);
+      sy += y1 * Math.sin(2 * Math.PI * dev);
+    }
+  }
+  const tuning = sx || sy ? Math.atan2(sy, sx) / (2 * Math.PI) : 0;
+  // Pass 2: bins -> pitch classes with a cos² weight around each semitone centre.
+  const pcOf = new Int8Array(bins).fill(-1);
+  const wOf = new Float32Array(bins);
+  for (let k = lo; k <= hi; k += 1) {
+    const semis = 12 * Math.log2((k * binHz) / 440) - tuning;
+    const nearest = Math.round(semis);
+    const dist = Math.abs(semis - nearest); // 0..0.5
+    pcOf[k] = (((nearest + 9) % 12) + 12) % 12;
+    wOf[k] = Math.cos(Math.PI * dist) ** 2;
+  }
+  const hr = new Float32Array(hrFrames * 12);
+  for (let f = 0; f < hrFrames; f += 1) {
+    const m = mags[f]!;
+    for (let k = lo; k <= hi; k += 1) {
+      const p = pcOf[k]!;
+      if (p >= 0) hr[f * 12 + p]! += Math.sqrt(m[k]!) * wOf[k]!;
+    }
+  }
+  // Onto the onset frame grid: each onset frame takes the long frame centred nearest to it.
+  for (let f = 0; f < frames; f += 1) {
+    const centre = f * HOP + FRAME / 2;
+    const g = Math.max(0, Math.min(hrFrames - 1, Math.round((centre - HR_FRAME / 2) / HR_HOP)));
+    for (let p = 0; p < 12; p += 1) chroma[f * 12 + p] = hr[g * 12 + p]!;
+  }
 }
 
 /** Removes the slowly varying part, keeps positive peaks, scales to unit deviation. */
-function normaliseEnvelope(env: Float32Array, frameRate: number): Float32Array {
+export function normaliseEnvelope(env: Float32Array, frameRate: number): Float32Array {
   const n = env.length;
   const half = Math.max(1, Math.round(frameRate * 0.25));
   const out = new Float32Array(n);
@@ -256,7 +350,7 @@ function at(curve: ArrayLike<number>, x: number): number {
 /* Tempo, beats, meter, key                                            */
 /* ------------------------------------------------------------------ */
 
-function estimateTempo(env: Float32Array, frameRate: number) {
+export function estimateTempo(env: Float32Array, frameRate: number) {
   const minLag = Math.floor((60 * frameRate) / MAX_BPM);
   const maxLag = Math.ceil((60 * frameRate) / MIN_BPM);
   if (env.length < maxLag * 2) return null;
@@ -297,7 +391,7 @@ function estimateTempo(env: Float32Array, frameRate: number) {
   return { bpm, period: lag, candidates, ambiguous, acf };
 }
 
-function trackBeats(env: Float32Array, period: number): number[] {
+export function trackBeats(env: Float32Array, period: number): number[] {
   const n = env.length;
   // Local score: onset strength smoothed at the scale of the beat.
   const sd = Math.max(1, period / 32);
@@ -345,7 +439,7 @@ function trackBeats(env: Float32Array, period: number): number[] {
 }
 
 /** The longest stretch of consecutive beats whose spacing stays within 15 % of the period. */
-function longestRegularRun(beats: number[], period: number): number[] {
+export function longestRegularRun(beats: number[], period: number): number[] {
   let best: number[] = [];
   let cur: number[] = beats.length ? [beats[0]!] : [];
   for (let i = 1; i < beats.length; i += 1) {
@@ -429,15 +523,20 @@ function pearson(a: number[], b: number[]): number {
   return da && db ? num / Math.sqrt(da * db) : 0;
 }
 
+const KEY_SILENCE = 1e-3;
+
 function estimateKey(f: Features): AnalysisReport["key"] {
   const profile = new Array<number>(12).fill(0);
+  let maxEnergy = 0;
+  for (const e of f.energy) maxEnergy = Math.max(maxEnergy, e);
   for (let t = 0; t < f.frames; t += 1) {
-    let frameSum = 0;
-    for (let p = 0; p < 12; p += 1) frameSum += f.chroma[t * 12 + p]!;
-    if (frameSum <= 0) continue;
-    // Each frame counts by its loudness, but relative within the frame (tonal content).
-    const w = Math.sqrt(f.energy[t]!);
-    for (let p = 0; p < 12; p += 1) profile[p]! += (f.chroma[t * 12 + p]! / frameSum) * w;
+    let frameMax = 0;
+    for (let p = 0; p < 12; p += 1) frameMax = Math.max(frameMax, f.chroma[t * 12 + p]!);
+    if (frameMax <= 0) continue;
+    // Each frame's harmony counts equally (normalised to its strongest note), so loud passages
+    // do not outweigh the rest of the song; near-silent frames are skipped.
+    if (f.energy[t]! < KEY_SILENCE * maxEnergy) continue;
+    for (let p = 0; p < 12; p += 1) profile[p]! += f.chroma[t * 12 + p]! / frameMax;
   }
   if (profile.every((v) => v === 0)) return null;
   const all: KeyCandidate[] = [];
@@ -478,6 +577,26 @@ function tempoStability(env: Float32Array, frameRate: number, period: number) {
 
 /** Analyses mono audio already at {@link ANALYSIS_SAMPLE_RATE}. */
 export function analyzeMono(x: Float32Array): AnalysisReport {
+  return analyzeCore(x).report;
+}
+
+/** Everything the tempo/beat analysis computed, for the pre-arrangement to build on. */
+export interface CoreAnalysis {
+  report: AnalysisReport;
+  features: Features;
+  /** Onset envelope (normalised) and its low-frequency part. */
+  env: Float32Array;
+  low: Float32Array;
+  /** Tracked beats, in frames. */
+  beatFrames: number[];
+}
+
+/** Time (s) at the centre of a feature frame. */
+export function frameToSeconds(frame: number): number {
+  return (frame * HOP + FRAME / 2) / ANALYSIS_SAMPLE_RATE;
+}
+
+export function analyzeCore(x: Float32Array): CoreAnalysis {
   const seconds = x.length / ANALYSIS_SAMPLE_RATE;
   if (seconds < MIN_SECONDS) throw new AnalysisError("too_short");
   let peak = 0;
@@ -549,19 +668,18 @@ export function analyzeMono(x: Float32Array): AnalysisReport {
     meter = estimateMeter(beats, accent);
     stability = tempoStability(env, f.frameRate, tempo.period);
   }
-  return {
+  const report: AnalysisReport = {
     engine: ANALYSIS_ENGINE,
     engineVersion: ANALYSIS_ENGINE_VERSION,
     analysedSeconds: Math.round(seconds * 10) / 10,
     signal,
     bpm,
     stability,
-    beats: beats.map(
-      (b) => Math.round(((b * HOP + FRAME / 2) / ANALYSIS_SAMPLE_RATE) * 1000) / 1000,
-    ),
+    beats: beats.map((b) => Math.round(frameToSeconds(b) * 1000) / 1000),
     meter,
     key: estimateKey(f),
   };
+  return { report, features: f, env, low, beatFrames: beats };
 }
 
 /** Analyses audio at any sample rate (one or more channels). */
